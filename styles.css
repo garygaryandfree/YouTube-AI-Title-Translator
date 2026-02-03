@@ -1,0 +1,43 @@
+/* 通用容器 */
+.gary-cn-box {
+    display: block;
+    margin-bottom: 4px;
+    cursor: pointer;
+    font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+    transition: opacity 0.2s;
+}
+
+.gary-cn-box:hover {
+    opacity: 0.8;
+}
+
+/* 标签样式 */
+.gary-tag {
+    display: inline-block;
+    background-color: #f2f2f2;
+    color: #606060;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 1.1rem;
+    margin-right: 8px;
+    font-weight: 500;
+    vertical-align: 2px;
+}
+
+/* 标题默认样式 */
+.gary-cn-title {
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: #0f0f0f;
+    line-height: 1.4;
+}
+
+/* 原标题变灰 */
+.gary-en-sub {
+    color: #888 !important;
+    font-size: 1.2rem !important;
+    text-decoration: none !important;
+    font-weight: 400 !important;
+    display: block !important;
+    margin-top: 2px;
+}

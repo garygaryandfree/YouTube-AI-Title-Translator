@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    /* 全局增加一点内边距，让整体不那么逼仄 */
+    body { width: 340px; padding: 20px; font-family: "Segoe UI", "Microsoft YaHei", sans-serif; background: #fff; color: #333; }
+    
+    /* 标题区：增加底部距离 */
+    header { border-bottom: 1px solid #eee; padding-bottom: 12px; margin-bottom: 20px; }
+    h3 { margin: 0; font-size: 16px; color: #333; display: flex; align-items: center; gap: 8px; }
+    
+    /* 核心布局调整：增加模块间的垂直间距 (由15px增加到20px) */
+    .provider-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 22px; }
+    .input-section { margin-bottom: 22px; }
+    
+    /* 卡片样式优化 */
+    .provider-card {
+      border: 2px solid #f0f0f0; border-radius: 10px; padding: 10px 4px; cursor: pointer;
+      text-align: center; transition: all 0.2s; background: #fafafa;
+    }
+    .provider-card:hover { background: #f5f5f5; border-color: #ddd; }
+    .provider-card.active {
+      border-color: #4CAF50; background-color: #e8f5e9; color: #2e7d32; font-weight: bold;
+      box-shadow: 0 2px 5px rgba(76, 175, 80, 0.1); /* 加一点点投影 */
+    }
+    .p-icon { font-size: 20px; display: block; margin-bottom: 6px; }
+    .p-name { font-size: 12px; }
+
+    /* 输入框优化 */
+    label { display: block; margin-bottom: 8px; font-size: 13px; font-weight: 600; color: #444; }
+    input[type="text"], input[type="password"] { 
+      width: 100%; padding: 12px; border: 1px solid #e0e0e0; border-radius: 8px; 
+      box-sizing: border-box; font-size: 13px; outline: none; transition: border 0.3s; background: #fcfcfc;
+    }
+    input:focus { border-color: #4CAF50; background: #fff; }
+    
+    .help-link { font-size: 12px; margin-top: 8px; color: #888; text-align: right; }
+    .help-link a { color: #2196F3; text-decoration: none; }
+
+    /* 高级设置 */
+    details { margin-bottom: 20px; border: 1px solid #f0f0f0; border-radius: 8px; padding: 10px; background: #fafafa; }
+    summary { font-size: 12px; color: #999; cursor: pointer; outline: none; }
+    .advanced-content { margin-top: 12px; }
+    .mini-group { margin-bottom: 12px; }
+    .mini-label { font-size: 11px; color: #aaa; margin-bottom: 4px; display: block; }
+    .mini-input { background: #eee; color: #666; font-family: monospace; border: none; }
+
+    /* 保存按钮 */
+    button#saveBtn {
+      width: 100%; padding: 14px; background-color: #4CAF50; color: white; border: none; 
+      border-radius: 10px; cursor: pointer; font-size: 15px; font-weight: 600;
+      box-shadow: 0 4px 6px rgba(76, 175, 80, 0.2); /* 按钮投影 */
+    }
+    button#saveBtn:hover { background-color: #43A047; transform: translateY(-1px); }
+    button#saveBtn:active { transform: translateY(1px); }
+    
+    /* 状态提示：减少高度占位 */
+    #status { margin-top: 8px; font-size: 12px; text-align: center; min-height: 18px; color: #666; }
+
+    /* --- 底部布局调整 (收紧下方) --- */
+    .footer {
+        margin-top: 12px; /* 减少间距 (原来可能是20px) */
+        padding-top: 15px;
+        border-top: 1px dashed #f0f0f0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    .footer-link {
+        text-decoration: none;
+        font-size: 12px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        border-radius: 6px;
+        transition: all 0.2s;
+        background: #fff;
+        border: 1px solid #eee;
+        color: #666;
+    }
+
+    /* 反馈按钮 */
+    .link-feedback:hover {
+        background-color: #f5f5f5;
+        border-color: #ddd;
+        color: #333;
+    }
+
+    /* 捐款按钮 (高亮) */
+    .link-donate {
+        color: #ff5722;
+        background: #fff8f5;
+        border-color: #ffccbc;
+    }
+    .link-donate:hover {
+        background-color: #ffccbc;
+        color: #d84315;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h3>🚀 AI 模型配置中心</h3>
+  </header>
+
+  <label>第一步：选择 AI 模型</label>
+  <div class="provider-grid">
+    <div class="provider-card active" id="card-deepseek">
+      <span class="p-icon">🦄</span>
+      <span class="p-name">DeepSeek</span>
+    </div>
+    <div class="provider-card" id="card-openai">
+      <span class="p-icon">🤖</span>
+      <span class="p-name">OpenAI</span>
+    </div>
+    <div class="provider-card" id="card-google">
+      <span class="p-icon">💎</span>
+      <span class="p-name">Gemini</span>
+    </div>
+  </div>
+
+  <div class="input-section">
+    <label for="apiKey">第二步：粘贴 API Key</label>
+    <input type="password" id="apiKey" placeholder="粘贴你的密钥..." autocomplete="off">
+    <div class="help-link" id="help-text">
+      <a href="https://platform.deepseek.com/api_keys" target="_blank">去 DeepSeek 官网申请 Key</a>
+    </div>
+  </div>
+
+  <details>
+    <summary>⚙️ 高级设置 (自动填充，无需修改)</summary>
+    <div class="advanced-content">
+      <div class="mini-group">
+        <span class="mini-label">API 接口地址</span>
+        <input type="text" id="apiUrl" class="mini-input">
+      </div>
+      <div class="mini-group">
+        <span class="mini-label">模型名称</span>
+        <input type="text" id="modelName" class="mini-input">
+      </div>
+    </div>
+  </details>
+
+  <button id="saveBtn">💾 保存配置</button>
+  <div id="status"></div>
+
+  <div class="footer">
+    <a href="mailto:你的邮箱@gmail.com?subject=【Gary插件反馈】" class="footer-link link-feedback">
+      💬 反馈建议
+    </a>
+
+    <a href="https://afdian.com/a/garygary" target="_blank" class="footer-link link-donate">
+      ☕ 请作者喝杯咖啡
+    </a>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
