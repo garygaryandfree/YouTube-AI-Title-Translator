@@ -48,20 +48,22 @@
 ## 🎬 效果演示
 
 ### 插件配置界面
-![插件配置界面](screenshots/popup-config.png)
-*简洁的配置界面，支持DeepSeek、OpenAI、Gemini三种AI模型*
+![插件配置界面](screenshots/popup-config-placeholder.png)
+*简洁的配置界面，支持DeepSeek、OpenAI、Gemini三种AI模型（AI生成示意图）*
+
+### 使用流程图
+![使用流程图](screenshots/workflow-diagram-placeholder.png)
+*五步完成配置：1) 点击图标 → 2) 选择模型 → 3) 输入密钥 → 4) 保存配置 → 5) 享受翻译*
 
 ### YouTube翻译效果
-![YouTube翻译效果](screenshots/youtube-translated.png)
+*实际截图待添加 - [查看制作指南](screenshots/README.md)*
 *智能翻译YouTube视频标题，完美融入原生界面*
 
-### 深色模式支持
-![深色模式效果](screenshots/dark-mode.png)
+### 深色模式支持  
+*实际截图待添加 - [查看制作指南](screenshots/README.md)*
 *自动适配YouTube深色模式，提供舒适的夜间浏览体验*
 
-### 完整使用演示
-![使用流程演示](screenshots/demo.gif)
-*从配置到使用的完整流程演示（点击查看大图）*
+> 💡 **提示**: 我们已添加AI生成的示意图。您可以使用[DALL-E](https://platform.openai.com/dall-e-3)、[Bing Image Creator](https://www.bing.com/images/create)或[Midjourney](https://www.midjourney.com)生成更高质量的示意图，或提供实际使用截图。详细指南请查看[screenshots/AI-GENERATION-GUIDE.md](screenshots/AI-GENERATION-GUIDE.md)。
 
 ## 🎯 核心功能详解
 
