@@ -60,7 +60,7 @@
 *智能翻译YouTube视频标题，完美融入原生界面。灰色标志表示已翻译标题，下方显示原英文标题。*
 
 ### 更多翻译示例
-![更多翻译示例](screenshots/youtube-translated-2-preview.png)
+![更多翻译示例](screenshots/youtube-translated-3-preview.png)
 *展示不同内容和场景下的翻译效果，确保各种视频标题都能准确翻译。*
 
 ### 深色模式支持  
