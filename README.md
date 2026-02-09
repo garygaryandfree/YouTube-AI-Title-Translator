@@ -48,8 +48,8 @@
 ## 🎬 效果演示
 
 ### 插件配置界面
-![插件配置界面](screenshots/popup-config-placeholder.png)
-*简洁的配置界面，支持DeepSeek、OpenAI、Gemini三种AI模型（AI生成示意图）*
+![插件配置界面](screenshots/popup-config.png)
+*简洁的配置界面，支持DeepSeek、OpenAI、Gemini三种AI模型*
 
 ### 使用流程图
 ![使用流程图](screenshots/workflow-diagram-placeholder.png)
