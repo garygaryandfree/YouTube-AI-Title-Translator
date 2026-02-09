@@ -16,7 +16,7 @@
 | 🔒 **隐私优先** | API密钥仅存储本地，绝不上传服务器 | 100%数据安全 |
 | ⚡ **智能缓存** | 翻译结果本地缓存，避免重复消耗Token | 节省90%API成本 |
 | 🎯 **精准翻译** | 理解俚语、梗、专业术语 | 地道中文表达 |
-| 🎨 **原生体验** | 完美融入YouTube界面，支持深色模式 | 无缝使用体验 |
+| 🎨 **原生体验** | 完美融入YouTube界面，自动适配主题 | 无缝使用体验 |
 | 🛡️ **安全过滤** | 内置敏感词过滤，避免API报错 | 稳定可靠 |
 
 ## 🚀 快速开始
@@ -24,7 +24,7 @@
 ### 安装方法
 
 #### 方法一：Chrome Web Store（推荐）
-🚀 **[点击前往Chrome应用商店下载](https://chrome.google.com/webstore)** *(审核中，即将上线)*
+🚀 **[点击前往Chrome应用商店下载](https://chromewebstore.google.com/detail/youtube-ai-%E6%A0%87%E9%A2%98%E7%BF%BB%E8%AF%91-%E5%85%A8%E8%83%BD%E7%89%88/bhajnflcikmidmdalnjhknillnkaojhk)**
 
 #### 方法二：开发者模式安装
 1. **下载项目代码**：点击右上角 "Code" → "Download ZIP"
@@ -51,10 +51,6 @@
 ![插件配置界面](screenshots/popup-config.png)
 *简洁的配置界面，支持DeepSeek、OpenAI、Gemini三种AI模型*
 
-### 使用流程图
-![使用流程图](screenshots/workflow-diagram-placeholder.png)
-*五步完成配置：1) 点击图标 → 2) 选择模型 → 3) 输入密钥 → 4) 保存配置 → 5) 享受翻译*
-
 ### YouTube翻译效果
 ![YouTube翻译效果](screenshots/youtube-translated-preview.png)
 *智能翻译YouTube视频标题，完美融入原生界面。灰色标志表示已翻译标题，下方显示原英文标题。*
@@ -62,14 +58,6 @@
 ### 更多翻译示例
 ![更多翻译示例](screenshots/youtube-translated-3-preview.png)
 *展示不同内容和场景下的翻译效果，确保各种视频标题都能准确翻译。*
-
-### 深色模式支持  
-*实际截图待添加 - [查看制作指南](screenshots/README.md)*
-*自动适配YouTube深色模式，提供舒适的夜间浏览体验*
-
-> 💡 **提示**: 我们已添加AI生成的示意图。您可以使用[DALL-E](https://platform.openai.com/dall-e-3)、[Bing Image Creator](https://www.bing.com/images/create)或[Midjourney](https://www.midjourney.com)生成更高质量的示意图，或提供实际使用截图。详细指南请查看[screenshots/AI-GENERATION-GUIDE.md](screenshots/AI-GENERATION-GUIDE.md)。
-
-## 🎯 核心功能详解
 
 ### 1. 智能标题翻译
 - **上下文理解**：不只是字面翻译，理解视频内容语境
@@ -168,7 +156,7 @@ git clone https://github.com/garygaryandfree/YouTube-AI-Title-Translator.git
 ### 问题反馈
 - 🐛 **Bug报告**：[创建Issue](https://github.com/garygaryandfree/YouTube-AI-Title-Translator/issues)
 - 💡 **功能建议**：[提交建议](https://github.com/garygaryandfree/YouTube-AI-Title-Translator/issues)
-- 📧 **邮件联系**：garygaryandfree@gmail.com
+- 📧 **邮件联系**：garyzhang345@gmail.com
 
 ### 支持开发者
 这是一个完全由独立开发者维护的开源项目。如果这个插件对您有帮助，欢迎请我喝杯咖啡，这将是我持续更新的最大动力！❤️
