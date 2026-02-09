@@ -56,8 +56,8 @@
 *五步完成配置：1) 点击图标 → 2) 选择模型 → 3) 输入密钥 → 4) 保存配置 → 5) 享受翻译*
 
 ### YouTube翻译效果
-*实际截图待添加 - [查看制作指南](screenshots/README.md)*
-*智能翻译YouTube视频标题，完美融入原生界面*
+![YouTube翻译效果](screenshots/youtube-translated-preview.png)
+*智能翻译YouTube视频标题，完美融入原生界面。灰色标志表示已翻译标题，下方显示原英文标题。*
 
 ### 深色模式支持  
 *实际截图待添加 - [查看制作指南](screenshots/README.md)*
