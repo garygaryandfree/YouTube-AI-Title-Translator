@@ -45,6 +45,24 @@
    - Gemini：[获取API密钥](https://makersuite.google.com/app/apikey)
 4. **保存配置** → **刷新YouTube页面** → **享受智能翻译！**
 
+## 🎬 效果演示
+
+### 插件配置界面
+![插件配置界面](screenshots/popup-config.png)
+*简洁的配置界面，支持DeepSeek、OpenAI、Gemini三种AI模型*
+
+### YouTube翻译效果
+![YouTube翻译效果](screenshots/youtube-translated.png)
+*智能翻译YouTube视频标题，完美融入原生界面*
+
+### 深色模式支持
+![深色模式效果](screenshots/dark-mode.png)
+*自动适配YouTube深色模式，提供舒适的夜间浏览体验*
+
+### 完整使用演示
+![使用流程演示](screenshots/demo.gif)
+*从配置到使用的完整流程演示（点击查看大图）*
+
 ## 🎯 核心功能详解
 
 ### 1. 智能标题翻译
