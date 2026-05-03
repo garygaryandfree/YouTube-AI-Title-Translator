@@ -1,92 +1,142 @@
-// 预设参数库
+// 预设参数库：每个 provider 配一个 url 模板 + 模型列表
+// Gemini 的 url 含 {MODEL} 占位符，保存时按所选模型替换
 const PRESETS = {
     deepseek: {
         url: "https://api.deepseek.com/chat/completions",
-        model: "deepseek-chat",
         helpUrl: "https://platform.deepseek.com/api_keys",
-        helpText: "去 DeepSeek 官网申请"
+        helpText: "去 DeepSeek 官网申请",
+        models: [
+            { id: "deepseek-chat",     label: "V3 通用（推荐，便宜快）" },
+            { id: "deepseek-reasoner", label: "R1 推理（贵且慢，标题翻译用不上）" }
+        ]
     },
     openai: {
         url: "https://api.openai.com/v1/chat/completions",
-        model: "gpt-4o-mini",
         helpUrl: "https://platform.openai.com/api-keys",
-        helpText: "去 OpenAI 官网申请"
+        helpText: "去 OpenAI 官网申请",
+        models: [
+            { id: "gpt-4o-mini",  label: "4o-mini（性价比首选）" },
+            { id: "gpt-4o",       label: "4o（更准但贵 10x）" },
+            { id: "gpt-4.1-mini", label: "4.1-mini" }
+        ]
     },
     google: {
-        url: "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent",
-        model: "gemini-1.5-flash",
+        url: "https://generativelanguage.googleapis.com/v1beta/models/{MODEL}:generateContent",
         helpUrl: "https://aistudio.google.com/app/apikey",
-        helpText: "去 Google AI Studio 申请"
+        helpText: "去 Google AI Studio 申请",
+        models: [
+            { id: "gemini-2.5-flash", label: "2.5 Flash（推荐）" },
+            { id: "gemini-2.5-pro",   label: "2.5 Pro（贵）" },
+            { id: "gemini-1.5-flash", label: "1.5 Flash（旧）" }
+        ]
+    },
+    minimax: {
+        url: "https://api.minimaxi.com/v1/text/chatcompletion_v2",
+        helpUrl: "https://platform.minimaxi.com/user-center/basic-information/interface-key",
+        helpText: "去 MiniMax 开放平台申请",
+        models: [
+            { id: "MiniMax-M2",    label: "M2（最新）" },
+            { id: "abab6.5s-chat", label: "abab6.5s（高速）" },
+            { id: "abab6.5-chat",  label: "abab6.5" }
+        ]
     }
 };
 
 let currentProvider = 'deepseek';
 
+function buildUrl(provider, modelId) {
+    const tpl = PRESETS[provider].url;
+    return tpl.includes('{MODEL}') ? tpl.replace('{MODEL}', modelId) : tpl;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
-    const apiUrlInput = document.getElementById('apiUrl');
-    const apiKeyInput = document.getElementById('apiKey');
-    const modelNameInput = document.getElementById('modelName');
-    const saveBtn = document.getElementById('saveBtn');
-    const status = document.getElementById('status');
+    const apiUrlInput       = document.getElementById('apiUrl');
+    const apiKeyInput       = document.getElementById('apiKey');
+    const modelNameInput    = document.getElementById('modelName');
+    const modelSelect       = document.getElementById('modelSelect');
+    const saveBtn           = document.getElementById('saveBtn');
+    const status            = document.getElementById('status');
     const helpLinkContainer = document.getElementById('help-text');
-    
+
     const cards = {
         deepseek: document.getElementById('card-deepseek'),
-        openai: document.getElementById('card-openai'),
-        google: document.getElementById('card-google')
+        openai:   document.getElementById('card-openai'),
+        google:   document.getElementById('card-google'),
+        minimax:  document.getElementById('card-minimax')
     };
 
-    // --- 核心修复：在这里手动添加点击监听，替代 HTML 里的 onclick ---
-    cards.deepseek.addEventListener('click', () => selectProvider('deepseek'));
-    cards.openai.addEventListener('click', () => selectProvider('openai'));
-    cards.google.addEventListener('click', () => selectProvider('google'));
-    // -----------------------------------------------------------
-
-    // 初始化：读取配置
-    chrome.storage.local.get(['customApiUrl', 'customApiKey', 'customModel', 'selectedProvider'], (result) => {
-        if (result.customApiUrl) apiUrlInput.value = result.customApiUrl;
-        if (result.customApiKey) apiKeyInput.value = result.customApiKey;
-        if (result.customModel) modelNameInput.value = result.customModel;
-        
-        if (result.selectedProvider) {
-            updateUIState(result.selectedProvider);
-        } else {
-            updateUIState('deepseek');
-            apiUrlInput.value = PRESETS.deepseek.url;
-            modelNameInput.value = PRESETS.deepseek.model;
-        }
+    Object.keys(cards).forEach(p => {
+        cards[p].addEventListener('click', () => selectProvider(p));
     });
 
-    // 切换服务商逻辑
+    // 切换模型版本：同步写入高级设置里的 url / model 输入框
+    modelSelect.addEventListener('change', () => {
+        const modelId = modelSelect.value;
+        modelNameInput.value = modelId;
+        apiUrlInput.value    = buildUrl(currentProvider, modelId);
+    });
+
+    // 初始化：读取已保存配置
+    chrome.storage.local.get(
+        ['customApiUrl', 'customApiKey', 'customModel', 'selectedProvider'],
+        (result) => {
+            const provider = result.selectedProvider || 'deepseek';
+            updateUIState(provider, result.customModel);
+
+            apiKeyInput.value = result.customApiKey || '';
+            // 高级设置里的 url / model 优先用已保存值；否则按预设填默认
+            apiUrlInput.value    = result.customApiUrl || buildUrl(provider, modelSelect.value);
+            modelNameInput.value = result.customModel  || modelSelect.value;
+        }
+    );
+
+    // 切换 provider：刷新卡片高亮、帮助链接、模型下拉，并重置高级输入
     function selectProvider(provider) {
-        updateUIState(provider);
-        apiUrlInput.value = PRESETS[provider].url;
-        modelNameInput.value = PRESETS[provider].model;
-        status.textContent = `已切换为 ${provider} 配置`;
+        updateUIState(provider, null);
+        const firstId = PRESETS[provider].models[0].id;
+        modelNameInput.value = firstId;
+        apiUrlInput.value    = buildUrl(provider, firstId);
+        status.textContent   = `已切换为 ${provider} 配置`;
         setTimeout(() => status.textContent = '', 1500);
-    };
-
-    function updateUIState(provider) {
-        currentProvider = provider;
-        
-        // 更新卡片高亮
-        Object.keys(cards).forEach(key => {
-            if (key === provider) {
-                cards[key].classList.add('active');
-            } else {
-                cards[key].classList.remove('active');
-            }
-        });
-
-        // 更新链接
-        const info = PRESETS[provider];
-        helpLinkContainer.innerHTML = `没有 Key? <a href="${info.helpUrl}" target="_blank">${info.helpText}</a>`;
     }
 
-    // 保存逻辑
+    function updateUIState(provider, preferredModelId) {
+        currentProvider = provider;
+
+        Object.keys(cards).forEach(key => {
+            cards[key].classList.toggle('active', key === provider);
+        });
+
+        const info = PRESETS[provider];
+        helpLinkContainer.innerHTML =
+            `没有 Key? <a href="${info.helpUrl}" target="_blank" rel="noopener noreferrer">${info.helpText}</a>`;
+
+        // 重建模型下拉
+        modelSelect.innerHTML = '';
+        let matched = false;
+        info.models.forEach(m => {
+            const opt = document.createElement('option');
+            opt.value       = m.id;
+            opt.textContent = m.label;
+            if (preferredModelId && m.id === preferredModelId) {
+                opt.selected = true;
+                matched = true;
+            }
+            modelSelect.appendChild(opt);
+        });
+        // 如果用户在高级设置里手填了一个非预设模型，保留为"自定义"选项
+        if (preferredModelId && !matched) {
+            const opt = document.createElement('option');
+            opt.value       = preferredModelId;
+            opt.textContent = `${preferredModelId}（自定义）`;
+            opt.selected    = true;
+            modelSelect.appendChild(opt);
+        }
+    }
+
     saveBtn.addEventListener('click', () => {
-        const url = apiUrlInput.value.trim();
-        const key = apiKeyInput.value.trim();
+        const url   = apiUrlInput.value.trim();
+        const key   = apiKeyInput.value.trim();
         const model = modelNameInput.value.trim();
 
         if (!key) {
@@ -97,9 +147,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         chrome.storage.local.set({
-            customApiUrl: url,
-            customApiKey: key,
-            customModel: model,
+            customApiUrl:     url,
+            customApiKey:     key,
+            customModel:      model,
             selectedProvider: currentProvider
         }, () => {
             status.textContent = "✅ 保存成功！请刷新 YouTube";

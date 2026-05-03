@@ -1,45 +1,49 @@
 // ================= 配置区 =================
 let USER_CONFIG = { apiUrl: "", apiKey: "", model: "" };
 
-// 🚫 敏感词黑名单 (关键修改：换成了英文！)
-// 逻辑：只要英文标题里包含这些词，就不发给 API，直接忽略。
+// 🚫 敏感词黑名单
+// 逻辑：标题命中后直接跳过，不发给 API，避免被风控拒绝。
+// 注意：使用 \b 单词边界匹配，不再做 substring，避免误杀
+//       （比如旧版本的 "Xi" 会误杀 "Mexico/Taxi"，"Party" 会误杀 "Birthday Party"）。
 const SENSITIVE_WORDS = [
-    // === 1. 核心政治/政党 (建议保留) ===
-    "CCP",              // 中国共产党 (英文缩写)
-    "CPC",              // 中国共产党 (官方英文缩写)
-    "Communist",        // 共产主义/共产党
-    "Party",            // 政党 (通常指代党派)
-    "Regime",           // 政权 (西方媒体常含贬义)
-    "Politburo",        // 政治局
+    // === 1. 政治/政党 ===
+    "CCP",
+    "CPC",
+    "Communist Party",     // 旧版用裸 "Communist"/"Party" 误杀严重，改成完整短语
+    "Politburo",
+    "Regime",
 
-    // === 2. 敏感人物 (建议保留) ===
-    "Xi Jinping",       // 习近平
-    "Xi",               // 习 (姓氏单独出现也可能触发)
-    "Mao",              // 毛泽东
-    "Mao Zedong",       // 毛泽东 (全名)
-    "Dalai Lama",       // 达赖喇嘛
-    "Jiang Zemin",      // 江泽民
-    "Hu Jintao",        // 胡锦涛
+    // === 2. 敏感人物 ===
+    "Xi Jinping",          // 删除了裸 "Xi"（会误杀 Mexico/Taxi/Sixteen 等）
+    "Mao Zedong",          // 删除了裸 "Mao"（会误杀 Maori/各种人名）
+    "Dalai Lama",
+    "Jiang Zemin",
+    "Hu Jintao",
 
-    // === 3. 敏感地区/地缘政治 (DeepSeek 风控高发区) ===
-    "Taiwan",           // 台湾 (极易触发风控)
-    "Hong Kong",        // 香港 (涉及政治/抗议时易触发)
-    "Xinjiang",         // 新疆 (涉及人权时易触发)
-    "Tibet",            // 西藏
-    "Uyghur",           // 维吾尔
-    "South China Sea",  // 南海
+    // === 3. 敏感地区 ===
+    "Taiwan",
+    "Hong Kong",
+    "Xinjiang",
+    "Tibet",
+    "Uyghur",
+    "South China Sea",
 
-    // === 4. 敏感事件/概念 (建议保留) ===
-    "Tiananmen",        // 天安门 (涉及六四)
-    "June 4",           // 六四
-    "Falun",            // 法轮功
-    "Revolution",       // 革命 (如文革 Cultural Revolution)
-    "Protest",          // 抗议/游行
-    "Human Rights",     // 人权
-    "Democracy",        // 民主
-    "Censorship",       // 审查
-    "Dictator",         // 独裁者
+    // === 4. 敏感事件/概念 ===
+    "Tiananmen",
+    "June 4",
+    "Falun",
+    "Cultural Revolution", // 旧版裸 "Revolution" 会误杀 Industrial/Tech/French Revolution
+    "Protest",
+    "Human Rights",
+    "Democracy",
+    "Censorship",
+    "Dictator"
 ];
+
+// 预编译为词边界正则，case-insensitive
+const SENSITIVE_PATTERNS = SENSITIVE_WORDS.map(w =>
+    new RegExp(`\\b${w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i')
+);
 // =========================================
 
 console.log("🚀 Gary插件 V6.0 (三合一全能版) 已启动！");
@@ -170,8 +174,8 @@ async function process() {
         const text = el.innerText.trim();
         if (!text || text.length < 3) continue;
 
-        // 敏感词拦截
-        if (SENSITIVE_WORDS.some(w => text.toLowerCase().includes(w.toLowerCase()))) {
+        // 敏感词拦截（词边界匹配，避免 substring 误杀）
+        if (SENSITIVE_PATTERNS.some(re => re.test(text))) {
             el.setAttribute('data-gary-done', 'blocked');
             continue;
         }
