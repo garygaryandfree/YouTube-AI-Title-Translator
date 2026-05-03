@@ -178,7 +178,10 @@ async function fetchAiTranslation(text) {
                         content: promptText
                     }],
                     temperature: 0.3,
-                    max_tokens: 100   // 限制长度，避免 M2.7 之类输出两遍 JSON
+                    // 留 2000 token 是为了照顾 MiniMax M2.7 等推理模型——
+                    // 它们会先输出 <think>...</think> 思考块再给 JSON，token 不够会卡死在思考中
+                    max_tokens: 2000,
+                    max_completion_tokens: 2000   // MiniMax 文档用的字段名
                 })
             });
         }
@@ -206,8 +209,12 @@ async function fetchAiTranslation(text) {
             return null;
         }
 
-        // 剥 ```json 围栏，再走括号计数提取首个完整对象
-        const cleaned = raw.replace(/```json|```/g, "");
+        // 推理模型（如 MiniMax M2.7、DeepSeek reasoner）会先输出 <think>...</think>
+        // 思考块再给最终答案，要先剥掉，包括被截断的未闭合 think
+        const cleaned = raw
+            .replace(/<think>[\s\S]*?<\/think>/g, "")  // 完整闭合
+            .replace(/<think>[\s\S]*$/, "")            // 被截断没闭合
+            .replace(/```json|```/g, "");
         const jsonStr = extractFirstJsonObject(cleaned);
         if (!jsonStr) {
             console.error("[Gary] 响应里找不到 JSON 对象。原文:", text, "模型返回:", raw);

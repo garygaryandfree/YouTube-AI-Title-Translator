@@ -37,9 +37,10 @@ const PRESETS = {
         url: "https://api.minimaxi.com/v1/chat/completions",
         helpUrl: "https://platform.minimaxi.com/user-center/basic-information/interface-key",
         helpText: "去 MiniMax 开放平台申请",
+        // M2.7 是推理模型（带 <think> 链，慢），highspeed 才适合标题翻译这种短任务
         models: [
-            { id: "MiniMax-M2.7",           label: "M2.7（推荐，最新）" },
-            { id: "MiniMax-M2.7-highspeed", label: "M2.7 高速（更快、更便宜）" },
+            { id: "MiniMax-M2.7-highspeed", label: "M2.7 高速（推荐，标题翻译用这个）" },
+            { id: "MiniMax-M2.7",           label: "M2.7（推理模型，慢但更准）" },
             { id: "MiniMax-M2.5",           label: "M2.5" },
             { id: "MiniMax-M2.1",           label: "M2.1（旧版）" }
         ]
