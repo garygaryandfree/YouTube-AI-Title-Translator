@@ -108,16 +108,42 @@ function createSafeBadge(tagText, cnText, isMainTitle = false) {
     return container;
 }
 
+// 提取响应文本里的第一个完整闭合 JSON 对象。
+// 用括号计数（且字符串内的 } 不计数），处理三类病态返回：
+//   1) "{...}{...}"  —— MiniMax M2.7 偶发把 JSON 输出两遍
+//   2) "前言... {...} 结尾..."  —— 模型加散文/解释
+//   3) `{ "cn": "}" }`  —— 字符串里含 }，不能被误判为对象结束
+function extractFirstJsonObject(s) {
+    const start = s.indexOf('{');
+    if (start < 0) return null;
+    let depth = 0, inStr = false, escape = false;
+    for (let i = start; i < s.length; i++) {
+        const c = s[i];
+        if (escape) { escape = false; continue; }
+        if (c === '\\') { escape = true; continue; }
+        if (c === '"') { inStr = !inStr; continue; }
+        if (inStr) continue;
+        if (c === '{') depth++;
+        else if (c === '}') {
+            depth--;
+            if (depth === 0) return s.slice(start, i + 1);
+        }
+    }
+    return null;
+}
+
 // --- 🤖 AI 调用核心 ---
 // 注意：去掉了 response_format: {type:"json_object"}，因为 MiniMax 等 OpenAI 兼容
 //       端点不一定支持，发了反而会被 4xx 拒绝。改用 prompt 强约束 + 容错解析。
 async function fetchAiTranslation(text) {
     if (!USER_CONFIG.apiKey) return null;
 
-    const promptText = `You are a translator. Translate this YouTube title to simplified Chinese (Mandarin). Keep it catchy. Return ONLY a JSON object, no markdown, no prose: {"tag": "中文分类(2-4字)", "cn": "中文标题"}. Original: "${text}"`;
+    const promptText = `You are a translator. Translate this YouTube title to simplified Chinese (Mandarin). Keep it catchy. Reply with EXACTLY ONE JSON object, no markdown, no prose, no repetition: {"tag":"中文分类(2-4字)","cn":"中文标题"}. Original: "${text}"`;
+
+    let raw = "";
+    let response;
 
     try {
-        let response;
         const isGoogle = USER_CONFIG.apiUrl.includes("googleapis.com");
 
         if (isGoogle) {
@@ -129,6 +155,7 @@ async function fetchAiTranslation(text) {
                     contents: [{ parts: [{ text: promptText }] }],
                     generationConfig: {
                         temperature: 0.3,
+                        maxOutputTokens: 100,
                         responseMimeType: "application/json"
                     }
                 })
@@ -145,12 +172,13 @@ async function fetchAiTranslation(text) {
                     model: USER_CONFIG.model,
                     messages: [{
                         role: "system",
-                        content: "You are a translator. Always reply with a single JSON object only."
+                        content: "You are a translator. Reply with exactly one JSON object and nothing else. Never repeat your output."
                     }, {
                         role: "user",
                         content: promptText
                     }],
-                    temperature: 0.3
+                    temperature: 0.3,
+                    max_tokens: 100   // 限制长度，避免 M2.7 之类输出两遍 JSON
                 })
             });
         }
@@ -162,8 +190,7 @@ async function fetchAiTranslation(text) {
             return null;
         }
 
-        // 解析返回结果
-        let raw = "";
+        // 提取响应文本
         if (isGoogle) {
             if (data.candidates && data.candidates[0] && data.candidates[0].content) {
                 raw = data.candidates[0].content.parts[0].text;
@@ -179,14 +206,17 @@ async function fetchAiTranslation(text) {
             return null;
         }
 
-        // 容错解析：剥 ```json 围栏，提取首个 {...} 对象（防止模型加散文）
-        raw = raw.replace(/```json|```/g, "").trim();
-        const m = raw.match(/\{[\s\S]*\}/);
-        if (m) raw = m[0];
-        return JSON.parse(raw);
+        // 剥 ```json 围栏，再走括号计数提取首个完整对象
+        const cleaned = raw.replace(/```json|```/g, "");
+        const jsonStr = extractFirstJsonObject(cleaned);
+        if (!jsonStr) {
+            console.error("[Gary] 响应里找不到 JSON 对象。原文:", text, "模型返回:", raw);
+            return null;
+        }
+        return JSON.parse(jsonStr);
 
     } catch (e) {
-        console.error("[Gary] 翻译失败:", e, "原文:", text);
+        console.error("[Gary] 翻译失败:", e, "原文:", text, "模型返回:", raw || "(无)");
     }
     return null;
 }
