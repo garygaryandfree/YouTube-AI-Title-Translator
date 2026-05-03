@@ -6,8 +6,10 @@ const PRESETS = {
         helpUrl: "https://platform.deepseek.com/api_keys",
         helpText: "去 DeepSeek 官网申请",
         models: [
-            { id: "deepseek-chat",     label: "V3 通用（推荐，便宜快）" },
-            { id: "deepseek-reasoner", label: "R1 推理（贵且慢，标题翻译用不上）" }
+            { id: "deepseek-v4-flash", label: "V4 Flash（推荐，便宜快）" },
+            { id: "deepseek-v4-pro",   label: "V4 Pro（更强，贵）" },
+            { id: "deepseek-chat",     label: "V3 chat（旧版，兼容）" },
+            { id: "deepseek-reasoner", label: "R1 reasoner（旧版，兼容）" }
         ]
     },
     openai: {
@@ -31,13 +33,15 @@ const PRESETS = {
         ]
     },
     minimax: {
-        url: "https://api.minimaxi.com/v1/text/chatcompletion_v2",
+        // OpenAI 兼容端点
+        url: "https://api.minimaxi.com/v1/chat/completions",
         helpUrl: "https://platform.minimaxi.com/user-center/basic-information/interface-key",
         helpText: "去 MiniMax 开放平台申请",
         models: [
-            { id: "MiniMax-M2",    label: "M2（最新）" },
-            { id: "abab6.5s-chat", label: "abab6.5s（高速）" },
-            { id: "abab6.5-chat",  label: "abab6.5" }
+            { id: "MiniMax-M2.7",           label: "M2.7（推荐，最新）" },
+            { id: "MiniMax-M2.7-highspeed", label: "M2.7 高速（更快、更便宜）" },
+            { id: "MiniMax-M2.5",           label: "M2.5" },
+            { id: "MiniMax-M2.1",           label: "M2.1（旧版）" }
         ]
     }
 };
