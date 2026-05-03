@@ -69,6 +69,9 @@ document.addEventListener('DOMContentLoaded', () => {
         minimax:  document.getElementById('card-minimax')
     };
 
+    // 内存里的「按 provider 分别存」配置；从 storage 加载，Save 时写回
+    let providerConfigs = {};
+
     Object.keys(cards).forEach(p => {
         cards[p].addEventListener('click', () => selectProvider(p));
     });
@@ -80,28 +83,45 @@ document.addEventListener('DOMContentLoaded', () => {
         apiUrlInput.value    = buildUrl(currentProvider, modelId);
     });
 
-    // 初始化：读取已保存配置
+    // 初始化：读取已保存配置（含旧版本扁平结构的迁移）
     chrome.storage.local.get(
-        ['customApiUrl', 'customApiKey', 'customModel', 'selectedProvider'],
+        ['providerConfigs', 'selectedProvider', 'customApiUrl', 'customApiKey', 'customModel'],
         (result) => {
-            const provider = result.selectedProvider || 'deepseek';
-            updateUIState(provider, result.customModel);
+            providerConfigs = result.providerConfigs || {};
 
-            apiKeyInput.value = result.customApiKey || '';
-            // 高级设置里的 url / model 优先用已保存值；否则按预设填默认
-            apiUrlInput.value    = result.customApiUrl || buildUrl(provider, modelSelect.value);
-            modelNameInput.value = result.customModel  || modelSelect.value;
+            // 旧版本（v6.0/6.1）只有一份 customApiKey/Url/Model，迁移到对应 provider 名下
+            if (!result.providerConfigs && result.customApiKey && result.selectedProvider) {
+                providerConfigs[result.selectedProvider] = {
+                    apiKey: result.customApiKey,
+                    apiUrl: result.customApiUrl,
+                    model:  result.customModel
+                };
+            }
+
+            const provider = result.selectedProvider || 'deepseek';
+            hydrateForm(provider);
         }
     );
 
-    // 切换 provider：刷新卡片高亮、帮助链接、模型下拉，并重置高级输入
+    // 把指定 provider 的存储配置渲染到表单
+    function hydrateForm(provider) {
+        const cfg     = providerConfigs[provider] || {};
+        const modelId = cfg.model || PRESETS[provider].models[0].id;
+
+        updateUIState(provider, modelId);
+        apiKeyInput.value    = cfg.apiKey || '';
+        modelNameInput.value = modelId;
+        apiUrlInput.value    = cfg.apiUrl || buildUrl(provider, modelId);
+    }
+
+    // 切换 provider：用那个 provider 自己存过的 key/url/model 重新填表
     function selectProvider(provider) {
-        updateUIState(provider, null);
-        const firstId = PRESETS[provider].models[0].id;
-        modelNameInput.value = firstId;
-        apiUrlInput.value    = buildUrl(provider, firstId);
-        status.textContent   = `已切换为 ${provider} 配置`;
-        setTimeout(() => status.textContent = '', 1500);
+        hydrateForm(provider);
+        const hasKey = !!(providerConfigs[provider] && providerConfigs[provider].apiKey);
+        status.textContent = hasKey
+            ? `已切换为 ${provider}（含已保存 Key）`
+            : `已切换为 ${provider}（未配置 Key）`;
+        setTimeout(() => status.textContent = '', 1800);
     }
 
     function updateUIState(provider, preferredModelId) {
@@ -150,11 +170,16 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        // 只更新当前 provider 那一项，其它 provider 的配置原样保留
+        providerConfigs[currentProvider] = { apiKey: key, apiUrl: url, model: model };
+
         chrome.storage.local.set({
+            providerConfigs,
+            selectedProvider: currentProvider,
+            // 同步写一份扁平字段，方便老版 content.js 兼容（升级后可移除）
             customApiUrl:     url,
             customApiKey:     key,
-            customModel:      model,
-            selectedProvider: currentProvider
+            customModel:      model
         }, () => {
             status.textContent = "✅ 保存成功！请刷新 YouTube";
             status.style.color = "#2e7d32";

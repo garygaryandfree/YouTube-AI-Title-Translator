@@ -46,25 +46,42 @@ const SENSITIVE_PATTERNS = SENSITIVE_WORDS.map(w =>
 );
 // =========================================
 
-console.log("🚀 Gary插件 V6.0 (三合一全能版) 已启动！");
+console.log("🚀 Gary插件 V6.2 已启动");
 
 // --- 初始化配置 ---
+// v6.2 起每个 provider 单独存配置：providerConfigs[provider] = {apiKey, apiUrl, model}
+// 同时兼容 v6.0/6.1 的旧扁平结构 (customApiKey/Url/Model)
+function applyConfigFromStorage(result) {
+    const provider = result.selectedProvider;
+    const cfg = result.providerConfigs && provider ? result.providerConfigs[provider] : null;
+
+    if (cfg && cfg.apiKey) {
+        USER_CONFIG.apiUrl = cfg.apiUrl;
+        USER_CONFIG.apiKey = cfg.apiKey;
+        USER_CONFIG.model  = cfg.model;
+        console.log("✅ 已加载配置 [", provider, "]:", USER_CONFIG.model);
+    } else if (result.customApiKey) {
+        // 旧版本回退
+        USER_CONFIG.apiUrl = result.customApiUrl;
+        USER_CONFIG.apiKey = result.customApiKey;
+        USER_CONFIG.model  = result.customModel;
+        console.log("✅ 已加载用户配置（旧格式）:", USER_CONFIG.model);
+    }
+}
+
 function initConfig() {
-    chrome.storage.local.get(['customApiUrl', 'customApiKey', 'customModel'], (result) => {
-        if (result.customApiKey) {
-            USER_CONFIG.apiUrl = result.customApiUrl;
-            USER_CONFIG.apiKey = result.customApiKey;
-            USER_CONFIG.model = result.customModel;
-            console.log("✅ 已加载用户配置:", USER_CONFIG.model);
-        }
-    });
+    chrome.storage.local.get(
+        ['providerConfigs', 'selectedProvider', 'customApiUrl', 'customApiKey', 'customModel'],
+        applyConfigFromStorage
+    );
 
     chrome.storage.onChanged.addListener((changes, namespace) => {
-        if (namespace === 'local') {
-            if (changes.customApiUrl) USER_CONFIG.apiUrl = changes.customApiUrl.newValue;
-            if (changes.customApiKey) USER_CONFIG.apiKey = changes.customApiKey.newValue;
-            if (changes.customModel) USER_CONFIG.model = changes.customModel.newValue;
-        }
+        if (namespace !== 'local') return;
+        // 任意 key 变化时，整体重读，简单稳妥
+        chrome.storage.local.get(
+            ['providerConfigs', 'selectedProvider', 'customApiUrl', 'customApiKey', 'customModel'],
+            applyConfigFromStorage
+        );
     });
 }
 initConfig();
@@ -91,31 +108,33 @@ function createSafeBadge(tagText, cnText, isMainTitle = false) {
     return container;
 }
 
-// --- 🤖 AI 调用核心 (支持 Google & OpenAI/DeepSeek) ---
+// --- 🤖 AI 调用核心 ---
+// 注意：去掉了 response_format: {type:"json_object"}，因为 MiniMax 等 OpenAI 兼容
+//       端点不一定支持，发了反而会被 4xx 拒绝。改用 prompt 强约束 + 容错解析。
 async function fetchAiTranslation(text) {
     if (!USER_CONFIG.apiKey) return null;
 
+    const promptText = `You are a translator. Translate this YouTube title to simplified Chinese (Mandarin). Keep it catchy. Return ONLY a JSON object, no markdown, no prose: {"tag": "中文分类(2-4字)", "cn": "中文标题"}. Original: "${text}"`;
+
     try {
         let response;
-        // 判断是不是 Google 的 API
         const isGoogle = USER_CONFIG.apiUrl.includes("googleapis.com");
 
         if (isGoogle) {
-            // === Google Gemini 特殊逻辑 ===
             const urlWithKey = `${USER_CONFIG.apiUrl}?key=${USER_CONFIG.apiKey}`;
             response = await fetch(urlWithKey, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    contents: [{
-                        parts: [{
-                            text: `You are a translator. Translate this YouTube title to simplified Chinese (Mandarin). Keep it catchy. Return strictly JSON format: {"tag": "Category(2-4 chars)", "cn": "Chinese Title"}. Original Title: "${text}"`
-                        }]
-                    }]
+                    contents: [{ parts: [{ text: promptText }] }],
+                    generationConfig: {
+                        temperature: 0.3,
+                        responseMimeType: "application/json"
+                    }
                 })
             });
         } else {
-            // === DeepSeek / OpenAI 通用逻辑 ===
+            // OpenAI 兼容端点：DeepSeek / OpenAI / MiniMax 共用
             response = await fetch(USER_CONFIG.apiUrl, {
                 method: "POST",
                 headers: {
@@ -126,41 +145,50 @@ async function fetchAiTranslation(text) {
                     model: USER_CONFIG.model,
                     messages: [{
                         role: "system",
-                        content: "You are a translator. Translate the YouTube title to simplified Chinese (Mandarin). Keep it catchy. Return strictly JSON format: {\"tag\": \"Category(2-4 chars)\", \"cn\": \"Chinese Title\"}."
+                        content: "You are a translator. Always reply with a single JSON object only."
                     }, {
                         role: "user",
-                        content: `Original Title: "${text}"`
+                        content: promptText
                     }],
-                    temperature: 1.3,
-                    response_format: { type: "json_object" }
+                    temperature: 0.3
                 })
             });
         }
 
         const data = await response.json();
 
+        if (!response.ok) {
+            console.error("[Gary] API 返回错误", response.status, data);
+            return null;
+        }
+
         // 解析返回结果
         let raw = "";
         if (isGoogle) {
-            // Google 返回格式
             if (data.candidates && data.candidates[0] && data.candidates[0].content) {
                 raw = data.candidates[0].content.parts[0].text;
             }
         } else {
-            // OpenAI 返回格式
             if (data.choices && data.choices[0] && data.choices[0].message) {
                 raw = data.choices[0].message.content;
             }
         }
 
-        if (!raw) return null;
+        if (!raw) {
+            console.error("[Gary] 模型返回空内容", data);
+            return null;
+        }
+
+        // 容错解析：剥 ```json 围栏，提取首个 {...} 对象（防止模型加散文）
         raw = raw.replace(/```json|```/g, "").trim();
+        const m = raw.match(/\{[\s\S]*\}/);
+        if (m) raw = m[0];
         return JSON.parse(raw);
 
     } catch (e) {
-        // console.error(e); 
+        console.error("[Gary] 翻译失败:", e, "原文:", text);
     }
-    return null; 
+    return null;
 }
 
 // --- 页面扫描逻辑 ---
@@ -230,14 +258,22 @@ async function process() {
 
         if (USER_CONFIG.apiKey) {
             const result = await fetchAiTranslation(text);
+            const newTag = box.querySelector('.gary-tag');
+            const newTitle = box.querySelector('.gary-cn-title');
             if (result) {
-                const newTag = box.querySelector('.gary-tag');
-                const newTitle = box.querySelector('.gary-cn-title');
-                if(newTag) newTag.textContent = result.tag;
-                if(newTitle) newTitle.textContent = result.cn;
+                if (newTag) newTag.textContent = result.tag;
+                if (newTitle) newTitle.textContent = result.cn;
             } else {
-                box.remove();
-                el.classList.remove('gary-en-sub');
+                // 失败时不再静默 remove —— 改为显式报错，避免"几秒后变回英文"的迷惑
+                if (newTag) {
+                    newTag.classList.add('gary-error');
+                    newTag.textContent = "❌";
+                }
+                if (newTitle) {
+                    newTitle.classList.add('gary-error');
+                    newTitle.textContent = "翻译失败（按 F12 看 Console）";
+                }
+                box.title = "请检查 API Key、模型名、余额；或敏感内容被风控";
             }
         }
     }
