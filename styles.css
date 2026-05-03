@@ -41,3 +41,33 @@
     display: block !important;
     margin-top: 2px;
 }
+
+/* === YouTube 暗色模式适配 ===
+   YouTube 在切换暗色主题时会给 <html> 加上 dark 属性。
+   只用这个信号，避免被系统暗色 + YT 浅色的组合误伤。 */
+html[dark] .gary-tag {
+    background-color: #272727;
+    color: #aaa;
+}
+html[dark] .gary-cn-title {
+    color: #f1f1f1;
+}
+html[dark] .gary-en-sub {
+    color: #aaa !important;
+}
+
+/* 翻译失败时的红色提示 */
+.gary-tag.gary-error {
+    background-color: #ffebee;
+    color: #c62828;
+}
+html[dark] .gary-tag.gary-error {
+    background-color: #4a1f1f;
+    color: #ff7a7a;
+}
+.gary-cn-title.gary-error {
+    color: #c62828;
+}
+html[dark] .gary-cn-title.gary-error {
+    color: #ff7a7a;
+}
