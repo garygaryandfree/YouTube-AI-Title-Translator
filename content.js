@@ -164,128 +164,28 @@ function createSafeBadge(tagText, cnText, isMainTitle = false) {
     return container;
 }
 
-// 提取响应文本里的第一个完整闭合 JSON 对象。
-// 用括号计数（且字符串内的 } 不计数），处理三类病态返回：
-//   1) "{...}{...}"  —— MiniMax M2.7 偶发把 JSON 输出两遍
-//   2) "前言... {...} 结尾..."  —— 模型加散文/解释
-//   3) `{ "cn": "}" }`  —— 字符串里含 }，不能被误判为对象结束
-function extractFirstJsonObject(s) {
-    const start = s.indexOf('{');
-    if (start < 0) return null;
-    let depth = 0, inStr = false, escape = false;
-    for (let i = start; i < s.length; i++) {
-        const c = s[i];
-        if (escape) { escape = false; continue; }
-        if (c === '\\') { escape = true; continue; }
-        if (c === '"') { inStr = !inStr; continue; }
-        if (inStr) continue;
-        if (c === '{') depth++;
-        else if (c === '}') {
-            depth--;
-            if (depth === 0) return s.slice(start, i + 1);
-        }
-    }
-    return null;
-}
-
-// --- 🤖 AI 调用核心 ---
-// 注意：去掉了 response_format: {type:"json_object"}，因为 MiniMax 等 OpenAI 兼容
-//       端点不一定支持，发了反而会被 4xx 拒绝。改用 prompt 强约束 + 容错解析。
-// tag 枚举：12 个固定中文分类，让 UI 视觉一致（避免一会儿"游戏"一会儿"Game"
-// 一会儿"科技资讯"），后续也方便基于分类做筛选/过滤。
-const TAG_ENUM = ["科技", "游戏", "音乐", "教程", "搞笑", "新闻", "财经", "生活", "体育", "影视", "美食", "其它"];
-
+// --- 🤖 AI 调用：通过 background SW ---
+// v7.0 起 fetch 逻辑挪到 background.js，content script 只发消息。
+// 好处：避免 YouTube 页面 CSP 拦截、所有 tab 共享一个翻译入口、
+//       未来做并发限流和重试都集中在 SW 里。
 async function fetchAiTranslation(text) {
     if (!USER_CONFIG.apiKey) return null;
-
-    const promptText = `Translate this YouTube title to simplified Chinese (Mandarin). Keep it catchy. Reply with EXACTLY ONE JSON object, no markdown, no prose, no repetition: {"tag":"<one of: ${TAG_ENUM.join("/")}>","cn":"中文标题"}. The "tag" MUST be one of those 12 categories, choose the closest match. Original: "${text}"`;
-
-    let raw = "";
-    let response;
-
     try {
-        const isGoogle = USER_CONFIG.apiUrl.includes("googleapis.com");
-
-        if (isGoogle) {
-            const urlWithKey = `${USER_CONFIG.apiUrl}?key=${USER_CONFIG.apiKey}`;
-            response = await fetch(urlWithKey, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    contents: [{ parts: [{ text: promptText }] }],
-                    generationConfig: {
-                        temperature: 0.3,
-                        maxOutputTokens: 100,
-                        responseMimeType: "application/json"
-                    }
-                })
-            });
-        } else {
-            // OpenAI 兼容端点：DeepSeek / OpenAI / MiniMax 共用
-            response = await fetch(USER_CONFIG.apiUrl, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${USER_CONFIG.apiKey}`
-                },
-                body: JSON.stringify({
-                    model: USER_CONFIG.model,
-                    messages: [{
-                        role: "system",
-                        content: "You are a translator. Reply with exactly one JSON object and nothing else. Never repeat your output."
-                    }, {
-                        role: "user",
-                        content: promptText
-                    }],
-                    temperature: 0.3,
-                    // 留 2000 token 是为了照顾 MiniMax M2.7 等推理模型——
-                    // 它们会先输出 <think>...</think> 思考块再给 JSON，token 不够会卡死在思考中
-                    max_tokens: 2000,
-                    max_completion_tokens: 2000   // MiniMax 文档用的字段名
-                })
-            });
-        }
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            console.error("[Gary] API 返回错误", response.status, data);
-            return null;
-        }
-
-        // 提取响应文本
-        if (isGoogle) {
-            if (data.candidates && data.candidates[0] && data.candidates[0].content) {
-                raw = data.candidates[0].content.parts[0].text;
+        const reply = await chrome.runtime.sendMessage({
+            type: 'translate',
+            text,
+            config: {
+                apiUrl: USER_CONFIG.apiUrl,
+                apiKey: USER_CONFIG.apiKey,
+                model:  USER_CONFIG.model
             }
-        } else {
-            if (data.choices && data.choices[0] && data.choices[0].message) {
-                raw = data.choices[0].message.content;
-            }
-        }
-
-        if (!raw) {
-            console.error("[Gary] 模型返回空内容", data);
-            return null;
-        }
-
-        // 推理模型（如 MiniMax M2.7、DeepSeek reasoner）会先输出 <think>...</think>
-        // 思考块再给最终答案，要先剥掉，包括被截断的未闭合 think
-        const cleaned = raw
-            .replace(/<think>[\s\S]*?<\/think>/g, "")  // 完整闭合
-            .replace(/<think>[\s\S]*$/, "")            // 被截断没闭合
-            .replace(/```json|```/g, "");
-        const jsonStr = extractFirstJsonObject(cleaned);
-        if (!jsonStr) {
-            console.error("[Gary] 响应里找不到 JSON 对象。原文:", text, "模型返回:", raw);
-            return null;
-        }
-        return JSON.parse(jsonStr);
-
+        });
+        if (reply && reply.ok) return reply.result;
+        return null;
     } catch (e) {
-        console.error("[Gary] 翻译失败:", e, "原文:", text, "模型返回:", raw || "(无)");
+        console.error("[Gary] SW 通信失败:", e);
+        return null;
     }
-    return null;
 }
 
 // --- 页面扫描逻辑 ---
