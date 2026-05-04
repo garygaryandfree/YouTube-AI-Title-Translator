@@ -46,7 +46,58 @@ const SENSITIVE_PATTERNS = SENSITIVE_WORDS.map(w =>
 );
 // =========================================
 
-console.log("🚀 Gary插件 V6.2 已启动");
+console.log("🚀 Gary插件 V7.0 已启动");
+
+// ================= 持久化翻译缓存 =================
+// 设计：原文 → {tag, cn, ts} 的 Map，启动时一次从 chrome.storage 加载，
+// 命中直接渲染（0 token、0 网络）；写入时 debounce 500ms 落盘。
+// LRU：插入时如已存在先 delete 再 set，把最近用的放到 Map 末尾；
+// 超过 10000 条时弹出最早的 entry。
+const CACHE_LIMIT = 10000;
+const translationCache = new Map();
+let cacheSaveTimer = null;
+
+function loadCache() {
+    chrome.storage.local.get(['translationCache'], (result) => {
+        const arr = result.translationCache;
+        if (Array.isArray(arr)) {
+            arr.forEach(([k, v]) => translationCache.set(k, v));
+            console.log(`💾 缓存已加载 ${translationCache.size} 条`);
+        }
+    });
+}
+
+function cacheGet(text) {
+    const v = translationCache.get(text);
+    if (v) {
+        // LRU touch：移到末尾
+        translationCache.delete(text);
+        translationCache.set(text, v);
+    }
+    return v;
+}
+
+function cacheSet(text, result) {
+    translationCache.delete(text);
+    translationCache.set(text, { tag: result.tag, cn: result.cn, ts: Date.now() });
+    while (translationCache.size > CACHE_LIMIT) {
+        const oldest = translationCache.keys().next().value;
+        translationCache.delete(oldest);
+    }
+    scheduleCacheSave();
+}
+
+function scheduleCacheSave() {
+    if (cacheSaveTimer) clearTimeout(cacheSaveTimer);
+    cacheSaveTimer = setTimeout(() => {
+        const arr = Array.from(translationCache.entries());
+        chrome.storage.local.set({ translationCache: arr });
+        cacheSaveTimer = null;
+    }, 500);
+}
+
+loadCache();
+// =================================================
 
 // --- 初始化配置 ---
 // v6.2 起每个 provider 单独存配置：providerConfigs[provider] = {apiKey, apiUrl, model}
@@ -275,23 +326,30 @@ async function process() {
         const parent = targetElement.parentElement;
         if (!parent) continue;
 
+        // 缓存预查：命中直接拿出 tag/cn，不发 API、不消耗 token
+        const cached = cacheGet(text);
+
         // UI 渲染
-        let tag = "未配置"; 
-        let cn = "请配置插件"; 
-        if (USER_CONFIG.apiKey) { tag = "AI"; cn = "翻译中..."; }
+        let tag = "未配置";
+        let cn = "请配置插件";
+        if (cached) { tag = cached.tag; cn = cached.cn; }
+        else if (USER_CONFIG.apiKey) { tag = "AI"; cn = "翻译中..."; }
 
         const box = createSafeBadge(tag, cn, isMainTitle);
-        
+
         try {
             parent.insertBefore(box, targetElement);
             el.classList.add('gary-en-sub');
         } catch (e) { continue; }
 
-        box.onclick = (e) => { 
-            e.preventDefault(); 
+        box.onclick = (e) => {
+            e.preventDefault();
             if (!isMainTitle && targetElement.tagName === 'A') targetElement.click();
             else el.click();
         };
+
+        // 命中缓存的标题已经渲染好了，跳过网络
+        if (cached) continue;
 
         if (USER_CONFIG.apiKey) {
             const result = await fetchAiTranslation(text);
@@ -300,6 +358,7 @@ async function process() {
             if (result) {
                 if (newTag) newTag.textContent = result.tag;
                 if (newTitle) newTitle.textContent = result.cn;
+                cacheSet(text, result);   // 写缓存
             } else {
                 // 失败时不再静默 remove —— 改为显式报错，避免"几秒后变回英文"的迷惑
                 if (newTag) {
