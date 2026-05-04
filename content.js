@@ -375,5 +375,39 @@ async function process() {
     }
 }
 
-setInterval(process, 1000);
-process();
+// === 触发策略 ===
+// 旧版本用 setInterval(process, 1000) 每秒强扫整个 DOM——CPU 浪费 + 易竞态。
+// v7.0 改为 MutationObserver 监听 <ytd-app> 子树变化，200ms debounce 后执行 process。
+// 这样：(1) 只在真有新视频卡片插入时才触发；(2) 触发更快，不用等下一次 1 秒轮询。
+let processScheduled = false;
+let processInFlight = false;
+function scheduleProcess() {
+    if (processScheduled || processInFlight) return;
+    processScheduled = true;
+    setTimeout(async () => {
+        processScheduled = false;
+        processInFlight = true;
+        try { await process(); }
+        finally { processInFlight = false; }
+    }, 200);
+}
+
+function startObserver() {
+    const root = document.querySelector('ytd-app') || document.body;
+    if (!root) {
+        // YouTube SPA 还没装载好，重试
+        setTimeout(startObserver, 200);
+        return;
+    }
+    const observer = new MutationObserver(() => scheduleProcess());
+    observer.observe(root, { childList: true, subtree: true });
+    console.log("👁  MutationObserver 已挂载");
+    // 首次扫描（处理 observer 挂载之前已经存在的标题）
+    scheduleProcess();
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', startObserver);
+} else {
+    startObserver();
+}
