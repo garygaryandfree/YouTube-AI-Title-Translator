@@ -72,6 +72,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const status            = document.getElementById('status');
     const helpLinkContainer = document.getElementById('help-text');
     const masterToggle      = document.getElementById('masterToggle');
+    const modelSection      = document.getElementById('modelSection');
+    const customMainSettings = document.getElementById('customMainSettings');
+    const customApiUrlSlot  = document.getElementById('customApiUrlSlot');
+    const customModelNameSlot = document.getElementById('customModelNameSlot');
+    const advancedSettings  = document.getElementById('advancedSettings');
+    const advancedContent   = document.getElementById('advancedContent');
+    const apiUrlGroup       = document.getElementById('apiUrlGroup');
+    const modelNameGroup    = document.getElementById('modelNameGroup');
 
     const cards = {
         deepseek: document.getElementById('card-deepseek'),
@@ -140,9 +148,8 @@ document.addEventListener('DOMContentLoaded', () => {
         modelNameInput.value = modelId;
         apiUrlInput.value    = cfg.apiUrl || (provider === 'custom' ? '' : buildUrl(provider, modelId));
 
-        // 自定义模式下高级设置必须可见
-        const details = document.querySelector('details');
-        if (details) details.open = (provider === 'custom');
+        // 自定义模式下把 URL / 模型名放到主区，避免 Key 和必填项上下割裂
+        if (advancedSettings) advancedSettings.open = false;
     }
 
     // 切换 provider：用那个 provider 自己存过的 key/url/model 重新填表
@@ -166,16 +173,29 @@ document.addEventListener('DOMContentLoaded', () => {
         helpLinkContainer.innerHTML =
             `没有 Key? <a href="${info.helpUrl}" target="_blank" rel="noopener noreferrer">${info.helpText}</a>`;
 
+        const isCustom = provider === 'custom';
+        modelSection.style.display = isCustom ? 'none' : '';
+        customMainSettings.style.display = isCustom ? 'block' : 'none';
+        advancedSettings.style.display = isCustom ? 'none' : '';
+
+        if (isCustom) {
+            customApiUrlSlot.appendChild(apiUrlGroup);
+            customModelNameSlot.appendChild(modelNameGroup);
+        } else {
+            advancedContent.appendChild(apiUrlGroup);
+            advancedContent.appendChild(modelNameGroup);
+        }
+
         // 重建模型下拉
         modelSelect.innerHTML = '';
 
-        // 自定义 provider：models 为空，提示用户去高级设置填写
+        // 自定义 provider 隐藏下拉，但仍保留一个占位 option，避免切回时状态丢失
         if (info.models.length === 0) {
             const opt = document.createElement('option');
             opt.value       = preferredModelId || '';
             opt.textContent = preferredModelId
                 ? `${preferredModelId}（自定义）`
-                : "（请在下方高级设置填写 URL 和模型名）";
+                : "（请填写自定义模型名）";
             opt.selected = true;
             modelSelect.appendChild(opt);
             return;

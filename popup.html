@@ -60,6 +60,15 @@
     /* 5 个卡片改为 5 列窄网格 */
     .provider-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 22px; }
     .input-section { margin-bottom: 22px; }
+    .custom-main-settings { display: none; margin-bottom: 22px; }
+    .custom-main-settings .mini-group { margin-bottom: 14px; }
+    .custom-main-settings .mini-label {
+      display: block; margin-bottom: 8px; font-size: 13px; font-weight: 600; color: #444;
+    }
+    .custom-main-settings .mini-input {
+      background: #fcfcfc; color: #333; font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+      border: 1px solid #e0e0e0;
+    }
 
     /* 卡片样式优化 */
     .provider-card {
@@ -223,9 +232,15 @@
     </div>
   </div>
 
-  <div class="input-section">
+  <div class="input-section" id="modelSection">
     <label for="modelSelect">第二步：选择模型版本</label>
     <select id="modelSelect"></select>
+  </div>
+
+  <div class="custom-main-settings" id="customMainSettings">
+    <label>第二步：填写自定义接口</label>
+    <div id="customApiUrlSlot"></div>
+    <div id="customModelNameSlot"></div>
   </div>
 
   <div class="input-section">
@@ -236,14 +251,14 @@
     </div>
   </div>
 
-  <details>
+  <details id="advancedSettings">
     <summary>⚙️ 高级设置 (自动填充，无需修改)</summary>
-    <div class="advanced-content">
-      <div class="mini-group">
+    <div class="advanced-content" id="advancedContent">
+      <div class="mini-group" id="apiUrlGroup">
         <span class="mini-label">API 接口地址</span>
         <input type="text" id="apiUrl" class="mini-input">
       </div>
-      <div class="mini-group">
+      <div class="mini-group" id="modelNameGroup">
         <span class="mini-label">模型名称</span>
         <input type="text" id="modelName" class="mini-input">
       </div>
