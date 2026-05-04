@@ -186,10 +186,14 @@ function extractFirstJsonObject(s) {
 // --- 🤖 AI 调用核心 ---
 // 注意：去掉了 response_format: {type:"json_object"}，因为 MiniMax 等 OpenAI 兼容
 //       端点不一定支持，发了反而会被 4xx 拒绝。改用 prompt 强约束 + 容错解析。
+// tag 枚举：12 个固定中文分类，让 UI 视觉一致（避免一会儿"游戏"一会儿"Game"
+// 一会儿"科技资讯"），后续也方便基于分类做筛选/过滤。
+const TAG_ENUM = ["科技", "游戏", "音乐", "教程", "搞笑", "新闻", "财经", "生活", "体育", "影视", "美食", "其它"];
+
 async function fetchAiTranslation(text) {
     if (!USER_CONFIG.apiKey) return null;
 
-    const promptText = `You are a translator. Translate this YouTube title to simplified Chinese (Mandarin). Keep it catchy. Reply with EXACTLY ONE JSON object, no markdown, no prose, no repetition: {"tag":"中文分类(2-4字)","cn":"中文标题"}. Original: "${text}"`;
+    const promptText = `Translate this YouTube title to simplified Chinese (Mandarin). Keep it catchy. Reply with EXACTLY ONE JSON object, no markdown, no prose, no repetition: {"tag":"<one of: ${TAG_ENUM.join("/")}>","cn":"中文标题"}. The "tag" MUST be one of those 12 categories, choose the closest match. Original: "${text}"`;
 
     let raw = "";
     let response;
