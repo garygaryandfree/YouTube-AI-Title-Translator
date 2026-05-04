@@ -102,7 +102,12 @@ loadCache();
 // --- 初始化配置 ---
 // v6.2 起每个 provider 单独存配置：providerConfigs[provider] = {apiKey, apiUrl, model}
 // 同时兼容 v6.0/6.1 的旧扁平结构 (customApiKey/Url/Model)
+// 主开关状态（默认开启）
+let ENABLED = true;
+
 function applyConfigFromStorage(result) {
+    ENABLED = result.enabled !== false;   // undefined 视为开启
+
     const provider = result.selectedProvider;
     const cfg = result.providerConfigs && provider ? result.providerConfigs[provider] : null;
 
@@ -110,7 +115,7 @@ function applyConfigFromStorage(result) {
         USER_CONFIG.apiUrl = cfg.apiUrl;
         USER_CONFIG.apiKey = cfg.apiKey;
         USER_CONFIG.model  = cfg.model;
-        console.log("✅ 已加载配置 [", provider, "]:", USER_CONFIG.model);
+        console.log("✅ 已加载配置 [", provider, "]:", USER_CONFIG.model, ENABLED ? '(开启)' : '(已暂停)');
     } else if (result.customApiKey) {
         // 旧版本回退
         USER_CONFIG.apiUrl = result.customApiUrl;
@@ -122,7 +127,7 @@ function applyConfigFromStorage(result) {
 
 function initConfig() {
     chrome.storage.local.get(
-        ['providerConfigs', 'selectedProvider', 'customApiUrl', 'customApiKey', 'customModel'],
+        ['enabled', 'providerConfigs', 'selectedProvider', 'customApiUrl', 'customApiKey', 'customModel'],
         applyConfigFromStorage
     );
 
@@ -130,7 +135,7 @@ function initConfig() {
         if (namespace !== 'local') return;
         // 任意 key 变化时，整体重读，简单稳妥
         chrome.storage.local.get(
-            ['providerConfigs', 'selectedProvider', 'customApiUrl', 'customApiKey', 'customModel'],
+            ['enabled', 'providerConfigs', 'selectedProvider', 'customApiUrl', 'customApiKey', 'customModel'],
             applyConfigFromStorage
         );
     });
@@ -285,6 +290,7 @@ async function fetchAiTranslation(text) {
 
 // --- 页面扫描逻辑 ---
 async function process() {
+    if (!ENABLED) return;   // 主开关关闭时直接返回，不扫不翻
     const titles = document.querySelectorAll('#video-title, #video-title-link, h3 a, ytd-watch-metadata h1 yt-formatted-string');
 
     for (const el of titles) {

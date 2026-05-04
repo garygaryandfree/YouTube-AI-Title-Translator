@@ -160,6 +160,29 @@
         background-color: #ffccbc;
         color: #d84315;
     }
+
+    /* === 主开关 toggle === */
+    .master-switch {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 14px; margin-bottom: 18px;
+      background: #f8f9fa; border-radius: 8px; border: 1px solid #eef0f2;
+    }
+    .master-switch-label { font-size: 13px; font-weight: 600; color: #444; }
+    .switch {
+      position: relative; display: inline-block; width: 42px; height: 24px;
+    }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute; cursor: pointer; inset: 0;
+      background: #ccc; transition: .2s; border-radius: 24px;
+    }
+    .slider:before {
+      content: ""; position: absolute; height: 18px; width: 18px;
+      left: 3px; bottom: 3px; background: #fff; border-radius: 50%;
+      transition: .2s; box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    }
+    input:checked + .slider { background: #4CAF50; }
+    input:checked + .slider:before { transform: translateX(18px); }
   </style>
 </head>
 <body>
@@ -167,6 +190,14 @@
     <h1>🚀 YouTube AI Title Translator</h1>
     <h3>AI 模型配置中心</h3>
   </header>
+
+  <div class="master-switch">
+    <span class="master-switch-label">🎯 翻译开关</span>
+    <label class="switch">
+      <input type="checkbox" id="masterToggle" checked>
+      <span class="slider"></span>
+    </label>
+  </div>
 
   <label>第一步：选择 AI 服务商</label>
   <div class="provider-grid">

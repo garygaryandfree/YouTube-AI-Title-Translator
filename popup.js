@@ -62,6 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const saveBtn           = document.getElementById('saveBtn');
     const status            = document.getElementById('status');
     const helpLinkContainer = document.getElementById('help-text');
+    const masterToggle      = document.getElementById('masterToggle');
 
     const cards = {
         deepseek: document.getElementById('card-deepseek'),
@@ -72,6 +73,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 内存里的「按 provider 分别存」配置；从 storage 加载，Save 时写回
     let providerConfigs = {};
+
+    // 主开关：默认开启，切换立即落盘
+    chrome.storage.local.get(['enabled'], (result) => {
+        masterToggle.checked = result.enabled !== false;   // undefined 视为 true
+    });
+    masterToggle.addEventListener('change', () => {
+        chrome.storage.local.set({ enabled: masterToggle.checked });
+        status.textContent = masterToggle.checked
+            ? "✅ 翻译已开启（刷新 YouTube 生效）"
+            : "⏸ 翻译已暂停";
+        status.style.color = masterToggle.checked ? "#2e7d32" : "#888";
+        setTimeout(() => status.textContent = '', 2000);
+    });
 
     Object.keys(cards).forEach(p => {
         cards[p].addEventListener('click', () => selectProvider(p));
