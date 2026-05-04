@@ -177,6 +177,12 @@ document.addEventListener('DOMContentLoaded', () => {
         modelSection.style.display = isCustom ? 'none' : '';
         customMainSettings.style.display = isCustom ? 'block' : 'none';
         advancedSettings.style.display = isCustom ? 'none' : '';
+        apiUrlInput.placeholder = isCustom
+            ? "例如：https://openrouter.ai/api/v1/chat/completions"
+            : "";
+        modelNameInput.placeholder = isCustom
+            ? "例如：openai/gpt-4o-mini、deepseek/deepseek-chat"
+            : "";
 
         if (isCustom) {
             customApiUrlSlot.appendChild(apiUrlGroup);
