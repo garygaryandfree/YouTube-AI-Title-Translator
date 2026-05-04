@@ -57,8 +57,8 @@
     h1 { margin: 0; font-size: 18px; color: #333; display: flex; align-items: center; gap: 8px; }
     h3 { margin: 0; font-size: 16px; color: #333; display: flex; align-items: center; gap: 8px; }
     
-    /* 核心布局调整：4 个卡片改为 4 列窄网格 */
-    .provider-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 22px; }
+    /* 5 个卡片改为 5 列窄网格 */
+    .provider-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 22px; }
     .input-section { margin-bottom: 22px; }
 
     /* 卡片样式优化 */
@@ -71,8 +71,8 @@
       border-color: #4CAF50; background-color: #e8f5e9; color: #2e7d32; font-weight: bold;
       box-shadow: 0 2px 5px rgba(76, 175, 80, 0.1); /* 加一点点投影 */
     }
-    .p-icon { font-size: 18px; display: block; margin-bottom: 4px; }
-    .p-name { font-size: 11px; }
+    .p-icon { font-size: 16px; display: block; margin-bottom: 3px; }
+    .p-name { font-size: 10px; }
 
     /* 模型版本下拉 */
     select#modelSelect {
@@ -216,6 +216,10 @@
     <div class="provider-card" id="card-minimax">
       <span class="p-icon">⚡</span>
       <span class="p-name">MiniMax</span>
+    </div>
+    <div class="provider-card" id="card-custom">
+      <span class="p-icon">🔧</span>
+      <span class="p-name">自定义</span>
     </div>
   </div>
 

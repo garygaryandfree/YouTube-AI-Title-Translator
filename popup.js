@@ -44,6 +44,15 @@ const PRESETS = {
             { id: "MiniMax-M2.5",           label: "M2.5" },
             { id: "MiniMax-M2.1",           label: "M2.1（旧版）" }
         ]
+    },
+    // 自定义 OpenAI 兼容端点：让用户自己填 base URL 和 model 名，
+    // 立刻能用 OpenRouter / SiliconFlow / 火山方舟 / 本地 Ollama / LM Studio 等。
+    // 第一次保存某个新域名时会触发 chrome.permissions.request 弹一个原生权限框。
+    custom: {
+        url: "",
+        helpUrl: "https://github.com/garygaryandfree/YouTube-AI-Title-Translator#%E8%87%AA%E5%AE%9A%E4%B9%89%E7%AB%AF%E7%82%B9",
+        helpText: "查看自定义端点说明",
+        models: []   // 空数组：UI 上显示"请在下方高级设置填写"占位
     }
 };
 
@@ -68,7 +77,8 @@ document.addEventListener('DOMContentLoaded', () => {
         deepseek: document.getElementById('card-deepseek'),
         openai:   document.getElementById('card-openai'),
         google:   document.getElementById('card-google'),
-        minimax:  document.getElementById('card-minimax')
+        minimax:  document.getElementById('card-minimax'),
+        custom:   document.getElementById('card-custom')
     };
 
     // 内存里的「按 provider 分别存」配置；从 storage 加载，Save 时写回
@@ -121,12 +131,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // 把指定 provider 的存储配置渲染到表单
     function hydrateForm(provider) {
         const cfg     = providerConfigs[provider] || {};
-        const modelId = cfg.model || PRESETS[provider].models[0].id;
+        // 自定义 provider 没有预设模型，从 cfg 读，没有就空字符串
+        const presetFirst = PRESETS[provider].models[0];
+        const modelId = cfg.model || (presetFirst ? presetFirst.id : '');
 
         updateUIState(provider, modelId);
         apiKeyInput.value    = cfg.apiKey || '';
         modelNameInput.value = modelId;
-        apiUrlInput.value    = cfg.apiUrl || buildUrl(provider, modelId);
+        apiUrlInput.value    = cfg.apiUrl || (provider === 'custom' ? '' : buildUrl(provider, modelId));
+
+        // 自定义模式下高级设置必须可见
+        const details = document.querySelector('details');
+        if (details) details.open = (provider === 'custom');
     }
 
     // 切换 provider：用那个 provider 自己存过的 key/url/model 重新填表
@@ -152,6 +168,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 重建模型下拉
         modelSelect.innerHTML = '';
+
+        // 自定义 provider：models 为空，提示用户去高级设置填写
+        if (info.models.length === 0) {
+            const opt = document.createElement('option');
+            opt.value       = preferredModelId || '';
+            opt.textContent = preferredModelId
+                ? `${preferredModelId}（自定义）`
+                : "（请在下方高级设置填写 URL 和模型名）";
+            opt.selected = true;
+            modelSelect.appendChild(opt);
+            return;
+        }
+
         let matched = false;
         info.models.forEach(m => {
             const opt = document.createElement('option');
@@ -173,7 +202,19 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    saveBtn.addEventListener('click', () => {
+    // 自定义端点保存前：申请该域名的 host_permissions
+    async function ensureHostPermission(url) {
+        try {
+            const u = new URL(url);
+            const origin = `${u.protocol}//${u.hostname}/*`;
+            return await chrome.permissions.request({ origins: [origin] });
+        } catch (e) {
+            console.error("[Gary] URL 解析失败:", e);
+            return false;
+        }
+    }
+
+    saveBtn.addEventListener('click', async () => {
         const url   = apiUrlInput.value.trim();
         const key   = apiKeyInput.value.trim();
         const model = modelNameInput.value.trim();
@@ -183,6 +224,21 @@ document.addEventListener('DOMContentLoaded', () => {
             status.style.color = "#d32f2f";
             apiKeyInput.focus();
             return;
+        }
+
+        // 自定义端点：URL 和 model 也必填，并申请该域名访问权限
+        if (currentProvider === 'custom') {
+            if (!url || !model) {
+                status.textContent = "❌ 自定义端点需要填 URL 和模型名";
+                status.style.color = "#d32f2f";
+                return;
+            }
+            const granted = await ensureHostPermission(url);
+            if (!granted) {
+                status.textContent = "❌ 未授予该域名访问权限，无法调用";
+                status.style.color = "#d32f2f";
+                return;
+            }
         }
 
         // 只更新当前 provider 那一项，其它 provider 的配置原样保留

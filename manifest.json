@@ -27,6 +27,9 @@
     "https://api.minimaxi.com/*",
     "https://api.minimax.chat/*"
   ],
+  "optional_host_permissions": [
+    "<all_urls>"
+  ],
   "content_scripts": [
     {
       "matches": ["https://*.youtube.com/*"],
