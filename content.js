@@ -188,10 +188,29 @@ async function fetchAiTranslation(text) {
     }
 }
 
-// --- 页面扫描逻辑 ---
+// 渲染辅助函数（批量翻译走相同的成功/失败渲染路径）
+function renderSuccess(box, result) {
+    const tag = box.querySelector('.gary-tag');
+    const title = box.querySelector('.gary-cn-title');
+    if (tag) tag.textContent = result.tag;
+    if (title) title.textContent = result.cn;
+}
+function renderError(box) {
+    const tag = box.querySelector('.gary-tag');
+    const title = box.querySelector('.gary-cn-title');
+    if (tag)   { tag.classList.add('gary-error');   tag.textContent = "❌"; }
+    if (title) { title.classList.add('gary-error'); title.textContent = "翻译失败（按 F12 看 Console）"; }
+    box.title = "请检查 API Key、模型名、余额；或敏感内容被风控";
+}
+
+// --- 页面扫描 + 批量翻译 ---
+const BATCH_SIZE = 5;
+
 async function process() {
-    if (!ENABLED) return;   // 主开关关闭时直接返回，不扫不翻
+    if (!ENABLED) return;
     const titles = document.querySelectorAll('#video-title, #video-title-link, h3 a, ytd-watch-metadata h1 yt-formatted-string');
+
+    const pendingBatch = [];   // 缓存未命中、需要发 API 的项 [{text, box}]
 
     for (const el of titles) {
         if (el.getAttribute('data-gary-done')) continue;
@@ -200,53 +219,43 @@ async function process() {
         const text = el.innerText.trim();
         if (!text || text.length < 3) continue;
 
-        // 敏感词拦截（词边界匹配，避免 substring 误杀）
         if (SENSITIVE_PATTERNS.some(re => re.test(text))) {
             el.setAttribute('data-gary-done', 'blocked');
             continue;
         }
 
-        // 语言判断
-        const hasJapanese = /[\u3040-\u30ff\u31f0-\u31ff]/.test(text);
-        const hasKorean = /[\uac00-\ud7af]/.test(text);
-        const hasThai = /[\u0e00-\u0e7f]/.test(text);
-        const hasEnglish = /[a-zA-Z]/.test(text);
-        const hasChinese = /[\u4e00-\u9fa5]/.test(text);
+        const hasJapanese = /[぀-ヿㇰ-ㇿ]/.test(text);
+        const hasKorean   = /[가-힯]/.test(text);
+        const hasThai     = /[฀-๿]/.test(text);
+        const hasEnglish  = /[a-zA-Z]/.test(text);
+        const hasChinese  = /[一-龥]/.test(text);
 
         let shouldTranslate = false;
         if (hasJapanese || hasKorean || hasThai) shouldTranslate = true;
         else if (hasChinese) shouldTranslate = false;
         else if (hasEnglish) shouldTranslate = true;
-
         if (!shouldTranslate) continue;
 
         el.setAttribute('data-gary-done', 'true');
 
-        // 插入位置
-        let targetElement = el; 
+        let targetElement = el;
         let isMainTitle = false;
         if (el.matches('ytd-watch-metadata h1 yt-formatted-string')) {
             isMainTitle = true;
-            targetElement = el; 
         } else {
             const link = el.closest('a');
             if (link) targetElement = link;
         }
-
         const parent = targetElement.parentElement;
         if (!parent) continue;
 
-        // 缓存预查：命中直接拿出 tag/cn，不发 API、不消耗 token
         const cached = cacheGet(text);
 
-        // UI 渲染
-        let tag = "未配置";
-        let cn = "请配置插件";
+        let tag = "未配置", cn = "请配置插件";
         if (cached) { tag = cached.tag; cn = cached.cn; }
         else if (USER_CONFIG.apiKey) { tag = "AI"; cn = "翻译中..."; }
 
         const box = createSafeBadge(tag, cn, isMainTitle);
-
         try {
             parent.insertBefore(box, targetElement);
             el.classList.add('gary-en-sub');
@@ -258,31 +267,54 @@ async function process() {
             else el.click();
         };
 
-        // 命中缓存的标题已经渲染好了，跳过网络
-        if (cached) continue;
+        if (cached) continue;                  // 命中缓存：已渲染好
+        if (!USER_CONFIG.apiKey) continue;     // 没配置 Key：渲染"未配置"badge 后停下
 
-        if (USER_CONFIG.apiKey) {
-            const result = await fetchAiTranslation(text);
-            const newTag = box.querySelector('.gary-tag');
-            const newTitle = box.querySelector('.gary-cn-title');
-            if (result) {
-                if (newTag) newTag.textContent = result.tag;
-                if (newTitle) newTitle.textContent = result.cn;
-                cacheSet(text, result);   // 写缓存
-            } else {
-                // 失败时不再静默 remove —— 改为显式报错，避免"几秒后变回英文"的迷惑
-                if (newTag) {
-                    newTag.classList.add('gary-error');
-                    newTag.textContent = "❌";
-                }
-                if (newTitle) {
-                    newTitle.classList.add('gary-error');
-                    newTitle.textContent = "翻译失败（按 F12 看 Console）";
-                }
-                box.title = "请检查 API Key、模型名、余额；或敏感内容被风控";
-            }
-        }
+        pendingBatch.push({ text, box });
     }
+
+    if (pendingBatch.length === 0) return;
+
+    // 切成 5 条/批，并行送给 SW 批量翻译
+    const chunks = [];
+    for (let i = 0; i < pendingBatch.length; i += BATCH_SIZE) {
+        chunks.push(pendingBatch.slice(i, i + BATCH_SIZE));
+    }
+    await Promise.all(chunks.map(translateChunk));
+}
+
+async function translateChunk(chunk) {
+    let reply;
+    try {
+        reply = await chrome.runtime.sendMessage({
+            type: 'translateBatch',
+            items: chunk.map(p => p.text),
+            config: {
+                apiUrl: USER_CONFIG.apiUrl,
+                apiKey: USER_CONFIG.apiKey,
+                model:  USER_CONFIG.model
+            }
+        });
+    } catch (e) {
+        console.error("[Gary] SW 通信失败:", e);
+        chunk.forEach(p => renderError(p.box));
+        return;
+    }
+
+    if (!reply || !reply.ok || !Array.isArray(reply.results)) {
+        chunk.forEach(p => renderError(p.box));
+        return;
+    }
+
+    chunk.forEach((p, i) => {
+        const result = reply.results[i];
+        if (result && result.tag && result.cn) {
+            renderSuccess(p.box, result);
+            cacheSet(p.text, result);
+        } else {
+            renderError(p.box);
+        }
+    });
 }
 
 // === 触发策略 ===
