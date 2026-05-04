@@ -49,233 +49,825 @@
   <link rel="canonical" href="https://github.com/garygaryandfree/YouTube-AI-Title-Translator">
   
   <style>
-    /* 全局增加一点内边距，让整体不那么逼仄 */
-    body { width: 340px; padding: 20px; font-family: "Segoe UI", "Microsoft YaHei", sans-serif; background: #fff; color: #333; }
-    
-    /* 标题区：增加底部距离 */
-    header { border-bottom: 1px solid #eee; padding-bottom: 12px; margin-bottom: 20px; }
-    h1 { margin: 0; font-size: 18px; color: #333; display: flex; align-items: center; gap: 8px; }
-    h3 { margin: 0; font-size: 16px; color: #333; display: flex; align-items: center; gap: 8px; }
-    
-    /* 5 个卡片改为 5 列窄网格 */
-    .provider-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 22px; }
-    .input-section { margin-bottom: 22px; }
-    .custom-main-settings { display: none; margin-bottom: 22px; }
-    .custom-main-settings .mini-group { margin-bottom: 14px; }
-    .custom-main-settings .mini-label {
-      display: block; margin-bottom: 8px; font-size: 13px; font-weight: 600; color: #444;
-    }
-    .custom-main-settings .mini-input {
-      background: #fcfcfc; color: #333; font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
-      border: 1px solid #e0e0e0;
+    :root {
+      --bg: #f7f8fb;
+      --surface: #ffffff;
+      --surface-soft: #f9fafc;
+      --text: #16181d;
+      --muted: #69717f;
+      --subtle: #8a93a3;
+      --line: #dfe3ea;
+      --line-strong: #cbd2dc;
+      --red: #14b8a6;
+      --red-dark: #0f766e;
+      --blue: #2868f0;
+      --green: #1d9a57;
+      --shadow: 0 14px 36px rgba(20, 24, 33, 0.10);
     }
 
-    /* 卡片样式优化 */
-    .provider-card {
-      border: 2px solid #f0f0f0; border-radius: 10px; padding: 8px 2px; cursor: pointer;
-      text-align: center; transition: all 0.2s; background: #fafafa;
-    }
-    .provider-card:hover { background: #f5f5f5; border-color: #ddd; }
-    .provider-card.active {
-      border-color: #4CAF50; background-color: #e8f5e9; color: #2e7d32; font-weight: bold;
-      box-shadow: 0 2px 5px rgba(76, 175, 80, 0.1); /* 加一点点投影 */
-    }
-    .p-icon { font-size: 16px; display: block; margin-bottom: 3px; }
-    .p-name { font-size: 10px; }
+    * { box-sizing: border-box; }
 
-    /* 模型版本下拉 */
-    select#modelSelect {
-      width: 100%; padding: 11px 12px; border: 1px solid #e0e0e0; border-radius: 8px;
-      box-sizing: border-box; font-size: 13px; outline: none; transition: border 0.3s;
-      background: #fcfcfc; color: #333; cursor: pointer;
-      appearance: none;
-      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='%23888'><path d='M7 10l5 5 5-5z'/></svg>");
-      background-repeat: no-repeat;
-      background-position: right 10px center;
-      padding-right: 30px;
-    }
-    select#modelSelect:focus { border-color: #4CAF50; background-color: #fff; }
-
-    /* 输入框优化 */
-    label { display: block; margin-bottom: 8px; font-size: 13px; font-weight: 600; color: #444; }
-    input[type="text"], input[type="password"] { 
-      width: 100%; padding: 12px; border: 1px solid #e0e0e0; border-radius: 8px; 
-      box-sizing: border-box; font-size: 13px; outline: none; transition: border 0.3s; background: #fcfcfc;
-    }
-    input:focus { border-color: #4CAF50; background: #fff; }
-    
-    .help-link { font-size: 12px; margin-top: 8px; color: #888; text-align: right; }
-    .help-link a { color: #2196F3; text-decoration: none; }
-
-    /* 高级设置 */
-    details { margin-bottom: 20px; border: 1px solid #f0f0f0; border-radius: 8px; padding: 10px; background: #fafafa; }
-    summary { font-size: 12px; color: #999; cursor: pointer; outline: none; }
-    .advanced-content { margin-top: 12px; }
-    .mini-group { margin-bottom: 12px; }
-    .mini-label { font-size: 11px; color: #aaa; margin-bottom: 4px; display: block; }
-    .mini-input { background: #eee; color: #666; font-family: monospace; border: none; }
-
-    /* 保存按钮 */
-    button#saveBtn {
-      width: 100%; padding: 14px; background-color: #4CAF50; color: white; border: none; 
-      border-radius: 10px; cursor: pointer; font-size: 15px; font-weight: 600;
-      box-shadow: 0 4px 6px rgba(76, 175, 80, 0.2); /* 按钮投影 */
-    }
-    button#saveBtn:hover { background-color: #43A047; transform: translateY(-1px); }
-    button#saveBtn:active { transform: translateY(1px); }
-    
-    /* 状态提示：减少高度占位 */
-    #status { margin-top: 8px; font-size: 12px; text-align: center; min-height: 18px; color: #666; }
-
-    /* --- 底部布局调整 (收紧下方) --- */
-    .footer {
-        margin-top: 12px; /* 减少间距 (原来可能是20px) */
-        padding-top: 15px;
-        border-top: 1px dashed #f0f0f0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 12px;
-    }
-    
-    .footer-link {
-        text-decoration: none;
-        font-size: 12px;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 6px 12px;
-        border-radius: 6px;
-        transition: all 0.2s;
-        background: #fff;
-        border: 1px solid #eee;
-        color: #666;
+    html {
+      scrollbar-width: none;
     }
 
-    /* 反馈按钮 */
-    .link-feedback:hover {
-        background-color: #f5f5f5;
-        border-color: #ddd;
-        color: #333;
+    html::-webkit-scrollbar,
+    body::-webkit-scrollbar {
+      width: 0;
+      height: 0;
+      display: none;
     }
 
-    /* 捐款按钮 (高亮) */
-    .link-donate {
-        color: #ff5722;
-        background: #fff8f5;
-        border-color: #ffccbc;
-    }
-    .link-donate:hover {
-        background-color: #ffccbc;
-        color: #d84315;
+    body {
+      width: 390px;
+      margin: 0;
+      padding: 0;
+      font-family: Inter, "SF Pro Display", "PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      letter-spacing: 0;
+      overflow-y: auto;
+      scrollbar-width: none;
     }
 
-    /* === 主开关 toggle === */
+    button, input, select {
+      font: inherit;
+    }
+
+    .app-shell {
+      min-height: 100vh;
+      background: var(--bg);
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 14px 18px 12px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      width: 48px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      color: #fff;
+      background: #ff0033;
+      border-radius: 8px;
+    }
+
+    .brand-mark svg {
+      width: 22px;
+      height: 22px;
+      fill: currentColor;
+      transform: translateX(1px);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 17px;
+      line-height: 1.15;
+      font-weight: 760;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .brand-subtitle {
+      margin-top: 4px;
+      font-size: 12px;
+      line-height: 1.25;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 0 0 auto;
+    }
+
+    .icon-button {
+      width: 34px;
+      height: 34px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: #303640;
+      background: var(--surface);
+      cursor: pointer;
+      transition: transform .16s ease, border-color .16s ease, background .16s ease;
+    }
+
+    .icon-button:hover {
+      transform: translateY(-1px);
+      border-color: var(--line-strong);
+      background: #fdfdfe;
+    }
+
+    .icon-button svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      stroke-width: 2;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    main {
+      padding: 14px 18px 12px;
+    }
+
     .master-switch {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 10px 14px; margin-bottom: 18px;
-      background: #f8f9fa; border-radius: 8px; border: 1px solid #eef0f2;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 16px;
+      padding: 14px 16px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 8px;
     }
-    .master-switch-label { font-size: 13px; font-weight: 600; color: #444; }
+
+    .master-switch-copy {
+      min-width: 0;
+    }
+
+    .master-switch-label {
+      display: block;
+      font-size: 17px;
+      line-height: 1.2;
+      font-weight: 760;
+      color: var(--text);
+    }
+
+    .master-switch-desc {
+      display: block;
+      margin-top: 5px;
+      font-size: 11px;
+      line-height: 1.35;
+      color: var(--muted);
+    }
+
     .switch {
-      position: relative; display: inline-block; width: 42px; height: 24px;
+      position: relative;
+      display: inline-block;
+      width: 58px;
+      height: 32px;
+      flex: 0 0 auto;
     }
-    .switch input { opacity: 0; width: 0; height: 0; }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
     .slider {
-      position: absolute; cursor: pointer; inset: 0;
-      background: #ccc; transition: .2s; border-radius: 24px;
+      position: absolute;
+      inset: 0;
+      cursor: pointer;
+      background: #b7beca;
+      border-radius: 999px;
+      transition: background .18s ease;
     }
+
     .slider:before {
-      content: ""; position: absolute; height: 18px; width: 18px;
-      left: 3px; bottom: 3px; background: #fff; border-radius: 50%;
-      transition: .2s; box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+      content: "";
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      left: 4px;
+      top: 50%;
+      background: #fff;
+      border-radius: 50%;
+      transform: translateY(-50%);
+      transition: transform .18s ease;
+      border: 1px solid rgba(20, 24, 33, 0.08);
     }
-    input:checked + .slider { background: #4CAF50; }
-    input:checked + .slider:before { transform: translateX(18px); }
+
+    input:checked + .slider {
+      background: var(--red);
+    }
+
+    input:checked + .slider:before {
+      transform: translate(26px, -50%);
+    }
+
+    .section {
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      margin: 0 0 10px;
+      font-size: 17px;
+      line-height: 1.25;
+      font-weight: 760;
+      color: var(--text);
+    }
+
+    .section-title span {
+      font-size: 12px;
+      font-weight: 650;
+      color: var(--subtle);
+    }
+
+    label, .field-label, .mini-label {
+      display: block;
+      margin: 0 0 8px;
+      font-size: 13px;
+      line-height: 1.25;
+      font-weight: 650;
+      color: #4d5562;
+    }
+
+    .provider-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      overflow: hidden;
+      margin-bottom: 0;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+
+    .provider-card {
+      position: relative;
+      min-height: 72px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 8px 4px;
+      text-align: center;
+      color: #49515d;
+      background: var(--surface);
+      border: 0;
+      border-right: 1px solid var(--line);
+      cursor: pointer;
+      transition: color .16s ease, background .16s ease, box-shadow .16s ease;
+    }
+
+    .provider-card:last-child {
+      border-right: 0;
+    }
+
+    .provider-card:hover {
+      color: var(--text);
+      background: var(--surface-soft);
+    }
+
+    .provider-card.active {
+      color: var(--red);
+      background: #fff;
+      box-shadow: inset 0 0 0 2px var(--red);
+      z-index: 1;
+    }
+
+    .provider-card.active::after {
+      content: "";
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--red);
+    }
+
+    .provider-card.active::before {
+      content: "";
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 7px;
+      height: 4px;
+      border-left: 2px solid #fff;
+      border-bottom: 2px solid #fff;
+      transform: rotate(-45deg);
+      z-index: 2;
+    }
+
+    .p-icon {
+      width: 28px;
+      height: 24px;
+      display: grid;
+      place-items: center;
+      color: currentColor;
+      font-size: 0;
+    }
+
+    .p-icon svg {
+      width: 24px;
+      height: 24px;
+      stroke: currentColor;
+      stroke-width: 2.1;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .brand-logo {
+      display: block;
+      width: 28px;
+      height: 28px;
+      object-fit: contain;
+    }
+
+    #card-openai .brand-logo {
+      width: 30px;
+      object-fit: cover;
+      object-position: left center;
+    }
+
+    .p-icon .filled,
+    .p-icon .brand-fill {
+      fill: currentColor;
+      stroke: none;
+    }
+
+    #card-deepseek .p-icon {
+      color: #2563eb;
+    }
+
+    #card-openai .p-icon {
+      color: #20242a;
+    }
+
+    #card-google .p-icon {
+      color: #4f46e5;
+    }
+
+    #card-minimax .p-icon {
+      color: var(--red);
+    }
+
+    #card-custom .p-icon {
+      color: #4d5562;
+    }
+
+    .p-name {
+      display: block;
+      width: 100%;
+      font-size: 12px;
+      line-height: 1.15;
+      font-weight: 680;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .input-section, .custom-main-settings {
+      margin-bottom: 14px;
+    }
+
+    .custom-main-settings {
+      display: none;
+      padding: 14px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+
+    .custom-main-settings .mini-group:last-child {
+      margin-bottom: 0;
+    }
+
+    select#modelSelect,
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      min-height: 46px;
+      padding: 12px 14px;
+      color: var(--text);
+      background: var(--surface);
+      border: 1px solid var(--line-strong);
+      border-radius: 8px;
+      outline: none;
+      font-size: 14px;
+      line-height: 1.35;
+      transition: border-color .16s ease, box-shadow .16s ease, background .16s ease;
+    }
+
+    select#modelSelect {
+      appearance: none;
+      cursor: pointer;
+      padding-right: 42px;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%2369717f' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><path d='m6 9 6 6 6-6'/></svg>");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+    }
+
+    input[type="password"],
+    .api-key-field input[type="text"] {
+      padding-right: 52px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      letter-spacing: .02em;
+    }
+
+    input::placeholder {
+      color: #9aa3b1;
+      letter-spacing: 0;
+      font-family: inherit;
+    }
+
+    select#modelSelect:focus,
+    input:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(40, 104, 240, 0.12);
+      background: #fff;
+    }
+
+    .api-key-field {
+      position: relative;
+    }
+
+    .visibility-toggle {
+      position: absolute;
+      top: 7px;
+      right: 7px;
+      width: 34px;
+      height: 34px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #4d5562;
+      background: #f7f8fb;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background .16s ease, color .16s ease, border-color .16s ease;
+    }
+
+    .visibility-toggle:hover {
+      color: var(--text);
+      background: #fff;
+      border-color: var(--line-strong);
+    }
+
+    .visibility-toggle svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      stroke-width: 2;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .help-link {
+      margin-top: 8px;
+      font-size: 12px;
+      line-height: 1.35;
+      color: var(--muted);
+      text-align: right;
+    }
+
+    .help-link a {
+      color: var(--blue);
+      text-decoration: none;
+      font-weight: 650;
+    }
+
+    .help-link a:hover {
+      text-decoration: underline;
+    }
+
+    details {
+      margin-bottom: 14px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+
+    summary {
+      list-style: none;
+      min-height: 46px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 14px;
+      font-size: 13px;
+      line-height: 1.25;
+      font-weight: 680;
+      color: #4d5562;
+      cursor: pointer;
+      outline: none;
+    }
+
+    summary::-webkit-details-marker {
+      display: none;
+    }
+
+    summary::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-right: 2px solid currentColor;
+      border-bottom: 2px solid currentColor;
+      transform: rotate(-45deg);
+      transition: transform .16s ease;
+    }
+
+    details[open] summary::before {
+      transform: rotate(45deg) translate(-2px, -2px);
+    }
+
+    .advanced-content {
+      padding: 0 14px 14px;
+    }
+
+    .mini-group {
+      margin-bottom: 14px;
+    }
+
+    .mini-input {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+      color: #3e4652;
+      background: #fbfcfe;
+    }
+
+    button#saveBtn {
+      width: 100%;
+      min-height: 52px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 15px 18px;
+      color: #fff;
+      background: var(--red);
+      border: 0;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      line-height: 1.2;
+      font-weight: 760;
+      transition: transform .16s ease, filter .16s ease;
+    }
+
+    button#saveBtn:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.02);
+    }
+
+    button#saveBtn:active {
+      transform: translateY(1px);
+    }
+
+    button#saveBtn svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      stroke-width: 2.2;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    #status {
+      min-height: 40px;
+      margin-top: 10px;
+      padding: 0 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: 13px;
+      line-height: 1.35;
+      font-weight: 650;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.65);
+      border: 1px solid transparent;
+      border-radius: 8px;
+    }
+
+    #status:empty {
+      display: none;
+    }
+
+    .footer {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      padding: 12px 18px 12px;
+      background: var(--surface);
+      border-top: 1px solid var(--line);
+    }
+
+    .footer-link {
+      min-height: 38px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px;
+      text-decoration: none;
+      font-size: 13px;
+      line-height: 1.2;
+      font-weight: 680;
+      color: #3f4753;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      transition: transform .16s ease, border-color .16s ease, background .16s ease, color .16s ease;
+    }
+
+    .footer-link:hover {
+      transform: translateY(-1px);
+      border-color: var(--line-strong);
+      background: #fbfcfe;
+    }
+
+    .link-feedback {
+      color: #185bc9;
+    }
+
+    .link-donate {
+      color: var(--red-dark);
+    }
+
+    .footer-link svg {
+      width: 17px;
+      height: 17px;
+      stroke: currentColor;
+      stroke-width: 2;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      flex: 0 0 auto;
+    }
+
+    .privacy-note {
+      padding: 0 18px 14px;
+      margin: 0;
+      font-size: 10px;
+      line-height: 1.35;
+      text-align: center;
+      color: var(--subtle);
+      background: var(--surface);
+    }
+
+    @media (max-width: 360px) {
+      body { width: 360px; }
+      header, main { padding-left: 14px; padding-right: 14px; }
+      h1 { font-size: 15px; }
+      .provider-card { min-height: 78px; }
+      .p-name { font-size: 11px; }
+    }
   </style>
 </head>
 <body>
-  <header>
-    <h1>🚀 YouTube AI Title Translator</h1>
-    <h3>AI 模型配置中心</h3>
-  </header>
-
-  <div class="master-switch">
-    <span class="master-switch-label">🎯 翻译开关</span>
-    <label class="switch">
-      <input type="checkbox" id="masterToggle" checked>
-      <span class="slider"></span>
-    </label>
-  </div>
-
-  <label>第一步：选择 AI 服务商</label>
-  <div class="provider-grid">
-    <div class="provider-card active" id="card-deepseek">
-      <span class="p-icon">🦄</span>
-      <span class="p-name">DeepSeek</span>
-    </div>
-    <div class="provider-card" id="card-openai">
-      <span class="p-icon">🤖</span>
-      <span class="p-name">OpenAI</span>
-    </div>
-    <div class="provider-card" id="card-google">
-      <span class="p-icon">💎</span>
-      <span class="p-name">Gemini</span>
-    </div>
-    <div class="provider-card" id="card-minimax">
-      <span class="p-icon">⚡</span>
-      <span class="p-name">MiniMax</span>
-    </div>
-    <div class="provider-card" id="card-custom">
-      <span class="p-icon">🔧</span>
-      <span class="p-name">自定义</span>
-    </div>
-  </div>
-
-  <div class="input-section" id="modelSection">
-    <label for="modelSelect">第二步：选择模型版本</label>
-    <select id="modelSelect"></select>
-  </div>
-
-  <div class="custom-main-settings" id="customMainSettings">
-    <label>第二步：填写自定义接口</label>
-    <div id="customApiUrlSlot"></div>
-    <div id="customModelNameSlot"></div>
-  </div>
-
-  <div class="input-section">
-    <label for="apiKey">第三步：粘贴 API Key</label>
-    <input type="password" id="apiKey" placeholder="粘贴你的密钥..." autocomplete="off">
-    <div class="help-link" id="help-text">
-      <a href="https://platform.deepseek.com/api_keys" target="_blank" rel="noopener noreferrer">去 DeepSeek 官网申请 Key</a>
-    </div>
-  </div>
-
-  <details id="advancedSettings">
-    <summary>⚙️ 高级设置 (自动填充，无需修改)</summary>
-    <div class="advanced-content" id="advancedContent">
-      <div class="mini-group" id="apiUrlGroup">
-        <span class="mini-label">API 接口地址</span>
-        <input type="text" id="apiUrl" class="mini-input">
+  <div class="app-shell">
+    <header>
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M9.6 7.4v9.2l7.1-4.6-7.1-4.6z"/></svg>
+        </div>
+        <div>
+          <h1>YouTube AI Title Translator</h1>
+          <div class="brand-subtitle">AI 模型配置中心</div>
+        </div>
       </div>
-      <div class="mini-group" id="modelNameGroup">
-        <span class="mini-label">模型名称</span>
-        <input type="text" id="modelName" class="mini-input">
+      <div class="header-actions" aria-label="快捷操作">
+        <a class="icon-button" href="https://github.com/garygaryandfree/YouTube-AI-Title-Translator" target="_blank" rel="noopener noreferrer" title="打开项目说明" aria-label="打开项目说明">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+        </a>
       </div>
+    </header>
+
+    <main>
+      <div class="master-switch">
+        <span class="master-switch-copy">
+          <span class="master-switch-label">翻译开关</span>
+          <span class="master-switch-desc">在 YouTube 页面上自动翻译视频标题</span>
+        </span>
+        <label class="switch" aria-label="翻译开关">
+          <input type="checkbox" id="masterToggle" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <section class="section" aria-labelledby="providerTitle">
+        <h2 class="section-title" id="providerTitle">1. 选择 AI 服务商</h2>
+        <div class="provider-grid">
+          <div class="provider-card active" id="card-deepseek" role="button" tabindex="0">
+            <span class="p-icon" aria-hidden="true">
+              <img class="brand-logo" src="assets/brands/deepseek.svg" alt="">
+            </span>
+            <span class="p-name">DeepSeek</span>
+          </div>
+          <div class="provider-card" id="card-openai" role="button" tabindex="0">
+            <span class="p-icon" aria-hidden="true">
+              <img class="brand-logo" src="assets/brands/openai.svg" alt="">
+            </span>
+            <span class="p-name">OpenAI</span>
+          </div>
+          <div class="provider-card" id="card-google" role="button" tabindex="0">
+            <span class="p-icon" aria-hidden="true">
+              <img class="brand-logo" src="assets/brands/google-gemini.svg" alt="">
+            </span>
+            <span class="p-name">Gemini</span>
+          </div>
+          <div class="provider-card" id="card-minimax" role="button" tabindex="0">
+            <span class="p-icon" aria-hidden="true">
+              <img class="brand-logo" src="assets/brands/minimax.svg" alt="">
+            </span>
+            <span class="p-name">MiniMax</span>
+          </div>
+          <div class="provider-card" id="card-custom" role="button" tabindex="0">
+            <span class="p-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="m8 9-4 3 4 3"/><path d="m16 9 4 3-4 3"/><path d="m14 5-4 14"/></svg>
+            </span>
+            <span class="p-name">自定义</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="modelTitle">
+        <h2 class="section-title" id="modelTitle">2. 模型配置 <span>Model</span></h2>
+        <div class="input-section" id="modelSection">
+          <label for="modelSelect">模型版本</label>
+          <select id="modelSelect"></select>
+        </div>
+
+        <div class="custom-main-settings" id="customMainSettings">
+          <label>自定义接口</label>
+          <div id="customApiUrlSlot"></div>
+          <div id="customModelNameSlot"></div>
+        </div>
+
+        <div class="input-section">
+          <label for="apiKey">API Key</label>
+          <div class="api-key-field">
+            <input type="password" id="apiKey" placeholder="粘贴你的密钥..." autocomplete="off">
+            <button type="button" class="visibility-toggle" id="apiKeyVisibility" title="显示或隐藏 API Key" aria-label="显示或隐藏 API Key">
+              <svg viewBox="0 0 24 24"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <div class="help-link" id="help-text">
+            <a href="https://platform.deepseek.com/api_keys" target="_blank" rel="noopener noreferrer">去 DeepSeek 官网申请 Key</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="advancedTitle">
+        <h2 class="section-title" id="advancedTitle">3. 高级设置 <span>可选</span></h2>
+        <details id="advancedSettings">
+          <summary>自定义 API Endpoint / 自定义模型名</summary>
+          <div class="advanced-content" id="advancedContent">
+            <div class="mini-group" id="apiUrlGroup">
+              <span class="mini-label">API 接口地址</span>
+              <input type="text" id="apiUrl" class="mini-input">
+            </div>
+            <div class="mini-group" id="modelNameGroup">
+              <span class="mini-label">模型名称</span>
+              <input type="text" id="modelName" class="mini-input">
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <button id="saveBtn">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8"/><path d="M7 3v5h8"/></svg>
+        保存设置
+      </button>
+      <div id="status"></div>
+    </main>
+
+    <div class="footer">
+      <a href="mailto:garyzhang345@gmail.com?subject=【Gary插件反馈】" class="footer-link link-feedback" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/></svg>
+        反馈建议
+      </a>
+
+      <a href="https://afdian.com/a/garygary" target="_blank" class="footer-link link-donate" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>
+        支持开发者
+      </a>
     </div>
-  </details>
-
-  <button id="saveBtn">💾 保存配置</button>
-  <div id="status"></div>
-
-  <div class="footer">
-    <a href="mailto:garyzhang345@gmail.com?subject=【Gary插件反馈】" class="footer-link link-feedback" rel="noopener noreferrer">
-      💬 反馈建议
-    </a>
-
-    <a href="https://afdian.com/a/garygary" target="_blank" class="footer-link link-donate" rel="noopener noreferrer">
-      ☕ 请作者喝杯咖啡
-    </a>
+    <p class="privacy-note">v7.1 ｜ 仅在当前浏览器本地存储，不会上传任何数据。</p>
   </div>
 
   <script src="popup.js"></script>

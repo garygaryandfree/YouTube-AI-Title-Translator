@@ -1,3 +1,31 @@
+if (!globalThis.chrome || !globalThis.chrome.storage || !globalThis.chrome.storage.local) {
+    const previewStore = {};
+    globalThis.chrome = {
+        storage: {
+            local: {
+                get(keys, callback) {
+                    const result = {};
+                    (Array.isArray(keys) ? keys : Object.keys(keys || {})).forEach(key => {
+                        if (Object.prototype.hasOwnProperty.call(previewStore, key)) {
+                            result[key] = previewStore[key];
+                        }
+                    });
+                    callback(result);
+                },
+                set(values, callback) {
+                    Object.assign(previewStore, values);
+                    if (callback) callback();
+                }
+            }
+        },
+        permissions: {
+            request() {
+                return Promise.resolve(true);
+            }
+        }
+    };
+}
+
 // 预设参数库：每个 provider 配一个 url 模板 + 模型列表
 // Gemini 的 url 含 {MODEL} 占位符，保存时按所选模型替换
 const PRESETS = {
@@ -80,6 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const advancedContent   = document.getElementById('advancedContent');
     const apiUrlGroup       = document.getElementById('apiUrlGroup');
     const modelNameGroup    = document.getElementById('modelNameGroup');
+    const apiKeyVisibility  = document.getElementById('apiKeyVisibility');
 
     const cards = {
         deepseek: document.getElementById('card-deepseek'),
@@ -93,21 +122,52 @@ document.addEventListener('DOMContentLoaded', () => {
     let providerConfigs = {};
 
     // 主开关：默认开启，切换立即落盘
+    function setSaveButtonLabel(label) {
+        saveBtn.innerHTML = `
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                <path d="M17 21v-8H7v8"></path>
+                <path d="M7 3v5h8"></path>
+            </svg>
+            ${label}
+        `;
+    }
+
+    function setStatus(message, color) {
+        status.textContent = message;
+        status.style.color = color || "";
+    }
+
     chrome.storage.local.get(['enabled'], (result) => {
         masterToggle.checked = result.enabled !== false;   // undefined 视为 true
     });
     masterToggle.addEventListener('change', () => {
         chrome.storage.local.set({ enabled: masterToggle.checked });
-        status.textContent = masterToggle.checked
-            ? "✅ 翻译已开启（刷新 YouTube 生效）"
-            : "⏸ 翻译已暂停";
-        status.style.color = masterToggle.checked ? "#2e7d32" : "#888";
-        setTimeout(() => status.textContent = '', 2000);
+        setStatus(
+            masterToggle.checked ? "翻译已开启，刷新 YouTube 后生效" : "翻译已暂停",
+            masterToggle.checked ? "#1d9a57" : "#69717f"
+        );
+        setTimeout(() => setStatus(""), 2000);
     });
 
     Object.keys(cards).forEach(p => {
         cards[p].addEventListener('click', () => selectProvider(p));
+        cards[p].addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                selectProvider(p);
+            }
+        });
     });
+
+    if (apiKeyVisibility) {
+        apiKeyVisibility.addEventListener('click', () => {
+            const shouldShow = apiKeyInput.type === 'password';
+            apiKeyInput.type = shouldShow ? 'text' : 'password';
+            apiKeyVisibility.setAttribute('aria-pressed', shouldShow ? 'true' : 'false');
+            apiKeyVisibility.title = shouldShow ? '隐藏 API Key' : '显示 API Key';
+        });
+    }
 
     // 切换模型版本：同步写入高级设置里的 url / model 输入框
     modelSelect.addEventListener('change', () => {
@@ -156,10 +216,10 @@ document.addEventListener('DOMContentLoaded', () => {
     function selectProvider(provider) {
         hydrateForm(provider);
         const hasKey = !!(providerConfigs[provider] && providerConfigs[provider].apiKey);
-        status.textContent = hasKey
-            ? `已切换为 ${provider}（含已保存 Key）`
-            : `已切换为 ${provider}（未配置 Key）`;
-        setTimeout(() => status.textContent = '', 1800);
+        setStatus(hasKey
+            ? `已切换为 ${provider}，已读取保存的 Key`
+            : `已切换为 ${provider}，还未配置 Key`);
+        setTimeout(() => setStatus(""), 1800);
     }
 
     function updateUIState(provider, preferredModelId) {
@@ -167,6 +227,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         Object.keys(cards).forEach(key => {
             cards[key].classList.toggle('active', key === provider);
+            cards[key].setAttribute('aria-pressed', key === provider ? 'true' : 'false');
         });
 
         const info = PRESETS[provider];
@@ -246,8 +307,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const model = modelNameInput.value.trim();
 
         if (!key) {
-            status.textContent = "❌ 必须要填 API Key";
-            status.style.color = "#d32f2f";
+            setStatus("必须填写 API Key", "#d92d20");
             apiKeyInput.focus();
             return;
         }
@@ -255,14 +315,12 @@ document.addEventListener('DOMContentLoaded', () => {
         // 自定义端点：URL 和 model 也必填，并申请该域名访问权限
         if (currentProvider === 'custom') {
             if (!url || !model) {
-                status.textContent = "❌ 自定义端点需要填 URL 和模型名";
-                status.style.color = "#d32f2f";
+                setStatus("自定义端点需要填写 URL 和模型名", "#d92d20");
                 return;
             }
             const granted = await ensureHostPermission(url);
             if (!granted) {
-                status.textContent = "❌ 未授予该域名访问权限，无法调用";
-                status.style.color = "#d32f2f";
+                setStatus("未授予该域名访问权限，无法调用", "#d92d20");
                 return;
             }
         }
@@ -278,10 +336,9 @@ document.addEventListener('DOMContentLoaded', () => {
             customApiKey:     key,
             customModel:      model
         }, () => {
-            status.textContent = "✅ 保存成功！请刷新 YouTube";
-            status.style.color = "#2e7d32";
-            saveBtn.textContent = "已保存";
-            setTimeout(() => { saveBtn.textContent = "💾 保存配置"; }, 1500);
+            setStatus("保存成功，请刷新 YouTube 页面", "#1d9a57");
+            setSaveButtonLabel("已保存");
+            setTimeout(() => { setSaveButtonLabel("保存设置"); }, 1500);
         });
     });
 });

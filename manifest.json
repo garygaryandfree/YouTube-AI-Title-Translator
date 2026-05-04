@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "YouTube AI 标题翻译 (全能版)",
-  "version": "7.0",
+  "version": "7.1",
   "description": "一键支持 DeepSeek / OpenAI / Google Gemini / MiniMax / 自定义 OpenAI 兼容端点，自动翻译 YouTube 标题。",
 
   "icons": {
