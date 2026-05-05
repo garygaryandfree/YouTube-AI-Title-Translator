@@ -143,10 +143,19 @@ function initConfig() {
 initConfig();
 
 // --- UI 创建函数 ---
-function createSafeBadge(tagText, cnText, isMainTitle = false) {
+function buildTooltip(originalText, statusText) {
+    return `原标题：${originalText}${statusText ? `\n状态：${statusText}` : ""}`;
+}
+
+function setBoxTooltip(box, originalText, statusText) {
+    box.title = buildTooltip(originalText, statusText);
+}
+
+function createSafeBadge(tagText, cnText, isMainTitle = false, originalText = "", statusText = "") {
     const container = document.createElement('div');
     container.className = 'gary-cn-box';
     if (isMainTitle) { container.style.marginBottom = "8px"; container.style.marginTop = "4px"; }
+    setBoxTooltip(container, originalText, statusText);
 
     const tagSpan = document.createElement('span');
     tagSpan.className = 'gary-tag';
@@ -189,22 +198,70 @@ async function fetchAiTranslation(text) {
 }
 
 // 渲染辅助函数（批量翻译走相同的成功/失败渲染路径）
-function renderSuccess(box, result) {
+function renderStatus(box, tagText, cnText, statusText) {
     const tag = box.querySelector('.gary-tag');
     const title = box.querySelector('.gary-cn-title');
-    if (tag) tag.textContent = result.tag;
-    if (title) title.textContent = result.cn;
+    if (tag) {
+        tag.classList.remove('gary-error');
+        tag.textContent = tagText;
+    }
+    if (title) {
+        title.classList.remove('gary-error');
+        title.textContent = cnText;
+        title.style.color = "";
+    }
+    setBoxTooltip(box, box.dataset.garyOriginal || "", statusText);
 }
-function renderError(box) {
+
+function renderSuccess(box, result) {
+    renderStatus(box, result.tag, result.cn, "已完成");
+}
+
+function getFriendlyErrorText(error) {
+    const type = error && error.type ? error.type : "";
+    if (type === "auth") return "Key 无效";
+    if (type === "quota") return "余额不足或被限流";
+    if (type === "model") return "模型名可能错误";
+    if (type === "parse" || type === "empty") return "模型返回格式异常";
+    return "网络或服务商异常";
+}
+
+function renderError(box, error) {
     const tag = box.querySelector('.gary-tag');
     const title = box.querySelector('.gary-cn-title');
+    const reason = getFriendlyErrorText(error);
     if (tag)   { tag.classList.add('gary-error');   tag.textContent = "❌"; }
-    if (title) { title.classList.add('gary-error'); title.textContent = "翻译失败（按 F12 看 Console）"; }
-    box.title = "请检查 API Key、模型名、余额；或敏感内容被风控";
+    if (title) { title.classList.add('gary-error'); title.textContent = `翻译失败：${reason}`; }
+    setBoxTooltip(box, box.dataset.garyOriginal || "", `翻译失败：${reason}`);
 }
 
 // --- 页面扫描 + 批量翻译 ---
-const BATCH_SIZE = 5;
+const PRIORITY_VIEWPORT_MARGIN = 320;
+
+function isNearViewport(el) {
+    const rect = el.getBoundingClientRect();
+    if (rect.width <= 0 || rect.height <= 0) return false;
+    return rect.bottom >= -PRIORITY_VIEWPORT_MARGIN &&
+        rect.top <= window.innerHeight + PRIORITY_VIEWPORT_MARGIN;
+}
+
+function getDynamicBatchSize() {
+    const model = (USER_CONFIG.model || "").toLowerCase();
+    if (!model) return 6;
+    if ((model.includes("m2.7") && !model.includes("highspeed")) ||
+        model.includes("thinking") ||
+        model.includes("reason")) {
+        return 4;
+    }
+    if (model.includes("flash") ||
+        model.includes("highspeed") ||
+        model.includes("turbo") ||
+        model.includes("haiku") ||
+        model.includes("deepseek")) {
+        return 8;
+    }
+    return 6;
+}
 
 async function process() {
     if (!ENABLED) return;
@@ -215,6 +272,7 @@ async function process() {
     for (const el of titles) {
         if (el.getAttribute('data-gary-done')) continue;
         if (el.closest('ytd-comments') || el.closest('ytd-comment-renderer') || el.closest('#comments')) continue;
+        if (!isNearViewport(el)) continue;
 
         const text = el.innerText.trim();
         if (!text || text.length < 3) continue;
@@ -251,11 +309,12 @@ async function process() {
 
         const cached = cacheGet(text);
 
-        let tag = "未配置", cn = "请配置插件";
-        if (cached) { tag = cached.tag; cn = cached.cn; }
-        else if (USER_CONFIG.apiKey) { tag = "AI"; cn = "翻译中..."; }
+        let tag = "未配置", cn = "请配置插件", statusText = "未配置";
+        if (cached) { tag = cached.tag; cn = cached.cn; statusText = "已缓存"; }
+        else if (USER_CONFIG.apiKey) { tag = "队列"; cn = "排队中..."; statusText = "排队中"; }
 
-        const box = createSafeBadge(tag, cn, isMainTitle);
+        const box = createSafeBadge(tag, cn, isMainTitle, text, statusText);
+        box.dataset.garyOriginal = text;
         try {
             parent.insertBefore(box, targetElement);
             el.classList.add('gary-en-sub');
@@ -275,16 +334,18 @@ async function process() {
 
     if (pendingBatch.length === 0) return;
 
-    // 切成 5 条/批，并行送给 SW 批量翻译
+    // 按模型动态切批，真正的并发限制在 background SW 统一处理。
+    const batchSize = getDynamicBatchSize();
     const chunks = [];
-    for (let i = 0; i < pendingBatch.length; i += BATCH_SIZE) {
-        chunks.push(pendingBatch.slice(i, i + BATCH_SIZE));
+    for (let i = 0; i < pendingBatch.length; i += batchSize) {
+        chunks.push(pendingBatch.slice(i, i + batchSize));
     }
-    await Promise.all(chunks.map(translateChunk));
+    chunks.forEach(translateChunk);
 }
 
 async function translateChunk(chunk) {
     let reply;
+    chunk.forEach(p => renderStatus(p.box, "AI", "翻译中...", "翻译中"));
     try {
         reply = await chrome.runtime.sendMessage({
             type: 'translateBatch',
@@ -297,12 +358,12 @@ async function translateChunk(chunk) {
         });
     } catch (e) {
         console.error("[Gary] SW 通信失败:", e);
-        chunk.forEach(p => renderError(p.box));
+        chunk.forEach(p => renderError(p.box, { type: "network" }));
         return;
     }
 
-    if (!reply || !reply.ok || !Array.isArray(reply.results)) {
-        chunk.forEach(p => renderError(p.box));
+    if (!reply || !Array.isArray(reply.results)) {
+        chunk.forEach(p => renderError(p.box, reply && reply.error));
         return;
     }
 
@@ -312,7 +373,8 @@ async function translateChunk(chunk) {
             renderSuccess(p.box, result);
             cacheSet(p.text, result);
         } else {
-            renderError(p.box);
+            const itemError = Array.isArray(reply.errors) ? reply.errors[i] : null;
+            renderError(p.box, itemError || reply.error);
         }
     });
 }
@@ -343,6 +405,8 @@ function startObserver() {
     }
     const observer = new MutationObserver(() => scheduleProcess());
     observer.observe(root, { childList: true, subtree: true });
+    window.addEventListener('scroll', scheduleProcess, { passive: true });
+    window.addEventListener('resize', scheduleProcess, { passive: true });
     console.log("👁  MutationObserver 已挂载");
     // 首次扫描（处理 observer 挂载之前已经存在的标题）
     scheduleProcess();
