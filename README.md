@@ -10,47 +10,27 @@
 
 如果你经常看国外 YouTube 视频，但不想每次都读英文标题，这个插件可以解决 90% 的标题理解问题：打开 YouTube，标题自动翻译，前面还会显示内容标签，帮你一秒判断这个视频到底在讲什么。
 
-## 当前版本：v7.1 清爽配置中心
+## 当前版本：v7.2 多模型配置中心
 
-v7.1 是一次面向日常使用体验的大版本迭代。核心目标不是堆功能，而是让配置过程更清楚、更稳定、更容易被普通用户理解。
+v7.2 的重点是让模型配置更完整、更直观。配置页删除了容易造成困惑的“高级设置”区：预设服务商只需要选择模型并填写 API Key；选择“自定义”时才显示 API Endpoint 和模型名。服务商也扩展为 OpenAI、Gemini、Claude、DeepSeek、MiniMax、智谱、Kimi 和自定义，排序上把 OpenAI、Gemini、Claude 放在前面，国产模型和自定义放在后面。
 
-本次更新重新设计了整个弹窗配置页：顶部品牌区、翻译开关、AI 服务商选择、模型配置、API Key 输入、高级设置和保存操作都重新排版。界面去掉了旧版偏重的红色光晕和装饰阴影，改为更轻、更干净的视觉语言；主操作色也从高饱和大红调整为清新的青绿色，让开关和保存按钮更耐看。
+本版同时更新了模型列表，并给每个预设服务商增加“其他（手动输入模型名）”。当服务商发布新模型而插件还没同步时，你可以直接填写官方文档中的模型 ID。Claude 已改为 Anthropic Messages API 请求格式；Claude、智谱/Z.ai、Kimi 也替换为真实品牌 logo。底部“支持开发者”按钮调整为红色系，与插件主视觉更统一。
 
-AI 服务商区域现在使用本地品牌图标资源，DeepSeek、OpenAI、Gemini、MiniMax 和自定义端点有更明确的识别度。API Key 输入增加了显示/隐藏按钮，服务商卡片增加键盘可访问操作，保存后的状态反馈也改成更自然的中文提示。
+| 更新点 | 说明 |
+|--------|------|
+| 配置简化 | 删除“高级设置”区，减少重复入口 |
+| 服务商扩展 | 新增 Claude、智谱、Kimi，整体改为 4 列两行布局 |
+| 模型更新 | 更新 OpenAI、Gemini、Claude、DeepSeek、MiniMax、智谱、Kimi 的推荐模型 |
+| 手动模型 | 所有预设服务商都支持“其他（手动输入模型名）” |
+| Claude 支持 | Background Service Worker 增加 Anthropic Messages API 调用格式 |
+| 品牌图标 | Claude、智谱/Z.ai、Kimi 使用真实 logo 资源 |
+| 视觉调整 | 主操作色和“支持开发者”按钮统一为红色系 |
 
-## v7.1 更新内容
+## 为什么用这个插件
 
-| 模块 | 更新 |
-|------|------|
-| 配置页面 | 全新弹窗布局，信息层级更清晰，操作路径更短 |
-| 视觉设计 | 移除光晕和厚重阴影，采用简洁、轻量、留白更合理的界面 |
-| 主题色 | 将主操作色调整为清新的青绿色，降低视觉压力 |
-| 服务商选择 | 新增/优化本地品牌图标资源，支持 DeepSeek、OpenAI、Gemini、MiniMax、自定义 |
-| 翻译开关 | 修正开关按钮居中问题，视觉状态更稳定 |
-| API Key | 增加显示/隐藏能力，减少配置时的输入确认成本 |
-| 可访问性 | 服务商卡片支持键盘 Enter/Space 选择，并同步 aria 状态 |
-| 隐私提示 | 强化“仅本地存储，不上传数据”的说明 |
+普通翻译工具更擅长逐词翻译，但 YouTube 标题经常有梗、夸张表达、省略语、挑战句式和内容营销写法。直接机翻容易生硬、有翻译腔，也经常看不出视频重点。
 
-## 核心卖点
-
-| 卖点 | 说明 | 适合谁 |
-|------|------|--------|
-| 更像中文标题 | 相比传统机翻和普通网页翻译，更重视语境、语气和中文表达习惯 | 经常看英文 YouTube 的中文用户 |
-| 一秒识别内容类型 | 标题前自动增加标签，例如科技、游戏、教程、财经、影视等 | 想快速判断视频值不值得点开的人 |
-| 多模型自由选择 | 支持 DeepSeek、OpenAI、Google Gemini、MiniMax 和自定义 OpenAI 兼容端点 | 已经有 API Key 或模型套餐的用户 |
-| 消耗闲置额度 | 如果你买了 coding plan 或 token plan 但额度用不完，可以把它变成日常看视频的实用工具 | 有 AI 套餐、API 余额、token 额度的用户 |
-| 本地隐私 | API Key 只存在浏览器本地，不上传到作者服务器 | 关注数据安全的用户 |
-
-## 为什么不是普通翻译插件
-
-普通翻译工具更擅长逐词翻译，但 YouTube 标题经常有梗、夸张表达、省略语、挑战句式和内容营销写法。直接机翻会出现生硬、像翻译腔、看不出重点的问题。
-
-这个插件用 AI 模型按“中文标题”的方式重新表达，目标是：
-
-- 保留原标题吸引力，不把标题翻得死板。
-- 理解标题里的梗、语气、上下文和专业词。
-- 给标题加上内容标签，先判断类型，再决定要不要点开。
-- 让你刷 YouTube 时不用在英文标题上消耗注意力。
+这个插件的目标不是逐字翻译，而是把 YouTube 标题改写成更自然的中文标题：理解标题里的语气、上下文、专业词和视频类型，同时保留原标题的吸引力。翻译结果会直接嵌入 YouTube 页面，并在标题前显示内容标签，让你先判断视频类型，再决定要不要点开。
 
 支持的标签包括：
 
@@ -58,18 +38,19 @@ AI 服务商区域现在使用本地品牌图标资源，DeepSeek、OpenAI、Gem
 科技 / 游戏 / 音乐 / 教程 / 搞笑 / 新闻 / 财经 / 生活 / 体育 / 影视 / 美食 / 其它
 ```
 
-## 项目亮点
+## 功能亮点
 
-| 特性 | 描述 | 优势 |
-|------|------|------|
-| 多 AI 模型支持 | DeepSeek、OpenAI、Google Gemini、MiniMax、自定义 OpenAI 兼容端点 | 灵活选择，按成本和质量自由切换 |
-| 标题标签 | 每个翻译标题前自动显示内容分类 | 快速判断视频主题，减少无效点击 |
-| 精准翻译 | 理解俚语、梗、专业术语和 YouTube 标题风格 | 更自然，更像中文用户会写的标题 |
-| 隐私优先 | API Key 仅存储在本地浏览器 | 不经过作者服务器，不上传配置数据 |
-| 智能缓存 | 翻译结果本地缓存 | 避免重复消耗 token，提升加载速度 |
-| 批量翻译 | 多个标题合并请求处理 | 减少请求次数，提升效率 |
-| 原生体验 | 翻译结果直接融入 YouTube 页面 | 不破坏原有浏览体验 |
-| 自定义端点 | 支持 OpenRouter、SiliconFlow、火山方舟、本地 Ollama、LM Studio 等 | 用你已有的模型服务和余额 |
+| 功能 | 说明 |
+|------|------|
+| 多 AI 服务商 | 支持 OpenAI、Google Gemini、Claude、DeepSeek、MiniMax、智谱、Kimi 和自定义端点 |
+| 标题智能改写 | 理解俚语、梗、专业术语和 YouTube 标题风格，输出更自然的中文标题 |
+| 内容标签 | 每个标题前自动显示分类标签，快速判断视频主题 |
+| 手动模型名 | 预设列表没有目标模型时，可以选择“其他”并手动填写模型 ID |
+| 本地隐私 | API Key 仅保存在当前浏览器本地，不经过作者服务器 |
+| 智能缓存 | 相同标题只翻译一次，减少重复 token 消耗 |
+| 批量翻译 | 多个标题合并请求，减少 API 调用次数 |
+| 原生体验 | 翻译结果直接融入 YouTube 页面，不需要额外窗口 |
+| 自定义端点 | 支持 OpenRouter、SiliconFlow、火山方舟、本地 Ollama、LM Studio 等 OpenAI 兼容服务 |
 
 ## 快速开始
 
@@ -91,7 +72,7 @@ AI 服务商区域现在使用本地品牌图标资源，DeepSeek、OpenAI、Gem
 
 1. 点击浏览器右上角的插件图标。
 2. 打开“翻译开关”。
-3. 选择 AI 服务商：DeepSeek、OpenAI、Gemini、MiniMax 或自定义。
+3. 选择 AI 服务商：OpenAI、Gemini、Claude、DeepSeek、MiniMax、智谱、Kimi 或自定义。
 4. 选择模型版本。
 5. 粘贴对应服务商的 API Key。
 6. 点击“保存设置”。
@@ -101,10 +82,29 @@ AI 服务商区域现在使用本地品牌图标资源，DeepSeek、OpenAI、Gem
 
 | 服务商 | 获取地址 |
 |--------|----------|
-| DeepSeek | [platform.deepseek.com/api_keys](https://platform.deepseek.com/api_keys) |
 | OpenAI | [platform.openai.com/api-keys](https://platform.openai.com/api-keys) |
 | Google Gemini | [aistudio.google.com/app/apikey](https://aistudio.google.com/app/apikey) |
+| Claude | [console.anthropic.com/settings/keys](https://console.anthropic.com/settings/keys) |
+| DeepSeek | [platform.deepseek.com/api_keys](https://platform.deepseek.com/api_keys) |
 | MiniMax | [platform.minimaxi.com/user-center/basic-information/interface-key](https://platform.minimaxi.com/user-center/basic-information/interface-key) |
+| 智谱 | [bigmodel.cn/usercenter/proj-mgmt/apikeys](https://bigmodel.cn/usercenter/proj-mgmt/apikeys) |
+| Kimi | [platform.kimi.com/console/api-keys](https://platform.kimi.com/console/api-keys) |
+
+## 内置模型列表
+
+插件会提供常用模型预设，也允许你手动填写模型 ID。
+
+| 服务商 | 默认模型 |
+|--------|----------|
+| OpenAI | `gpt-5.5`、`gpt-5.4-mini`、`gpt-5.4` |
+| Gemini | `gemini-3-pro-preview`、`gemini-3-flash-preview`、`gemini-2.5-flash` |
+| Claude | `claude-opus-4-7`、`claude-opus-4-6`、`claude-sonnet-4-6`、`claude-haiku-4-5` |
+| DeepSeek | `deepseek-v4-flash`、`deepseek-v4-pro`、`deepseek-chat` |
+| MiniMax | `MiniMax-M2.7-highspeed`、`MiniMax-M2.7`、`MiniMax-M2.5` |
+| 智谱 | `glm-5.1`、`glm-5.1-flash`、`glm-4.6` |
+| Kimi | `kimi-k2.6`、`kimi-k2.6-turbo`、`kimi-k2.6-thinking` |
+
+如果下拉里没有你想用的模型，选择“其他（手动输入模型名）”，然后填写服务商文档中给出的模型 ID。
 
 ## 自定义端点
 
@@ -113,7 +113,7 @@ AI 服务商区域现在使用本地品牌图标资源，DeepSeek、OpenAI、Gem
 需要填写：
 
 - `API Endpoint`：完整的接口地址，例如 `https://openrouter.ai/api/v1/chat/completions`
-- `模型名称`：服务商要求的模型 ID，例如 `openai/gpt-4o-mini`
+- `模型名称`：服务商要求的模型 ID，例如 `openai/gpt-5.4-mini`
 - `API Key`：对应服务商的密钥
 
 首次保存新的接口域名时，Chrome 可能会弹出权限确认，这是为了让扩展能直接访问你填写的服务商地址。
@@ -158,7 +158,7 @@ AI 会为每个标题返回一个内容标签，例如科技、游戏、教程�
 
 - 智能缓存：相同标题只翻译一次。
 - 批量处理：多个标题合并请求，减少 API 调用次数。
-- 多模型选择：按质量、速度、价格选择最合适的模型。
+- 多模型选择：按质量、速度、价格选择最合适的模型；如果列表里没有目标模型，也可以手动填写模型 ID。
 - 闲置额度利用：适合消耗已经购买但用不完的 coding plan、token plan 或 API 余额。
 
 ### 5. 用户体验优化
@@ -166,7 +166,7 @@ AI 会为每个标题返回一个内容标签，例如科技、游戏、教程�
 - 实时翻译：页面加载和滚动时自动处理新标题。
 - 无缝集成：翻译内容嵌入 YouTube 页面，不需要打开额外窗口。
 - 一键暂停：不需要翻译时可以直接关闭主开关。
-- 本地配置中心：服务商、模型、API Key、高级端点集中管理。
+- 本地配置中心：服务商、模型、API Key、自定义端点集中管理。
 
 ## 性能对比
 
@@ -183,7 +183,7 @@ AI 会为每个标题返回一个内容标签，例如科技、游戏、教程�
 
 - 前端：HTML5、CSS3、JavaScript
 - 浏览器 API：Chrome Extensions Manifest V3
-- AI 集成：DeepSeek API、OpenAI API、Google Gemini API、MiniMax API、自定义 OpenAI 兼容端点
+- AI 集成：OpenAI API、Google Gemini API、Anthropic Claude API、DeepSeek API、MiniMax API、智谱 GLM API、Kimi API、自定义 OpenAI 兼容端点
 - 存储：Chrome Storage Local API
 - 架构：Content Script + Background Service Worker
 - 构建：原生开发，无构建依赖
@@ -247,7 +247,9 @@ cd YouTube-AI-Title-Translator
 
 ### 支持自定义模型吗？
 
-支持。选择“自定义”后，可以填写兼容 OpenAI 接口格式的 API Endpoint 和模型名。
+支持。每个预设服务商的模型下拉里都有“其他（手动输入模型名）”。选择后填写该服务商支持的模型 ID 即可。
+
+如果你使用 OpenRouter、SiliconFlow、火山方舟、本地 Ollama、LM Studio 等第三方或本地模型服务，可以选择“自定义”，填写兼容 OpenAI 接口格式的 API Endpoint 和模型名。
 
 ### 支持其他语言吗？
 
@@ -268,7 +270,7 @@ cd YouTube-AI-Title-Translator
 
 ## 致谢
 
-感谢 DeepSeek、OpenAI、Google Gemini、MiniMax 提供模型与 API 能力，也感谢所有测试用户和反馈者。
+感谢 OpenAI、Google Gemini、Anthropic Claude、DeepSeek、MiniMax、智谱、Kimi 提供模型与 API 能力，也感谢所有测试用户和反馈者。
 
 [![Star History Chart](https://api.star-history.com/svg?repos=garygaryandfree/YouTube-AI-Title-Translator&type=Date)](https://star-history.com/#garygaryandfree/YouTube-AI-Title-Translator&Date)
 

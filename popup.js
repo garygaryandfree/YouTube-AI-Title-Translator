@@ -28,26 +28,17 @@ if (!globalThis.chrome || !globalThis.chrome.storage || !globalThis.chrome.stora
 
 // 预设参数库：每个 provider 配一个 url 模板 + 模型列表
 // Gemini 的 url 含 {MODEL} 占位符，保存时按所选模型替换
+const CUSTOM_MODEL_VALUE = "__custom_model__";
+
 const PRESETS = {
-    deepseek: {
-        url: "https://api.deepseek.com/chat/completions",
-        helpUrl: "https://platform.deepseek.com/api_keys",
-        helpText: "去 DeepSeek 官网申请",
-        models: [
-            { id: "deepseek-v4-flash", label: "V4 Flash（推荐，便宜快）" },
-            { id: "deepseek-v4-pro",   label: "V4 Pro（更强，贵）" },
-            { id: "deepseek-chat",     label: "V3 chat（旧版，兼容）" },
-            { id: "deepseek-reasoner", label: "R1 reasoner（旧版，兼容）" }
-        ]
-    },
     openai: {
         url: "https://api.openai.com/v1/chat/completions",
         helpUrl: "https://platform.openai.com/api-keys",
         helpText: "去 OpenAI 官网申请",
         models: [
-            { id: "gpt-4o-mini",  label: "4o-mini（性价比首选）" },
-            { id: "gpt-4o",       label: "4o（更准但贵 10x）" },
-            { id: "gpt-4.1-mini", label: "4.1-mini" }
+            { id: "gpt-5.5",      label: "GPT-5.5（旗舰）" },
+            { id: "gpt-5.4-mini", label: "GPT-5.4 Mini（推荐）" },
+            { id: "gpt-5.4",      label: "GPT-5.4" }
         ]
     },
     google: {
@@ -55,9 +46,30 @@ const PRESETS = {
         helpUrl: "https://aistudio.google.com/app/apikey",
         helpText: "去 Google AI Studio 申请",
         models: [
-            { id: "gemini-2.5-flash", label: "2.5 Flash（推荐）" },
-            { id: "gemini-2.5-pro",   label: "2.5 Pro（贵）" },
-            { id: "gemini-1.5-flash", label: "1.5 Flash（旧）" }
+            { id: "gemini-3-pro-preview",   label: "Gemini 3 Pro Preview（最强）" },
+            { id: "gemini-3-flash-preview", label: "Gemini 3 Flash Preview（推荐）" },
+            { id: "gemini-2.5-flash",       label: "Gemini 2.5 Flash（稳定）" }
+        ]
+    },
+    anthropic: {
+        url: "https://api.anthropic.com/v1/messages",
+        helpUrl: "https://console.anthropic.com/settings/keys",
+        helpText: "去 Claude Console 申请",
+        models: [
+            { id: "claude-opus-4-7",   label: "Claude Opus 4.7（最强）" },
+            { id: "claude-opus-4-6",   label: "Claude Opus 4.6" },
+            { id: "claude-sonnet-4-6", label: "Claude Sonnet 4.6（推荐）" },
+            { id: "claude-haiku-4-5",  label: "Claude Haiku 4.5（快）" }
+        ]
+    },
+    deepseek: {
+        url: "https://api.deepseek.com/chat/completions",
+        helpUrl: "https://platform.deepseek.com/api_keys",
+        helpText: "去 DeepSeek 官网申请",
+        models: [
+            { id: "deepseek-v4-flash", label: "V4 Flash（推荐，便宜快）" },
+            { id: "deepseek-v4-pro",   label: "V4 Pro（更强）" },
+            { id: "deepseek-chat",     label: "V3 Chat（兼容旧 Key）" }
         ]
     },
     minimax: {
@@ -69,8 +81,27 @@ const PRESETS = {
         models: [
             { id: "MiniMax-M2.7-highspeed", label: "M2.7 高速（推荐，标题翻译用这个）" },
             { id: "MiniMax-M2.7",           label: "M2.7（推理模型，慢但更准）" },
-            { id: "MiniMax-M2.5",           label: "M2.5" },
-            { id: "MiniMax-M2.1",           label: "M2.1（旧版）" }
+            { id: "MiniMax-M2.5",           label: "M2.5（兼容）" }
+        ]
+    },
+    zhipu: {
+        url: "https://open.bigmodel.cn/api/paas/v4/chat/completions",
+        helpUrl: "https://bigmodel.cn/usercenter/proj-mgmt/apikeys",
+        helpText: "去智谱开放平台申请",
+        models: [
+            { id: "glm-5.1",       label: "GLM-5.1（推荐）" },
+            { id: "glm-5.1-flash", label: "GLM-5.1 Flash（快）" },
+            { id: "glm-4.6",       label: "GLM-4.6（稳定）" }
+        ]
+    },
+    kimi: {
+        url: "https://api.moonshot.cn/v1/chat/completions",
+        helpUrl: "https://platform.kimi.com/console/api-keys",
+        helpText: "去 Kimi 开放平台申请",
+        models: [
+            { id: "kimi-k2.6",          label: "Kimi K2.6（推荐）" },
+            { id: "kimi-k2.6-turbo",    label: "Kimi K2.6 Turbo（快）" },
+            { id: "kimi-k2.6-thinking", label: "Kimi K2.6 Thinking（推理）" }
         ]
     },
     // 自定义 OpenAI 兼容端点：让用户自己填 base URL 和 model 名，
@@ -80,11 +111,11 @@ const PRESETS = {
         url: "",
         helpUrl: "https://github.com/garygaryandfree/YouTube-AI-Title-Translator#%E8%87%AA%E5%AE%9A%E4%B9%89%E7%AB%AF%E7%82%B9",
         helpText: "查看自定义端点说明",
-        models: []   // 空数组：UI 上显示"请在下方高级设置填写"占位
+        models: []   // 空数组：UI 上显示自定义 URL / 模型名输入框
     }
 };
 
-let currentProvider = 'deepseek';
+let currentProvider = 'openai';
 
 function buildUrl(provider, modelId) {
     const tpl = PRESETS[provider].url;
@@ -101,20 +132,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const helpLinkContainer = document.getElementById('help-text');
     const masterToggle      = document.getElementById('masterToggle');
     const modelSection      = document.getElementById('modelSection');
+    const manualModelSection = document.getElementById('manualModelSection');
+    const manualModelNameSlot = document.getElementById('manualModelNameSlot');
     const customMainSettings = document.getElementById('customMainSettings');
     const customApiUrlSlot  = document.getElementById('customApiUrlSlot');
     const customModelNameSlot = document.getElementById('customModelNameSlot');
-    const advancedSettings  = document.getElementById('advancedSettings');
-    const advancedContent   = document.getElementById('advancedContent');
     const apiUrlGroup       = document.getElementById('apiUrlGroup');
     const modelNameGroup    = document.getElementById('modelNameGroup');
     const apiKeyVisibility  = document.getElementById('apiKeyVisibility');
 
     const cards = {
-        deepseek: document.getElementById('card-deepseek'),
         openai:   document.getElementById('card-openai'),
         google:   document.getElementById('card-google'),
+        anthropic: document.getElementById('card-anthropic'),
+        deepseek: document.getElementById('card-deepseek'),
         minimax:  document.getElementById('card-minimax'),
+        zhipu:    document.getElementById('card-zhipu'),
+        kimi:     document.getElementById('card-kimi'),
         custom:   document.getElementById('card-custom')
     };
 
@@ -169,11 +203,21 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 切换模型版本：同步写入高级设置里的 url / model 输入框
+    // 切换模型版本：同步写入隐藏的 url / model 输入框，保存时统一读取
     modelSelect.addEventListener('change', () => {
         const modelId = modelSelect.value;
-        modelNameInput.value = modelId;
-        apiUrlInput.value    = buildUrl(currentProvider, modelId);
+        const isManualModel = modelId === CUSTOM_MODEL_VALUE;
+        const cfg = providerConfigs[currentProvider] || {};
+        const savedManualModel = cfg.model && !isPresetModel(currentProvider, cfg.model) ? cfg.model : "";
+        modelNameInput.value = isManualModel ? savedManualModel : modelId;
+        apiUrlInput.value    = buildUrl(currentProvider, modelNameInput.value);
+        updateModelNamePlacement(currentProvider, isManualModel);
+    });
+
+    modelNameInput.addEventListener('input', () => {
+        if (currentProvider !== 'custom' && modelSelect.value === CUSTOM_MODEL_VALUE) {
+            apiUrlInput.value = buildUrl(currentProvider, modelNameInput.value.trim());
+        }
     });
 
     // 初始化：读取已保存配置（含旧版本扁平结构的迁移）
@@ -191,7 +235,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
             }
 
-            const provider = result.selectedProvider || 'deepseek';
+            const provider = PRESETS[result.selectedProvider] ? result.selectedProvider : 'openai';
             hydrateForm(provider);
         }
     );
@@ -208,8 +252,27 @@ document.addEventListener('DOMContentLoaded', () => {
         modelNameInput.value = modelId;
         apiUrlInput.value    = cfg.apiUrl || (provider === 'custom' ? '' : buildUrl(provider, modelId));
 
-        // 自定义模式下把 URL / 模型名放到主区，避免 Key 和必填项上下割裂
-        if (advancedSettings) advancedSettings.open = false;
+    }
+
+    function isPresetModel(provider, modelId) {
+        const info = PRESETS[provider];
+        return !!(info && info.models.some(m => m.id === modelId));
+    }
+
+    function updateModelNamePlacement(provider, showManualModel) {
+        const isCustom = provider === 'custom';
+        manualModelSection.style.display = !isCustom && showManualModel ? 'block' : 'none';
+
+        if (isCustom) {
+            customModelNameSlot.appendChild(modelNameGroup);
+            return;
+        }
+
+        manualModelNameSlot.appendChild(modelNameGroup);
+        if (showManualModel) {
+            modelNameInput.focus();
+            setStatus("请输入该服务商支持的模型 ID", "#69717f");
+        }
     }
 
     // 切换 provider：用那个 provider 自己存过的 key/url/model 重新填表
@@ -237,26 +300,26 @@ document.addEventListener('DOMContentLoaded', () => {
         const isCustom = provider === 'custom';
         modelSection.style.display = isCustom ? 'none' : '';
         customMainSettings.style.display = isCustom ? 'block' : 'none';
-        advancedSettings.style.display = isCustom ? 'none' : '';
+        manualModelSection.style.display = 'none';
         apiUrlInput.placeholder = isCustom
             ? "例如：https://openrouter.ai/api/v1/chat/completions"
             : "";
         modelNameInput.placeholder = isCustom
-            ? "例如：openai/gpt-4o-mini、deepseek/deepseek-chat"
-            : "";
+            ? "例如：openai/gpt-5.4-mini、anthropic/claude-sonnet-4"
+            : "填写服务商支持的模型 ID";
+
+        if (!isCustom) {
+            apiUrlGroup.remove();
+            manualModelNameSlot.appendChild(modelNameGroup);
+        }
 
         if (isCustom) {
             customApiUrlSlot.appendChild(apiUrlGroup);
-            customModelNameSlot.appendChild(modelNameGroup);
-        } else {
-            advancedContent.appendChild(apiUrlGroup);
-            advancedContent.appendChild(modelNameGroup);
+            updateModelNamePlacement(provider, false);
         }
 
-        // 重建模型下拉
         modelSelect.innerHTML = '';
 
-        // 自定义 provider 隐藏下拉，但仍保留一个占位 option，避免切回时状态丢失
         if (info.models.length === 0) {
             const opt = document.createElement('option');
             opt.value       = preferredModelId || '';
@@ -279,14 +342,16 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             modelSelect.appendChild(opt);
         });
-        // 如果用户在高级设置里手填了一个非预设模型，保留为"自定义"选项
+
+        const customModelOpt = document.createElement('option');
+        customModelOpt.value = CUSTOM_MODEL_VALUE;
+        customModelOpt.textContent = "其他（手动输入模型名）";
         if (preferredModelId && !matched) {
-            const opt = document.createElement('option');
-            opt.value       = preferredModelId;
-            opt.textContent = `${preferredModelId}（自定义）`;
-            opt.selected    = true;
-            modelSelect.appendChild(opt);
+            customModelOpt.selected = true;
         }
+        modelSelect.appendChild(customModelOpt);
+
+        updateModelNamePlacement(provider, !!(preferredModelId && !matched));
     }
 
     // 自定义端点保存前：申请该域名的 host_permissions
@@ -323,6 +388,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 setStatus("未授予该域名访问权限，无法调用", "#d92d20");
                 return;
             }
+        } else if (!model) {
+            setStatus("请填写模型名称，或从模型版本中选择一个预设", "#d92d20");
+            modelNameInput.focus();
+            return;
         }
 
         // 只更新当前 provider 那一项，其它 provider 的配置原样保留

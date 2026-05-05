@@ -30,6 +30,52 @@ function extractFirstJsonObject(s) {
     return null;
 }
 
+function getApiType(config) {
+    const apiUrl = config && config.apiUrl ? config.apiUrl : "";
+    if (apiUrl.includes("googleapis.com")) return "google";
+    if (apiUrl.includes("anthropic.com")) return "anthropic";
+    return "openai-compatible";
+}
+
+function extractTextFromResponse(data, apiType) {
+    if (apiType === "google") {
+        return data && data.candidates && data.candidates[0] && data.candidates[0].content
+            ? data.candidates[0].content.parts[0].text
+            : "";
+    }
+    if (apiType === "anthropic") {
+        const textBlock = data && Array.isArray(data.content)
+            ? data.content.find(part => part && part.type === "text" && part.text)
+            : null;
+        return textBlock ? textBlock.text : "";
+    }
+    return data && data.choices && data.choices[0] && data.choices[0].message
+        ? data.choices[0].message.content
+        : "";
+}
+
+function buildChatCompletionsBody(config, promptText, maxTokens, systemPrompt) {
+    const body = {
+        model: config.model,
+        messages: [{
+            role: "system",
+            content: systemPrompt
+        }, {
+            role: "user",
+            content: promptText
+        }],
+        temperature: 0.3,
+        max_tokens: maxTokens
+    };
+
+    // OpenAI 新模型使用 max_completion_tokens；多数 OpenAI 兼容服务只认 max_tokens。
+    if (config.apiUrl.includes("api.openai.com")) {
+        body.max_completion_tokens = maxTokens;
+    }
+
+    return body;
+}
+
 async function fetchAiTranslation(text, config) {
     if (!config || !config.apiKey) return null;
 
@@ -39,9 +85,9 @@ async function fetchAiTranslation(text, config) {
     let response;
 
     try {
-        const isGoogle = config.apiUrl.includes("googleapis.com");
+        const apiType = getApiType(config);
 
-        if (isGoogle) {
+        if (apiType === "google") {
             const urlWithKey = `${config.apiUrl}?key=${config.apiKey}`;
             response = await fetch(urlWithKey, {
                 method: "POST",
@@ -55,6 +101,25 @@ async function fetchAiTranslation(text, config) {
                     }
                 })
             });
+        } else if (apiType === "anthropic") {
+            response = await fetch(config.apiUrl, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "x-api-key": config.apiKey,
+                    "anthropic-version": "2023-06-01"
+                },
+                body: JSON.stringify({
+                    model: config.model,
+                    system: "You are a translator. Reply with exactly one JSON object and nothing else. Never repeat your output.",
+                    messages: [{
+                        role: "user",
+                        content: promptText
+                    }],
+                    temperature: 0.3,
+                    max_tokens: 2000
+                })
+            });
         } else {
             response = await fetch(config.apiUrl, {
                 method: "POST",
@@ -62,19 +127,12 @@ async function fetchAiTranslation(text, config) {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${config.apiKey}`
                 },
-                body: JSON.stringify({
-                    model: config.model,
-                    messages: [{
-                        role: "system",
-                        content: "You are a translator. Reply with exactly one JSON object and nothing else. Never repeat your output."
-                    }, {
-                        role: "user",
-                        content: promptText
-                    }],
-                    temperature: 0.3,
-                    max_tokens: 2000,
-                    max_completion_tokens: 2000
-                })
+                body: JSON.stringify(buildChatCompletionsBody(
+                    config,
+                    promptText,
+                    2000,
+                    "You are a translator. Reply with exactly one JSON object and nothing else. Never repeat your output."
+                ))
             });
         }
 
@@ -84,15 +142,7 @@ async function fetchAiTranslation(text, config) {
             return null;
         }
 
-        if (isGoogle) {
-            if (data.candidates && data.candidates[0] && data.candidates[0].content) {
-                raw = data.candidates[0].content.parts[0].text;
-            }
-        } else {
-            if (data.choices && data.choices[0] && data.choices[0].message) {
-                raw = data.choices[0].message.content;
-            }
-        }
+        raw = extractTextFromResponse(data, apiType);
 
         if (!raw) {
             console.error("[Gary BG] 模型返回空内容", data);
@@ -137,9 +187,9 @@ Input: ${JSON.stringify(numbered)}`;
     let response;
 
     try {
-        const isGoogle = config.apiUrl.includes("googleapis.com");
+        const apiType = getApiType(config);
 
-        if (isGoogle) {
+        if (apiType === "google") {
             const urlWithKey = `${config.apiUrl}?key=${config.apiKey}`;
             response = await fetch(urlWithKey, {
                 method: "POST",
@@ -153,6 +203,25 @@ Input: ${JSON.stringify(numbered)}`;
                     }
                 })
             });
+        } else if (apiType === "anthropic") {
+            response = await fetch(config.apiUrl, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "x-api-key": config.apiKey,
+                    "anthropic-version": "2023-06-01"
+                },
+                body: JSON.stringify({
+                    model: config.model,
+                    system: "You are a translator. Reply with exactly one JSON object and nothing else.",
+                    messages: [{
+                        role: "user",
+                        content: promptText
+                    }],
+                    temperature: 0.3,
+                    max_tokens: 4000
+                })
+            });
         } else {
             response = await fetch(config.apiUrl, {
                 method: "POST",
@@ -160,19 +229,12 @@ Input: ${JSON.stringify(numbered)}`;
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${config.apiKey}`
                 },
-                body: JSON.stringify({
-                    model: config.model,
-                    messages: [{
-                        role: "system",
-                        content: "You are a translator. Reply with exactly one JSON object and nothing else."
-                    }, {
-                        role: "user",
-                        content: promptText
-                    }],
-                    temperature: 0.3,
-                    max_tokens: 4000,
-                    max_completion_tokens: 4000
-                })
+                body: JSON.stringify(buildChatCompletionsBody(
+                    config,
+                    promptText,
+                    4000,
+                    "You are a translator. Reply with exactly one JSON object and nothing else."
+                ))
             });
         }
 
@@ -182,15 +244,7 @@ Input: ${JSON.stringify(numbered)}`;
             return items.map(() => null);
         }
 
-        if (isGoogle) {
-            if (data.candidates && data.candidates[0] && data.candidates[0].content) {
-                raw = data.candidates[0].content.parts[0].text;
-            }
-        } else {
-            if (data.choices && data.choices[0] && data.choices[0].message) {
-                raw = data.choices[0].message.content;
-            }
-        }
+        raw = extractTextFromResponse(data, apiType);
         if (!raw) {
             console.error("[Gary BG] 批量返回空内容", data);
             return items.map(() => null);

@@ -58,8 +58,8 @@
       --subtle: #8a93a3;
       --line: #dfe3ea;
       --line-strong: #cbd2dc;
-      --red: #14b8a6;
-      --red-dark: #0f766e;
+      --red: #ff0033;
+      --red-dark: #d9002b;
       --blue: #2868f0;
       --green: #1d9a57;
       --shadow: 0 14px 36px rgba(20, 24, 33, 0.10);
@@ -302,12 +302,9 @@
 
     .provider-grid {
       display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
-      overflow: hidden;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
       margin-bottom: 0;
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: 8px;
     }
 
     .provider-card {
@@ -322,14 +319,10 @@
       text-align: center;
       color: #49515d;
       background: var(--surface);
-      border: 0;
-      border-right: 1px solid var(--line);
+      border: 1px solid var(--line);
+      border-radius: 8px;
       cursor: pointer;
       transition: color .16s ease, background .16s ease, box-shadow .16s ease;
-    }
-
-    .provider-card:last-child {
-      border-right: 0;
     }
 
     .provider-card:hover {
@@ -418,8 +411,20 @@
       color: #4f46e5;
     }
 
+    #card-anthropic .p-icon {
+      color: #2d241f;
+    }
+
     #card-minimax .p-icon {
       color: var(--red);
+    }
+
+    #card-zhipu .p-icon {
+      color: #2563eb;
+    }
+
+    #card-kimi .p-icon {
+      color: #111827;
     }
 
     #card-custom .p-icon {
@@ -439,6 +444,10 @@
 
     .input-section, .custom-main-settings {
       margin-bottom: 14px;
+    }
+
+    #manualModelSection {
+      display: none;
     }
 
     .custom-main-settings {
@@ -553,50 +562,6 @@
       text-decoration: underline;
     }
 
-    details {
-      margin-bottom: 14px;
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: 8px;
-    }
-
-    summary {
-      list-style: none;
-      min-height: 46px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 0 14px;
-      font-size: 13px;
-      line-height: 1.25;
-      font-weight: 680;
-      color: #4d5562;
-      cursor: pointer;
-      outline: none;
-    }
-
-    summary::-webkit-details-marker {
-      display: none;
-    }
-
-    summary::before {
-      content: "";
-      width: 8px;
-      height: 8px;
-      border-right: 2px solid currentColor;
-      border-bottom: 2px solid currentColor;
-      transform: rotate(-45deg);
-      transition: transform .16s ease;
-    }
-
-    details[open] summary::before {
-      transform: rotate(45deg) translate(-2px, -2px);
-    }
-
-    .advanced-content {
-      padding: 0 14px 14px;
-    }
-
     .mini-group {
       margin-bottom: 14px;
     }
@@ -706,6 +671,14 @@
 
     .link-donate {
       color: var(--red-dark);
+      background: #fff1f3;
+      border-color: rgba(255, 0, 51, 0.24);
+    }
+
+    .link-donate:hover {
+      color: var(--red-dark);
+      background: #ffe3e8;
+      border-color: rgba(255, 0, 51, 0.36);
     }
 
     .footer-link svg {
@@ -717,6 +690,10 @@
       stroke-linecap: round;
       stroke-linejoin: round;
       flex: 0 0 auto;
+    }
+
+    .link-donate svg {
+      fill: rgba(255, 0, 51, 0.12);
     }
 
     .privacy-note {
@@ -772,12 +749,6 @@
       <section class="section" aria-labelledby="providerTitle">
         <h2 class="section-title" id="providerTitle">1. 选择 AI 服务商</h2>
         <div class="provider-grid">
-          <div class="provider-card active" id="card-deepseek" role="button" tabindex="0">
-            <span class="p-icon" aria-hidden="true">
-              <img class="brand-logo" src="assets/brands/deepseek.svg" alt="">
-            </span>
-            <span class="p-name">DeepSeek</span>
-          </div>
           <div class="provider-card" id="card-openai" role="button" tabindex="0">
             <span class="p-icon" aria-hidden="true">
               <img class="brand-logo" src="assets/brands/openai.svg" alt="">
@@ -790,11 +761,35 @@
             </span>
             <span class="p-name">Gemini</span>
           </div>
+          <div class="provider-card" id="card-anthropic" role="button" tabindex="0">
+            <span class="p-icon" aria-hidden="true">
+              <img class="brand-logo" src="assets/brands/claude.svg" alt="">
+            </span>
+            <span class="p-name">Claude</span>
+          </div>
+          <div class="provider-card" id="card-deepseek" role="button" tabindex="0">
+            <span class="p-icon" aria-hidden="true">
+              <img class="brand-logo" src="assets/brands/deepseek.svg" alt="">
+            </span>
+            <span class="p-name">DeepSeek</span>
+          </div>
           <div class="provider-card" id="card-minimax" role="button" tabindex="0">
             <span class="p-icon" aria-hidden="true">
               <img class="brand-logo" src="assets/brands/minimax.svg" alt="">
             </span>
             <span class="p-name">MiniMax</span>
+          </div>
+          <div class="provider-card" id="card-zhipu" role="button" tabindex="0">
+            <span class="p-icon" aria-hidden="true">
+              <img class="brand-logo" src="assets/brands/zai.svg" alt="">
+            </span>
+            <span class="p-name">智谱</span>
+          </div>
+          <div class="provider-card" id="card-kimi" role="button" tabindex="0">
+            <span class="p-icon" aria-hidden="true">
+              <img class="brand-logo" src="assets/brands/kimi.png" alt="">
+            </span>
+            <span class="p-name">Kimi</span>
           </div>
           <div class="provider-card" id="card-custom" role="button" tabindex="0">
             <span class="p-icon" aria-hidden="true">
@@ -811,11 +806,24 @@
           <label for="modelSelect">模型版本</label>
           <select id="modelSelect"></select>
         </div>
+        <div class="input-section" id="manualModelSection">
+          <div id="manualModelNameSlot"></div>
+        </div>
 
         <div class="custom-main-settings" id="customMainSettings">
           <label>自定义接口</label>
-          <div id="customApiUrlSlot"></div>
-          <div id="customModelNameSlot"></div>
+          <div id="customApiUrlSlot">
+            <div class="mini-group" id="apiUrlGroup">
+              <span class="mini-label">API 接口地址</span>
+              <input type="text" id="apiUrl" class="mini-input">
+            </div>
+          </div>
+          <div id="customModelNameSlot">
+            <div class="mini-group" id="modelNameGroup">
+              <span class="mini-label">模型名称</span>
+              <input type="text" id="modelName" class="mini-input">
+            </div>
+          </div>
         </div>
 
         <div class="input-section">
@@ -830,23 +838,6 @@
             <a href="https://platform.deepseek.com/api_keys" target="_blank" rel="noopener noreferrer">去 DeepSeek 官网申请 Key</a>
           </div>
         </div>
-      </section>
-
-      <section class="section" aria-labelledby="advancedTitle">
-        <h2 class="section-title" id="advancedTitle">3. 高级设置 <span>可选</span></h2>
-        <details id="advancedSettings">
-          <summary>自定义 API Endpoint / 自定义模型名</summary>
-          <div class="advanced-content" id="advancedContent">
-            <div class="mini-group" id="apiUrlGroup">
-              <span class="mini-label">API 接口地址</span>
-              <input type="text" id="apiUrl" class="mini-input">
-            </div>
-            <div class="mini-group" id="modelNameGroup">
-              <span class="mini-label">模型名称</span>
-              <input type="text" id="modelName" class="mini-input">
-            </div>
-          </div>
-        </details>
       </section>
 
       <button id="saveBtn">
@@ -867,7 +858,7 @@
         支持开发者
       </a>
     </div>
-    <p class="privacy-note">v7.1 ｜ 仅在当前浏览器本地存储，不会上传任何数据。</p>
+    <p class="privacy-note">v7.2 ｜ 仅在当前浏览器本地存储，不会上传任何数据。</p>
   </div>
 
   <script src="popup.js"></script>
