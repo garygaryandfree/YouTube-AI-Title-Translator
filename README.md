@@ -257,7 +257,7 @@ cd YouTube-AI-Title-Translator
 - Bug 反馈：[GitHub Issues](https://github.com/garygaryandfree/YouTube-AI-Title-Translator/issues)
 - 功能建议：[提交建议](https://github.com/garygaryandfree/YouTube-AI-Title-Translator/issues)
 - 邮件联系：garyzhang345@gmail.com
-- 支持开发者：[爱发电](https://afdian.com/a/garygary)
+- 支持开发者：[GitHub 项目主页](https://github.com/garygaryandfree/YouTube-AI-Title-Translator)
 
 这是一个由独立开发者维护的开源项目。如果这个插件对你有帮助，欢迎支持后续维护。
 
