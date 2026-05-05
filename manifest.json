@@ -5,14 +5,19 @@
   "description": "一键支持 OpenAI / Gemini / Claude / DeepSeek / MiniMax / 智谱 / Kimi / 自定义端点，自动翻译 YouTube 标题。",
 
   "icons": {
-    "16": "icon.png",
-    "48": "icon.png",
-    "128": "icon.png"
+    "16": "icon/icon16.png",
+    "48": "icon/icon48.png",
+    "128": "icon/icon128.png"
   },
 
   "action": {
     "default_popup": "popup.html",
-    "default_icon": "icon.png",
+    "default_icon": {
+      "16": "icon/icon16.png",
+      "32": "icon/icon32.png",
+      "48": "icon/icon48.png",
+      "128": "icon/icon128.png"
+    },
     "default_title": "点击配置 AI"
   },
   "background": {

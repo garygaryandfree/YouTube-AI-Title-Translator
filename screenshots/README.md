@@ -1,70 +1,29 @@
-# 截图制作指南
+# 截图维护指南
 
-## 需要制作的截图
+这个目录存放 README 和 Chrome Web Store 可使用的产品截图。发布前请确保截图来自真实扩展界面，不再使用占位图或 AI mockup。
 
-### 1. popup-config.png
-**内容**：插件配置弹出窗口
-**要求**：
-- 显示插件图标点击后的弹出窗口
-- 展示DeepSeek、OpenAI、Gemini三个选项
-- 显示API密钥输入框
-- 尺寸：800x600像素
-**制作方法**：
-1. 安装插件
-2. 点击浏览器右上角插件图标
-3. 截图整个弹出窗口
+## 当前截图
 
-### 2. youtube-translated.png
-**内容**：YouTube页面翻译效果
-**要求**：
-- 显示YouTube视频列表
-- 展示中英文标题对比
-- 突出翻译效果
-- 尺寸：1920x1080像素（或适当裁剪）
-**制作方法**：
-1. 打开YouTube页面
-2. 确保插件正常工作
-3. 截图包含多个视频标题的页面
+- `popup-config.png`：插件配置界面
+- `chrome-store/截屏2026-05-05 15.02.02-1280x800.jpg`：Chrome Web Store 展示截图 1
+- `chrome-store/截屏2026-05-05 15.07.02-1280x800.jpg`：Chrome Web Store 展示截图 2
+- `chrome-store/截屏2026-05-05 15.11.20-1280x800.jpg`：Chrome Web Store 展示截图 3
+- `chrome-store/截屏2026-05-05 15.12.54-1280x800.jpg`：Chrome Web Store 展示截图 4
+- `promo_large.png`：Chrome Web Store 大宣传图
+- `promo_small.png`：Chrome Web Store 小宣传图
 
-### 3. dark-mode.png
-**内容**：深色模式效果
-**要求**：
-- 展示深色模式下的翻译效果
-- 与浅色模式形成对比
-- 尺寸：1920x1080像素
-**制作方法**：
-1. 将YouTube切换到深色模式
-2. 截图页面
+README 当前引用的是 `popup-config.png` 和 `chrome-store/` 下的 4 张展示截图。
 
-### 4. demo.gif
-**内容**：完整使用流程演示
-**要求**：
-- 展示从安装到使用的完整流程
-- 包含以下步骤：
-  1. 点击插件图标
-  2. 选择AI模型
-  3. 输入API密钥
-  4. 保存配置
-  5. 刷新YouTube页面
-  6. 查看翻译效果
-- 时长：15-30秒
-- 尺寸：800x600像素
-**制作工具**：
-- Windows: ScreenToGif, OBS
-- macOS: QuickTime Player, GIPHY Capture
-- Linux: Peek, SimpleScreenRecorder
+## 更新截图
+
+1. 在 `chrome://extensions/` 加载本项目。
+2. 点击扩展图标，截取配置弹窗。
+3. 打开 YouTube，确认标题翻译正常，截取 1280x800 的商店展示图。
+4. 替换同名文件，避免 README 链接失效。
 
 ## 截图规范
-- **格式**：PNG（截图）、GIF（演示）
-- **质量**：清晰、无模糊
-- **文件大小**：每个截图<1MB，GIF<5MB
-- **命名**：使用英文小写和连字符
 
-## 替代方案
-如果您暂时无法制作截图，可以使用：
-1. **占位符图片**：先用描述文字代替
-2. **在线工具**：Canva、Figma制作示意图
-3. **AI生成**：使用DALL-E等生成示意图
-
-## 更新README
-截图制作完成后，更新README.md中的图片链接。
+- 格式：PNG 优先。
+- 内容：必须是真实插件界面或真实 YouTube 翻译效果。
+- 命名：使用英文小写和连字符。
+- 体积：单张图片建议小于 1MB，便于 GitHub 和商店页面加载。

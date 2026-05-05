@@ -119,15 +119,17 @@ v7.2 聚焦多模型配置体验：新增 Claude、智谱、Kimi，删除重复�
 
 ![插件配置界面](screenshots/popup-config.png)
 
-### YouTube 翻译效果
+### Chrome Web Store 截图
 
-![YouTube 翻译效果](screenshots/youtube-translated-preview.png)
+![Chrome Web Store 截图 1](<screenshots/chrome-store/截屏2026-05-05 15.02.02-1280x800.jpg>)
 
-灰色标签表示视频内容类型，下方显示原始英文标题，方便你在不丢失原文信息的情况下快速理解内容。
+![Chrome Web Store 截图 2](<screenshots/chrome-store/截屏2026-05-05 15.07.02-1280x800.jpg>)
 
-### 更多翻译示例
+![Chrome Web Store 截图 3](<screenshots/chrome-store/截屏2026-05-05 15.11.20-1280x800.jpg>)
 
-![更多翻译示例](screenshots/youtube-translated-3-preview.png)
+![Chrome Web Store 截图 4](<screenshots/chrome-store/截屏2026-05-05 15.12.54-1280x800.jpg>)
+
+截图展示了 YouTube 页面中的标题翻译、内容标签和多模型配置体验。灰色标签表示视频内容类型，下方显示原始英文标题，方便你在不丢失原文信息的情况下快速理解内容。
 
 ## 主要功能
 
@@ -192,7 +194,7 @@ YouTube-AI-Title-Translator/
 ├── assets/brands/        # AI 服务商品牌图标
 ├── background.js         # 后台请求与 AI 翻译服务
 ├── content.js            # YouTube 页面内容脚本
-├── icon.png              # 插件图标
+├── icon/                 # Chrome 扩展图标尺寸
 ├── manifest.json         # Chrome 扩展配置
 ├── popup.html            # 弹窗配置页面
 ├── popup.js              # 弹窗交互逻辑
