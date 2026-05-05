@@ -264,16 +264,16 @@ cd YouTube-AI-Title-Translator
 
 ## 开发者寄语
 
-这是一个由独立开发者维护的开源项目。如果你觉得它帮你节省了时间，也对您有所帮助，欢迎向我打赏。您的支持是我持续更新的最大动力！
+这是一个由独立开发者维护的开源项目。如果它确实帮你节省了时间，也欢迎自愿支持项目继续更新。
 
 <table>
   <tr>
     <td align="center">
-      <img src="screenshots/IMG_7102.JPG" alt="微信收款码" width="260"><br>
+      <img src="screenshots/IMG_7102.JPG" alt="微信支持二维码" width="260"><br>
       微信
     </td>
     <td align="center">
-      <img src="screenshots/IMG_7103.JPG" alt="支付宝收款码" width="260"><br>
+      <img src="screenshots/IMG_7103.JPG" alt="支付宝支持二维码" width="260"><br>
       支付宝
     </td>
   </tr>
