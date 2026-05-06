@@ -119,7 +119,7 @@ v7.2 聚焦多模型配置体验：新增 Claude、智谱、Kimi，删除重复�
 
 ![插件配置界面](screenshots/popup-config.png)
 
-### Chrome Web Store 截图
+### Youtube 截图 (标签识别+标题翻译)
 
 ![Chrome Web Store 截图 1](<screenshots/chrome-store/截屏2026-05-05 15.02.02-1280x800.jpg>)
 
