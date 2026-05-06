@@ -1,10 +1,12 @@
-# YouTube AI Title Translator - AI 驱动的 YouTube 标题翻译插件
+# YouTube 标题翻译 - AI双语标题
 
 [![GitHub stars](https://img.shields.io/github/stars/garygaryandfree/YouTube-AI-Title-Translator?style=for-the-badge)](https://github.com/garygaryandfree/YouTube-AI-Title-Translator/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/garygaryandfree/YouTube-AI-Title-Translator?style=for-the-badge)](https://github.com/garygaryandfree/YouTube-AI-Title-Translator/network)
 [![GitHub issues](https://img.shields.io/github/issues/garygaryandfree/YouTube-AI-Title-Translator?style=for-the-badge)](https://github.com/garygaryandfree/YouTube-AI-Title-Translator/issues)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 [![Chrome Extension](https://img.shields.io/badge/Chrome-Extension-green?style=for-the-badge&logo=google-chrome&logoColor=white)](https://chrome.google.com/webstore)
+
+英文名：AI Title Translator - AI Bilingual
 
 一个专门为中文用户设计的 YouTube 视频标题 AI 翻译插件。它不只是把英文标题机械翻成中文，而是用大模型理解标题语境、视频类型和表达习惯，把标题翻成更自然、更有中文味儿的表达。
 
@@ -53,7 +55,7 @@ v7.2 聚焦多模型配置体验：新增 Claude、智谱、Kimi，删除重复�
 
 #### 方法一：Chrome Web Store
 
-[点击前往 Chrome 应用商店下载](https://chromewebstore.google.com/detail/youtube-ai-%E6%A0%87%E9%A2%98%E7%BF%BB%E8%AF%91-%E5%85%A8%E8%83%BD%E7%89%88/bhajnflcikmidmdalnjhknillnkaojhk)
+[点击前往 Chrome 应用商店下载](https://chromewebstore.google.com/detail/bhajnflcikmidmdalnjhknillnkaojhk)
 
 #### 方法二：开发者模式安装
 
@@ -119,7 +121,7 @@ v7.2 聚焦多模型配置体验：新增 Claude、智谱、Kimi，删除重复�
 
 ![插件配置界面](screenshots/popup-config.png)
 
-### Youtube 截图 (标签识别+标题翻译)
+### Chrome Web Store 截图
 
 ![Chrome Web Store 截图 1](<screenshots/chrome-store/截屏2026-05-05 15.02.02-1280x800.jpg>)
 
