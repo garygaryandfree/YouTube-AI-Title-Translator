@@ -354,11 +354,36 @@ document.addEventListener('DOMContentLoaded', () => {
         updateModelNamePlacement(provider, !!(preferredModelId && !matched));
     }
 
-    // 自定义端点保存前：申请该域名的 host_permissions
-    async function ensureHostPermission(url) {
+    function isLocalHttpEndpoint(u) {
+        return u.protocol === 'http:' && (
+            u.hostname === 'localhost' ||
+            u.hostname === '127.0.0.1' ||
+            u.hostname === '[::1]'
+        );
+    }
+
+    function validateCustomEndpoint(url) {
+        let u;
         try {
-            const u = new URL(url);
-            const origin = `${u.protocol}//${u.hostname}/*`;
+            u = new URL(url);
+        } catch (e) {
+            return { ok: false, message: "API Endpoint 格式不正确" };
+        }
+
+        if (u.protocol !== 'https:' && !isLocalHttpEndpoint(u)) {
+            return {
+                ok: false,
+                message: "自定义端点必须使用 HTTPS；本机 localhost 调试可使用 HTTP"
+            };
+        }
+
+        return { ok: true, url: u };
+    }
+
+    // 自定义端点保存前：申请该域名的 host_permissions
+    async function ensureHostPermission(parsedUrl) {
+        try {
+            const origin = `${parsedUrl.protocol}//${parsedUrl.hostname}/*`;
             return await chrome.permissions.request({ origins: [origin] });
         } catch (e) {
             console.error("[Gary] URL 解析失败:", e);
@@ -383,7 +408,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 setStatus("自定义端点需要填写 URL 和模型名", "#d92d20");
                 return;
             }
-            const granted = await ensureHostPermission(url);
+            const endpoint = validateCustomEndpoint(url);
+            if (!endpoint.ok) {
+                setStatus(endpoint.message, "#d92d20");
+                apiUrlInput.focus();
+                return;
+            }
+            const granted = await ensureHostPermission(endpoint.url);
             if (!granted) {
                 setStatus("未授予该域名访问权限，无法调用", "#d92d20");
                 return;

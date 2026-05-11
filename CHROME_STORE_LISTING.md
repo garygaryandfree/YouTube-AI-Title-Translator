@@ -21,6 +21,12 @@ YouTube 标题翻译 - AI双语标题是一款面向中文用户的 Chrome 扩�
 隐私说明：
 扩展不会收集、出售或共享你的浏览数据。API Key 和偏好设置保存在你的本地浏览器中。
 
+权限和数据使用：
+- 访问 YouTube 页面：读取页面中可见的视频标题并显示翻译结果。
+- 存储权限：在本地浏览器保存 API Key、设置和翻译缓存。
+- 可选主机权限：仅在用户配置自定义 API 接口时请求，用于向该接口发送翻译请求。
+- 用户数据仅用于标题翻译功能，不用于广告、转售或与扩展功能无关的用途。
+
 ## English
 
 Name:
@@ -42,3 +48,8 @@ Key features:
 Privacy:
 The extension does not collect, sell, or share your browsing data. API keys and preferences are stored locally in your browser.
 
+Permissions and data use:
+- YouTube page access: read visible video titles and display translated titles.
+- Storage permission: save API keys, settings, and translation cache locally in the browser.
+- Optional host permissions: requested only when the user configures a custom API endpoint, so translation requests can be sent to that endpoint.
+- User data is used only for title translation and is not used for advertising, resale, or unrelated purposes.

@@ -19,17 +19,27 @@ API keys, settings, preferences, and cached translation results are stored local
 
 We do not operate a server for this extension, and we do not collect, sell, or share user data with the developer's own server.
 
+## Limited Use
+
+User data is used only to provide the extension's title translation features. We do not use or transfer user data for advertising, unrelated analytics, creditworthiness, lending, resale, or any purpose unrelated to the extension's single purpose.
+
 ## Third-Party AI Services
 
 When the user enables translation and configures an AI service, the extension sends video title text directly from the user's browser to the AI service endpoint selected by the user. The selected third-party service may process that text according to its own privacy policy and terms.
 
 Users are responsible for choosing which AI service, model, API key, and endpoint they want to use.
 
+Custom endpoints must use HTTPS. HTTP is allowed only for local development endpoints such as localhost or 127.0.0.1.
+
 ## Permissions
 
 The extension requests access to YouTube pages so it can read visible video titles and display translated titles on the page. It uses storage permission to save settings locally in the browser.
 
 Optional host permissions may be requested when a user configures a custom API endpoint, so the extension can send translation requests to that endpoint.
+
+## Chrome Web Store Privacy Disclosure Guidance
+
+For the Chrome Web Store privacy form, this extension's data use should be disclosed as handling website content, authentication information, and user settings/preferences. The data is used only for title translation, stored locally where possible, and sent to user-selected AI services only when translation is enabled.
 
 ## Data Retention and Control
 
@@ -68,17 +78,27 @@ API Key、设置、偏好和缓存翻译结果会通过 Chrome 扩展存储保�
 
 我们不为此扩展运营服务器，也不会将用户数据收集、出售或共享到开发者自有服务器。
 
+## 限定用途
+
+用户数据仅用于提供扩展的标题翻译功能。我们不会将用户数据用于广告、无关分析、信用评估、贷款、转售或任何与扩展单一用途无关的目的。
+
 ## 第三方 AI 服务
 
 当用户启用翻译并配置 AI 服务后，扩展会从用户浏览器直接向用户选择的 AI 服务接口发送视频标题文本。用户选择的第三方服务可能会根据其自身隐私政策和服务条款处理这些文本。
 
 用户自行决定使用哪个 AI 服务、模型、API Key 和接口地址。
 
+自定义接口必须使用 HTTPS。本机开发接口（例如 localhost 或 127.0.0.1）可使用 HTTP。
+
 ## 权限说明
 
 扩展请求访问 YouTube 页面，是为了读取页面中可见的视频标题并显示翻译结果。扩展使用 storage 权限在本地浏览器保存设置。
 
 当用户配置自定义 API 接口时，扩展可能会请求可选主机权限，以便向该接口发送翻译请求。
+
+## Chrome 应用商店隐私披露建议
+
+在 Chrome 应用商店隐私表单中，本扩展应披露会处理网站内容、身份验证信息以及用户设置/偏好。相关数据仅用于标题翻译，尽可能保存在本地，并且只会在用户启用翻译时发送到用户自行选择的 AI 服务。
 
 ## 数据保留和控制
 
