@@ -46,7 +46,7 @@ const SENSITIVE_PATTERNS = SENSITIVE_WORDS.map(w =>
 );
 // =========================================
 
-console.log("🚀 Gary插件 V7.0 已启动");
+console.log("🚀 Gary插件 V7.4 已启动");
 
 // ================= 持久化翻译缓存 =================
 // 设计：原文 → {tag, cn, ts} 的 Map，启动时一次从 chrome.storage 加载，
@@ -154,6 +154,7 @@ function setBoxTooltip(box, originalText, statusText) {
 function createSafeBadge(tagText, cnText, isMainTitle = false, originalText = "", statusText = "") {
     const container = document.createElement('div');
     container.className = 'gary-cn-box';
+    container.dataset.garyRole = "translation";
     if (isMainTitle) { container.style.marginBottom = "8px"; container.style.marginTop = "4px"; }
     setBoxTooltip(container, originalText, statusText);
 
@@ -237,6 +238,7 @@ function renderError(box, error) {
 
 // --- 页面扫描 + 批量翻译 ---
 const PRIORITY_VIEWPORT_MARGIN = 320;
+let titleNodeIdCounter = 0;
 
 function isNearViewport(el) {
     const rect = el.getBoundingClientRect();
@@ -263,6 +265,45 @@ function getDynamicBatchSize() {
     return 6;
 }
 
+function getTitleText(el) {
+    return (el.innerText || el.textContent || "").trim();
+}
+
+function getTitleTarget(el) {
+    if (el.matches('ytd-watch-metadata h1 yt-formatted-string')) {
+        return { targetElement: el, isMainTitle: true };
+    }
+    const link = el.closest('a');
+    return { targetElement: link || el, isMainTitle: false };
+}
+
+function ensureTitleNodeId(el) {
+    if (!el.dataset.garyNodeId) {
+        titleNodeIdCounter++;
+        el.dataset.garyNodeId = String(titleNodeIdCounter);
+    }
+    return el.dataset.garyNodeId;
+}
+
+function removeTranslationBoxesForTitle(el, targetElement) {
+    const parent = targetElement && targetElement.parentElement;
+    if (!parent) return;
+
+    const nodeId = el.dataset.garyNodeId;
+    parent.querySelectorAll('.gary-cn-box[data-gary-role="translation"]').forEach(box => {
+        if ((nodeId && box.dataset.garyNodeId === nodeId) || box.nextElementSibling === targetElement) {
+            box.remove();
+        }
+    });
+}
+
+function resetTitleProcessingState(el, targetElement) {
+    removeTranslationBoxesForTitle(el, targetElement);
+    el.removeAttribute('data-gary-done');
+    el.removeAttribute('data-gary-original');
+    el.classList.remove('gary-en-sub');
+}
+
 async function process() {
     if (!ENABLED) return;
     const titles = document.querySelectorAll('#video-title, #video-title-link, h3 a, ytd-watch-metadata h1 yt-formatted-string');
@@ -270,15 +311,25 @@ async function process() {
     const pendingBatch = [];   // 缓存未命中、需要发 API 的项 [{text, box}]
 
     for (const el of titles) {
-        if (el.getAttribute('data-gary-done')) continue;
         if (el.closest('ytd-comments') || el.closest('ytd-comment-renderer') || el.closest('#comments')) continue;
         if (!isNearViewport(el)) continue;
 
-        const text = el.innerText.trim();
+        const text = getTitleText(el);
         if (!text || text.length < 3) continue;
 
+        const { targetElement, isMainTitle } = getTitleTarget(el);
+        const parent = targetElement.parentElement;
+        if (!parent) continue;
+
+        if (el.getAttribute('data-gary-done')) {
+            if (el.dataset.garyOriginal === text) continue;
+            resetTitleProcessingState(el, targetElement);
+        }
+
         if (SENSITIVE_PATTERNS.some(re => re.test(text))) {
+            resetTitleProcessingState(el, targetElement);
             el.setAttribute('data-gary-done', 'blocked');
+            el.dataset.garyOriginal = text;
             continue;
         }
 
@@ -295,17 +346,8 @@ async function process() {
         if (!shouldTranslate) continue;
 
         el.setAttribute('data-gary-done', 'true');
-
-        let targetElement = el;
-        let isMainTitle = false;
-        if (el.matches('ytd-watch-metadata h1 yt-formatted-string')) {
-            isMainTitle = true;
-        } else {
-            const link = el.closest('a');
-            if (link) targetElement = link;
-        }
-        const parent = targetElement.parentElement;
-        if (!parent) continue;
+        el.dataset.garyOriginal = text;
+        const nodeId = ensureTitleNodeId(el);
 
         const cached = cacheGet(text);
 
@@ -315,6 +357,7 @@ async function process() {
 
         const box = createSafeBadge(tag, cn, isMainTitle, text, statusText);
         box.dataset.garyOriginal = text;
+        box.dataset.garyNodeId = nodeId;
         try {
             parent.insertBefore(box, targetElement);
             el.classList.add('gary-en-sub');
@@ -345,7 +388,9 @@ async function process() {
 
 async function translateChunk(chunk) {
     let reply;
-    chunk.forEach(p => renderStatus(p.box, "AI", "翻译中...", "翻译中"));
+    chunk.forEach(p => {
+        if (p.box.isConnected) renderStatus(p.box, "AI", "翻译中...", "翻译中");
+    });
     try {
         reply = await chrome.runtime.sendMessage({
             type: 'translateBatch',
@@ -358,23 +403,27 @@ async function translateChunk(chunk) {
         });
     } catch (e) {
         console.error("[Gary] SW 通信失败:", e);
-        chunk.forEach(p => renderError(p.box, { type: "network" }));
+        chunk.forEach(p => {
+            if (p.box.isConnected) renderError(p.box, { type: "network" });
+        });
         return;
     }
 
     if (!reply || !Array.isArray(reply.results)) {
-        chunk.forEach(p => renderError(p.box, reply && reply.error));
+        chunk.forEach(p => {
+            if (p.box.isConnected) renderError(p.box, reply && reply.error);
+        });
         return;
     }
 
     chunk.forEach((p, i) => {
         const result = reply.results[i];
         if (result && result.tag && result.cn) {
-            renderSuccess(p.box, result);
+            if (p.box.isConnected) renderSuccess(p.box, result);
             cacheSet(p.text, result);
         } else {
             const itemError = Array.isArray(reply.errors) ? reply.errors[i] : null;
-            renderError(p.box, itemError || reply.error);
+            if (p.box.isConnected) renderError(p.box, itemError || reply.error);
         }
     });
 }
