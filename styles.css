@@ -11,6 +11,13 @@
     opacity: 0.8;
 }
 
+.gary-main-title-box {
+    display: block;
+    margin-top: 4px;
+    margin-bottom: 12px;
+    cursor: default;
+}
+
 /* 标签样式 */
 .gary-tag {
     display: inline-block;
@@ -32,6 +39,22 @@
     line-height: 1.4;
 }
 
+.gary-main-title-box .gary-cn-title {
+    font-size: 2.0rem;
+    line-height: 1.3;
+}
+
+.gary-original-title {
+    display: block;
+    margin-top: 8px;
+    color: #888;
+    font-size: 1.45rem;
+    line-height: 1.45;
+    font-weight: 500;
+    white-space: normal;
+    overflow: visible;
+}
+
 /* 原标题变灰 */
 .gary-en-sub {
     color: #888 !important;
@@ -40,6 +63,10 @@
     font-weight: 400 !important;
     display: block !important;
     margin-top: 2px;
+}
+
+.gary-original-source-hidden {
+    display: none !important;
 }
 
 /* === YouTube 暗色模式适配 ===
@@ -54,6 +81,9 @@ html[dark] .gary-cn-title {
 }
 html[dark] .gary-en-sub {
     color: #aaa !important;
+}
+html[dark] .gary-original-title {
+    color: #aaa;
 }
 
 /* 翻译失败时的红色提示 */

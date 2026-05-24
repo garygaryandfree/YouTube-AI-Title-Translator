@@ -155,7 +155,7 @@ function createSafeBadge(tagText, cnText, isMainTitle = false, originalText = ""
     const container = document.createElement('div');
     container.className = 'gary-cn-box';
     container.dataset.garyRole = "translation";
-    if (isMainTitle) { container.style.marginBottom = "8px"; container.style.marginTop = "4px"; }
+    if (isMainTitle) container.classList.add('gary-main-title-box');
     setBoxTooltip(container, originalText, statusText);
 
     const tagSpan = document.createElement('span');
@@ -165,12 +165,19 @@ function createSafeBadge(tagText, cnText, isMainTitle = false, originalText = ""
     const titleSpan = document.createElement('span');
     titleSpan.className = 'gary-cn-title';
     titleSpan.textContent = cnText;
-    if (isMainTitle) { titleSpan.style.fontSize = "2.0rem"; titleSpan.style.lineHeight = "1.3"; }
 
     if (tagText === "未配置") titleSpan.style.color = "#d32f2f";
 
     container.appendChild(tagSpan);
     container.appendChild(titleSpan);
+
+    if (isMainTitle) {
+        const originalLine = document.createElement('div');
+        originalLine.className = 'gary-original-title';
+        originalLine.textContent = originalText;
+        container.appendChild(originalLine);
+    }
+
     return container;
 }
 
@@ -266,12 +273,13 @@ function getDynamicBatchSize() {
 }
 
 function getTitleText(el) {
-    return (el.innerText || el.textContent || "").trim();
+    return (el.textContent || el.innerText || "").trim();
 }
 
 function getTitleTarget(el) {
     if (el.matches('ytd-watch-metadata h1 yt-formatted-string')) {
-        return { targetElement: el, isMainTitle: true };
+        const heading = el.closest('h1') || el;
+        return { targetElement: heading, isMainTitle: true };
     }
     const link = el.closest('a');
     return { targetElement: link || el, isMainTitle: false };
@@ -302,6 +310,7 @@ function resetTitleProcessingState(el, targetElement) {
     el.removeAttribute('data-gary-done');
     el.removeAttribute('data-gary-original');
     el.classList.remove('gary-en-sub');
+    targetElement.classList.remove('gary-original-source-hidden');
 }
 
 async function process() {
@@ -312,7 +321,6 @@ async function process() {
 
     for (const el of titles) {
         if (el.closest('ytd-comments') || el.closest('ytd-comment-renderer') || el.closest('#comments')) continue;
-        if (!isNearViewport(el)) continue;
 
         const text = getTitleText(el);
         if (!text || text.length < 3) continue;
@@ -320,6 +328,8 @@ async function process() {
         const { targetElement, isMainTitle } = getTitleTarget(el);
         const parent = targetElement.parentElement;
         if (!parent) continue;
+
+        if (!el.getAttribute('data-gary-done') && !isNearViewport(targetElement)) continue;
 
         if (el.getAttribute('data-gary-done')) {
             if (el.dataset.garyOriginal === text) continue;
@@ -360,7 +370,11 @@ async function process() {
         box.dataset.garyNodeId = nodeId;
         try {
             parent.insertBefore(box, targetElement);
-            el.classList.add('gary-en-sub');
+            if (isMainTitle) {
+                targetElement.classList.add('gary-original-source-hidden');
+            } else {
+                el.classList.add('gary-en-sub');
+            }
         } catch (e) { continue; }
 
         box.onclick = (e) => {
