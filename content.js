@@ -227,11 +227,20 @@ function renderSuccess(box, result) {
 
 function getFriendlyErrorText(error) {
     const type = error && error.type ? error.type : "";
+    if (type === "extension") return "插件已更新，请刷新页面";
     if (type === "auth") return "Key 无效";
     if (type === "quota") return "余额不足或被限流";
     if (type === "model") return "模型名可能错误";
     if (type === "parse" || type === "empty") return "模型返回格式异常";
     return "网络或服务商异常";
+}
+
+function makeRuntimeError(error) {
+    const message = error && error.message ? error.message : String(error || "");
+    if (message.includes("Extension context invalidated")) {
+        return { type: "extension", message };
+    }
+    return { type: "network", message };
 }
 
 function renderError(box, error) {
@@ -417,8 +426,9 @@ async function translateChunk(chunk) {
         });
     } catch (e) {
         console.error("[Gary] SW 通信失败:", e);
+        const runtimeError = makeRuntimeError(e);
         chunk.forEach(p => {
-            if (p.box.isConnected) renderError(p.box, { type: "network" });
+            if (p.box.isConnected) renderError(p.box, runtimeError);
         });
         return;
     }
