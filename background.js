@@ -27,12 +27,33 @@ const MAX_CONCURRENT_TRANSLATIONS = 3;
 const translationQueue = [];
 let activeTranslations = 0;
 const inflightTextResults = new Map();
+const DEFAULT_TARGET_LANGUAGE = "en";
+const TARGET_LANGUAGE_NAMES = {
+    "zh-Hans": "Simplified Chinese",
+    "zh-Hant": "Traditional Chinese",
+    en: "English",
+    ja: "Japanese",
+    ko: "Korean",
+    th: "Thai",
+    es: "Spanish",
+    fr: "French",
+    de: "German",
+    pt: "Portuguese",
+    id: "Indonesian",
+    vi: "Vietnamese"
+};
 
 // 同 content.js 里的实现：括号计数提取首个完整闭合 JSON 对象，
 // 处理 (1) 双 JSON 重复 (2) 散文包围 (3) 字符串内含 } 等病态返回
-function extractFirstJsonObject(s) {
-    const start = s.indexOf('{');
+function extractFirstJsonValue(s) {
+    const objectStart = s.indexOf('{');
+    const arrayStart = s.indexOf('[');
+    let start = -1;
+    if (objectStart >= 0 && arrayStart >= 0) start = Math.min(objectStart, arrayStart);
+    else start = Math.max(objectStart, arrayStart);
     if (start < 0) return null;
+    const open = s[start];
+    const close = open === "{" ? "}" : "]";
     let depth = 0, inStr = false, escape = false;
     for (let i = start; i < s.length; i++) {
         const c = s[i];
@@ -40,8 +61,8 @@ function extractFirstJsonObject(s) {
         if (c === '\\') { escape = true; continue; }
         if (c === '"') { inStr = !inStr; continue; }
         if (inStr) continue;
-        if (c === '{') depth++;
-        else if (c === '}') {
+        if (c === open) depth++;
+        else if (c === close) {
             depth--;
             if (depth === 0) return s.slice(start, i + 1);
         }
@@ -49,9 +70,12 @@ function extractFirstJsonObject(s) {
     return null;
 }
 
-function extractJsonObjectCandidates(s) {
+function extractJsonValueCandidates(s) {
     const candidates = [];
-    for (let start = s.indexOf('{'); start >= 0; start = s.indexOf('{', start + 1)) {
+    for (let start = 0; start < s.length; start++) {
+        if (s[start] !== "{" && s[start] !== "[") continue;
+        const open = s[start];
+        const close = open === "{" ? "}" : "]";
         let depth = 0, inStr = false, escape = false;
         for (let i = start; i < s.length; i++) {
             const c = s[i];
@@ -59,8 +83,8 @@ function extractJsonObjectCandidates(s) {
             if (c === '\\') { escape = true; continue; }
             if (c === '"') { inStr = !inStr; continue; }
             if (inStr) continue;
-            if (c === '{') depth++;
-            else if (c === '}') {
+            if (c === open) depth++;
+            else if (c === close) {
                 depth--;
                 if (depth === 0) {
                     candidates.push(s.slice(start, i + 1));
@@ -102,9 +126,11 @@ function normalizeTag(tag) {
 
 function normalizeTranslationResult(result) {
     if (!result) return null;
-    const cn = result.cn || result.title || result.translation || result.text || result.zh || result.chinese;
-    if (!cn) return null;
-    return { tag: normalizeTag(result.tag || result.category || result.type), cn: String(cn).trim() };
+    const translatedTitle = result.translatedTitle || result.translated_title || result.targetTitle ||
+        result.target_title || result.title || result.translation || result.translated || result.text ||
+        result.cn || result.zh || result.chinese;
+    if (!translatedTitle) return null;
+    return { tag: normalizeTag(result.tag || result.category || result.type), translatedTitle: String(translatedTitle).trim() };
 }
 
 function extractBatchArray(parsed, expectedLength) {
@@ -124,7 +150,7 @@ function extractBatchArray(parsed, expectedLength) {
         .map(key => Object.assign({ i: Number(key) }, parsed[key]));
     if (numericEntries.length > 0) return numericEntries;
 
-    if (expectedLength === 1 && (parsed.cn || parsed.tag)) return [parsed];
+    if (expectedLength === 1 && (parsed.translatedTitle || parsed.cn || parsed.tag)) return [parsed];
     return null;
 }
 
@@ -139,10 +165,11 @@ function parseSingleTranslationFromText(raw) {
     const searchTexts = [cleaned, raw];
 
     for (const text of searchTexts) {
-        const candidates = extractJsonObjectCandidates(text);
+        const candidates = extractJsonValueCandidates(text);
         for (let i = candidates.length - 1; i >= 0; i--) {
             try {
-                const result = normalizeTranslationResult(JSON.parse(candidates[i]));
+                const parsed = JSON.parse(candidates[i]);
+                const result = normalizeTranslationResult(Array.isArray(parsed) ? parsed[0] : parsed);
                 if (result) return result;
             } catch (e) {}
         }
@@ -157,7 +184,7 @@ function parseBatchTranslationsFromText(raw, expectedLength) {
     const searchTexts = [cleaned, raw];
 
     for (const text of searchTexts) {
-        const candidates = extractJsonObjectCandidates(text);
+        const candidates = extractJsonValueCandidates(text);
         for (let i = candidates.length - 1; i >= 0; i--) {
             try {
                 const parsed = JSON.parse(candidates[i]);
@@ -219,7 +246,37 @@ function drainTranslationQueue() {
 
 function getRequestKey(text, config) {
     config = config || {};
-    return [config.apiUrl || "", config.model || "", text].join("\n");
+    return [config.apiUrl || "", config.model || "", getTargetLanguageCode(config), text].join("\n");
+}
+
+function getTargetLanguageCode(config) {
+    const code = config && config.targetLanguage ? config.targetLanguage : DEFAULT_TARGET_LANGUAGE;
+    return TARGET_LANGUAGE_NAMES[code] ? code : DEFAULT_TARGET_LANGUAGE;
+}
+
+function getTargetLanguageName(config) {
+    return TARGET_LANGUAGE_NAMES[getTargetLanguageCode(config)];
+}
+
+function buildSinglePrompt(text, config) {
+    const targetLanguage = getTargetLanguageName(config);
+    return `Translate this YouTube title into ${targetLanguage}. Keep it natural, accurate, and readable as a YouTube title in the target language.
+Return EXACTLY ONE JSON object, no markdown, no prose, no repetition: {"tag":"<one of: ${TAG_ENUM.join("/")}>","translatedTitle":"<translated title in ${targetLanguage}>"}.
+Tag rules: ${TAG_GUIDE}.
+Choose the core topic of the title. Do not classify by a single incidental word. If uncertain or mixed, use 生活 or 其它.
+Original: ${JSON.stringify(text)}`;
+}
+
+function buildBatchPrompt(numbered, config) {
+    const targetLanguage = getTargetLanguageName(config);
+    return `Translate each YouTube title below into ${targetLanguage}. Keep titles natural, accurate, and readable as YouTube titles in the target language.
+Return EXACTLY ONE JSON object: {"items":[{"i":<index>,"tag":"<category>","translatedTitle":"<translated title in ${targetLanguage}>"},...]}
+The "tag" of each item MUST be one of: ${TAG_ENUM.join("/")}.
+Tag rules: ${TAG_GUIDE}.
+Choose each title's core topic. Do not classify by a single incidental word. If uncertain or mixed, use 生活 or 其它.
+The output array length MUST equal input length, and "i" MUST match input "i".
+No markdown fence, no prose, no repetition.
+Input: ${JSON.stringify(numbered)}`;
 }
 
 function buildChatCompletionsBody(config, promptText, maxTokens, systemPrompt) {
@@ -257,11 +314,7 @@ async function fetchAiTranslation(text, config) {
         return { ok: false, error: makeError("auth", "Key 无效") };
     }
 
-    const promptText = `Translate this YouTube title to simplified Chinese (Mandarin). Keep it natural, accurate, and readable as a Chinese title.
-Return EXACTLY ONE JSON object, no markdown, no prose, no repetition: {"tag":"<one of: ${TAG_ENUM.join("/")}>","cn":"中文标题"}.
-Tag rules: ${TAG_GUIDE}.
-Choose the core topic of the title. Do not classify by a single incidental word. If uncertain or mixed, use 生活 or 其它.
-Original: ${JSON.stringify(text)}`;
+    const promptText = buildSinglePrompt(text, config);
 
     let raw = "";
     let response;
@@ -345,8 +398,8 @@ Original: ${JSON.stringify(text)}`;
 }
 
 // === 批量翻译：一次 prompt 翻多条，节省调用数和握手开销 ===
-// 让模型返回 {"items":[{"i":0,"tag":"..","cn":".."}, ...]}，按 i 字段对齐回原数组。
-// 这种"包一层 object"的设计比裸数组更稳健——可继续复用 extractFirstJsonObject。
+// 让模型返回 {"items":[{"i":0,"tag":"..","translatedTitle":".."}, ...]}，按 i 字段对齐回原数组。
+// 这种"包一层 object"的设计比裸数组更稳健；解析器也兼容模型偶尔返回裸数组。
 async function fetchAiTranslationBatch(items, config) {
     if (!config || !config.apiKey) {
         return { ok: false, results: items.map(() => null), error: makeError("auth", "Key 无效") };
@@ -355,14 +408,7 @@ async function fetchAiTranslationBatch(items, config) {
 
     const numbered = items.map((t, i) => ({ i, t }));
     const maxTokens = Math.min(1200, 180 + items.length * 90);
-    const promptText = `Translate each YouTube title below to simplified Chinese (Mandarin). Keep titles natural, accurate, and readable as Chinese titles.
-Return EXACTLY ONE JSON object: {"items":[{"i":<index>,"tag":"<category>","cn":"<中文标题>"},...]}
-The "tag" of each item MUST be one of: ${TAG_ENUM.join("/")}.
-Tag rules: ${TAG_GUIDE}.
-Choose each title's core topic. Do not classify by a single incidental word. If uncertain or mixed, use 生活 or 其它.
-The output array length MUST equal input length, and "i" MUST match input "i".
-No markdown fence, no prose, no repetition.
-Input: ${JSON.stringify(numbered)}`;
+    const promptText = buildBatchPrompt(numbered, config);
 
     let raw = "";
     let response;
