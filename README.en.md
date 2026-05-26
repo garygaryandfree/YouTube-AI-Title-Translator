@@ -6,7 +6,22 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 [![Chrome Extension](https://img.shields.io/badge/Chrome-Extension-green?style=for-the-badge&logo=google-chrome&logoColor=white)](https://chromewebstore.google.com/detail/bhajnflcikmidmdalnjhknillnkaojhk)
 
-中文版本：[README.md](README.md)
+<p align="center">
+  <a href="README.md">简体中文</a> |
+  <a href="README.en.md">English</a> |
+  <a href="README.ja.md">日本語</a> |
+  <a href="README.ko.md">한국어</a> |
+  <a href="README.th.md">ไทย</a> |
+  <a href="README.es.md">Español</a> |
+  <a href="README.fr.md">Français</a> |
+  <a href="README.de.md">Deutsch</a> |
+  <a href="README.pt.md">Português</a> |
+  <a href="README.id.md">Bahasa Indonesia</a> |
+  <a href="README.vi.md">Tiếng Việt</a> |
+  <a href="README.ru.md">Русский</a> |
+  <a href="README.ar.md">العربية</a> |
+  <a href="README.hi.md">हिन्दी</a>
+</p>
 
 AI Title Translator is a Chrome extension that translates YouTube video titles with AI. The translated title is shown in the title position, while the original title remains below it for comparison, reading, and language learning.
 
@@ -67,7 +82,7 @@ The settings page stays compact and focused:
 
 | Area | Purpose |
 |------|---------|
-| Top-right Interface language | Changes only the extension settings UI language, not the YouTube page language or translation target |
+| Top-right Interface language | Provides multilingual support for the extension settings page, without changing the YouTube page language or translation target |
 | Translation switch | Turns automatic YouTube title translation on or off |
 | Translate titles into | Chooses the target language for translated titles. The default is English |
 | Choose AI provider | Selects the AI provider. DeepSeek is marked as the recommended option |
@@ -104,23 +119,13 @@ There is no source-language selector. The extension automatically handles common
 
 ### Install in Developer Mode
 
-1. Download the repository with `Code` -> `Download ZIP`.
-2. Unzip it locally.
+1. Open [GitHub Releases](https://github.com/garygaryandfree/YouTube-AI-Title-Translator/releases).
+2. Download the latest `YouTube_AI_Title_Translator_v8.0.zip` and unzip it locally.
 3. Open `chrome://extensions/` in Chrome.
 4. Enable Developer Mode.
 5. Click `Load unpacked` and select the project folder.
 
-### Configure
-
-1. Click the extension icon in Chrome.
-2. Choose `Interface language` in the top-right corner. This changes only the settings UI language.
-3. Choose the target language under `Translate titles into`. The first-time default is English.
-4. Turn on `Translation`.
-5. Choose an AI provider: OpenAI, Gemini, Claude, DeepSeek, MiniMax, Z.AI, Kimi, or Custom.
-6. Choose a model version, or enter another supported model ID.
-7. Paste the API key for that provider.
-8. Save settings.
-9. Refresh YouTube and start browsing.
+After installing, click the extension icon in Chrome to open the settings page. Choose the settings interface language in the top-right corner, then choose the title target language under `Translate titles into`; the first-time default is English. Keep `Translation` turned on, select an AI provider and model, paste that provider's API key, and save. Refresh YouTube after changing provider, model, or API key settings.
 
 ## API Key Links
 
@@ -139,7 +144,7 @@ There is no source-language selector. The extension automatically handles common
 | Provider | Models |
 |----------|--------|
 | OpenAI | `gpt-5.5`, `gpt-5.4-mini`, `gpt-5.4` |
-| Gemini | `gemini-3-pro-preview`, `gemini-3-flash-preview`, `gemini-2.5-flash` |
+| Gemini | `gemini-3.5-flash`, `gemini-3-pro-preview`, `gemini-3-flash-preview`, `gemini-2.5-flash` |
 | Claude | `claude-opus-4-7`, `claude-opus-4-6`, `claude-sonnet-4-6`, `claude-haiku-4-5` |
 | DeepSeek | `deepseek-v4-flash`, `deepseek-v4-pro`, `deepseek-chat` |
 | MiniMax | `MiniMax-M2.7-highspeed`, `MiniMax-M2.7`, `MiniMax-M2.5` |

@@ -6,7 +6,22 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 [![Chrome Extension](https://img.shields.io/badge/Chrome-Extension-green?style=for-the-badge&logo=google-chrome&logoColor=white)](https://chromewebstore.google.com/detail/bhajnflcikmidmdalnjhknillnkaojhk)
 
-English version: [README.en.md](README.en.md)
+<p align="center">
+  <a href="README.md">简体中文</a> |
+  <a href="README.en.md">English</a> |
+  <a href="README.ja.md">日本語</a> |
+  <a href="README.ko.md">한국어</a> |
+  <a href="README.th.md">ไทย</a> |
+  <a href="README.es.md">Español</a> |
+  <a href="README.fr.md">Français</a> |
+  <a href="README.de.md">Deutsch</a> |
+  <a href="README.pt.md">Português</a> |
+  <a href="README.id.md">Bahasa Indonesia</a> |
+  <a href="README.vi.md">Tiếng Việt</a> |
+  <a href="README.ru.md">Русский</a> |
+  <a href="README.ar.md">العربية</a> |
+  <a href="README.hi.md">हिन्दी</a>
+</p>
 
 AI Title Translator 是一个 Chrome 扩展，用 AI 自动翻译 YouTube 视频标题，并把译文直接显示在标题位置，原文保留在下方。你可以边浏览边对照原文，既方便快速理解内容，也方便学习其他语言的真实表达。
 
@@ -16,7 +31,7 @@ V8 起，插件不再只面向“翻译成中文”。它可以自动处理常�
 
 | 能力 | 说明 |
 |------|------|
-| 多语言标题识别 | 自动处理英文、中文、日语、韩语、泰语、西班牙语、法语、德语、葡萄牙语、印尼语、越南语、俄语、阿拉伯语、印地语等常见标题 |
+| 多语言标题识别 | 自动处理英文、中文、日语、韩语、泰语、西班牙语、法语、德语、葡萄牙语、印尼语、越南语、俄语、阿拉伯语、印地语等多种语言 |
 | 多目标语言翻译 | 支持把标题翻译成简体中文、繁体中文、英文、日语、韩语、泰语、西班牙语、法语、德语、葡萄牙语、印尼语、越南语 |
 | AI 语境翻译 | 不是逐词替换，而是理解 YouTube 标题里的梗、语气、缩写、标题党表达和本土语境 |
 | 译文 + 原文对照 | 译文作为主标题显示，原文保留在下方，适合快速浏览和语言学习 |
@@ -67,7 +82,7 @@ V8 起，插件不再只面向“翻译成中文”。它可以自动处理常�
 
 | 区域 | 作用 |
 |------|------|
-| 右上角 Interface language | 只切换插件配置界面的显示语言，不影响 YouTube 页面语言，也不影响标题翻译目标 |
+| 右上角 Interface language | 插件配置页面多语种支持，不影响 YouTube 页面语言，也不影响标题翻译目标 |
 | Translation 开关 | 控制是否在 YouTube 页面自动翻译视频标题 |
 | Translate titles into | 选择标题要翻译成什么语言，默认英文 |
 | Choose AI provider | 选择调用哪个 AI 服务商，DeepSeek 标记为推荐选项 |
@@ -104,23 +119,13 @@ Português / Bahasa Indonesia / Tiếng Việt / Русский / العربية
 
 ### 方法二：开发者模式安装
 
-1. 下载项目代码：点击右上角 `Code` -> `Download ZIP`。
-2. 解压文件到本地文件夹。
+1. 打开 [GitHub Releases](https://github.com/garygaryandfree/YouTube-AI-Title-Translator/releases)。
+2. 下载最新版本的 `YouTube_AI_Title_Translator_v8.0.zip`，并解压到本地文件夹。
 3. 在 Chrome 地址栏输入 `chrome://extensions/`。
 4. 开启右上角“开发者模式”。
 5. 点击“加载已解压的扩展程序”，选择解压后的项目文件夹。
 
-### 配置步骤
-
-1. 点击浏览器右上角的插件图标。
-2. 在右上角选择 `Interface language`，它只影响插件配置页面语言。
-3. 在 `Translate titles into` 选择标题翻译目标语言，首次默认英文。
-4. 打开 `Translation` 开关。
-5. 选择 AI 服务商：OpenAI、Gemini、Claude、DeepSeek、MiniMax、Z.AI、Kimi 或 Custom。
-6. 选择模型版本，或选择“其他模型”手动填写模型 ID。
-7. 粘贴对应服务商的 API Key。
-8. 点击保存设置。
-9. 刷新 YouTube 页面，开始自动翻译标题。
+安装后点击浏览器右上角的插件图标进入配置页面。你可以先在右上角选择配置界面的显示语言，然后在 `Translate titles into` 里选择标题要翻译成的目标语言；首次使用默认英文。确认 `Translation` 开关已开启后，选择 AI 服务商和模型版本，粘贴对应服务商的 API Key 并保存。保存服务商、模型或 API Key 后，刷新 YouTube 页面即可开始自动翻译标题。
 
 ## API Key 获取入口
 
@@ -139,7 +144,7 @@ Português / Bahasa Indonesia / Tiếng Việt / Русский / العربية
 | 服务商 | 模型 |
 |--------|------|
 | OpenAI | `gpt-5.5`、`gpt-5.4-mini`、`gpt-5.4` |
-| Gemini | `gemini-3-pro-preview`、`gemini-3-flash-preview`、`gemini-2.5-flash` |
+| Gemini | `gemini-3.5-flash`、`gemini-3-pro-preview`、`gemini-3-flash-preview`、`gemini-2.5-flash` |
 | Claude | `claude-opus-4-7`、`claude-opus-4-6`、`claude-sonnet-4-6`、`claude-haiku-4-5` |
 | DeepSeek | `deepseek-v4-flash`、`deepseek-v4-pro`、`deepseek-chat` |
 | MiniMax | `MiniMax-M2.7-highspeed`、`MiniMax-M2.7`、`MiniMax-M2.5` |

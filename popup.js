@@ -332,6 +332,7 @@ const PRESETS = {
         helpUrl: "https://aistudio.google.com/app/apikey",
         helpKey: "helpGoogle",
         models: [
+            { id: "gemini-3.5-flash", tier: "tierRecommended" },
             { id: "gemini-3-pro-preview", tier: "tierFlagship" },
             { id: "gemini-3-flash-preview", tier: "tierRecommended" },
             { id: "gemini-2.5-flash", tier: "tierStable" }
