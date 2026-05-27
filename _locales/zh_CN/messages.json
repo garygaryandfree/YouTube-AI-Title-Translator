@@ -1,14 +1,14 @@
 {
   "extName": {
-    "message": "YouTube 标题翻译 - AI双语标题",
+    "message": "YouTube 标题翻译 - 双语标题",
     "description": "Chrome Web Store extension name in Simplified Chinese"
   },
   "extDescription": {
-    "message": "用 AI 将 YouTube 标题翻译成多种目标语言，并保留双语对照。设置与 API Key 仅保存在本地浏览器。",
+    "message": "将 YouTube 标题翻译成所选语言，并保留原文对照。设置与 API Key 仅保存在本地浏览器。",
     "description": "Chrome Web Store extension description in Simplified Chinese"
   },
   "actionTitle": {
-    "message": "配置 AI 标题翻译",
+    "message": "配置标题翻译",
     "description": "Toolbar tooltip"
   }
 }

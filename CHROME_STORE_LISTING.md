@@ -3,53 +3,43 @@
 ## 简体中文
 
 名称：
-YouTube 标题翻译 - AI双语标题
+YouTube 标题翻译 - 双语标题
 
 简短说明：
-用 AI 将 YouTube 标题翻译为自然中文，并保留双语对照。
+将 YouTube 标题翻译成所选语言，并保留原文对照。
 
 详细说明：
-YouTube 标题翻译 - AI双语标题是一款面向中文用户的 Chrome 扩展。它会在 YouTube 页面中自动翻译视频标题，并保留原始标题，帮助你更快理解视频内容。
+YouTube 标题翻译 - 双语标题是一款用于 YouTube 标题翻译的 Chrome 扩展。它可以把页面中可见的视频标题翻译成你选择的语言，同时保留原始标题，方便对照理解和浏览。
 
 主要功能：
-- 自动翻译 YouTube 视频标题
-- 保留原文与中文译文，方便对照理解
-- 显示简洁的内容标签，帮助快速判断视频类型
-- 设置和 API Key 仅保存在本地浏览器
-- 支持自定义模型和接口配置
+- 自动翻译 YouTube 页面中可见的视频标题
+- 同时显示译文和原文，适合双语阅读
+- 支持英语、中文、日语、韩语、泰语、西班牙语、法语、德语、葡萄牙语、印尼语、越南语等目标语言
+- 为标题添加简洁的内容标签，帮助快速判断视频类型
+- 可在扩展设置中选择翻译服务、模型、接口和目标语言
+- 设置、API Key 和翻译缓存保存在本地浏览器
 
-隐私说明：
-扩展不会收集、出售或共享你的浏览数据。API Key 和偏好设置保存在你的本地浏览器中。
-
-权限和数据使用：
-- 访问 YouTube 页面：读取页面中可见的视频标题并显示翻译结果。
-- 存储权限：在本地浏览器保存 API Key、设置和翻译缓存。
-- 可选主机权限：仅在用户配置自定义 API 接口时请求，用于向该接口发送翻译请求。
-- 用户数据仅用于标题翻译功能，不用于广告、转售或与扩展功能无关的用途。
+隐私和数据使用：
+扩展只读取 YouTube 页面中可见的视频标题，用于提供标题翻译功能。设置和 API Key 保存在你的本地浏览器。翻译请求会由你的浏览器直接发送到你配置的服务或接口。开发者不会收集、出售或共享你的浏览数据。
 
 ## English
 
 Name:
-AI Title Translator - AI Bilingual
+AI Title Translator - YouTube Titles
 
 Short description:
-Translate YouTube titles into bilingual titles with AI.
+Translate YouTube titles into your chosen language and keep the original title visible.
 
 Detailed description:
-AI Title Translator - AI Bilingual is a Chrome extension that translates YouTube video titles and keeps the original title visible for bilingual reading.
+AI Title Translator - YouTube Titles helps you read YouTube video titles in your chosen language while keeping the original title visible for comparison.
 
-Key features:
-- Translate YouTube video titles automatically
-- Keep both the original title and translated title visible
-- Show concise content labels for faster browsing
-- Store settings and API keys only in your local browser
-- Support custom model and endpoint configuration
+What it does:
+- Translates visible YouTube video titles on YouTube pages
+- Keeps the translated title and original title together for bilingual reading
+- Supports multiple target languages, including English, Chinese, Japanese, Korean, Thai, Spanish, French, German, Portuguese, Indonesian, and Vietnamese
+- Adds concise category labels to help you scan videos faster
+- Lets you choose a translation service, model, endpoint, and target language in the extension settings
+- Saves settings, API keys, and translation cache locally in your browser
 
-Privacy:
-The extension does not collect, sell, or share your browsing data. API keys and preferences are stored locally in your browser.
-
-Permissions and data use:
-- YouTube page access: read visible video titles and display translated titles.
-- Storage permission: save API keys, settings, and translation cache locally in the browser.
-- Optional host permissions: requested only when the user configures a custom API endpoint, so translation requests can be sent to that endpoint.
-- User data is used only for title translation and is not used for advertising, resale, or unrelated purposes.
+Privacy and data use:
+The extension reads visible YouTube titles only to provide title translation. Settings and API keys are stored locally in your browser. Translation requests are sent directly from your browser to the service or endpoint you configure. The developer does not collect, sell, or share your browsing data.

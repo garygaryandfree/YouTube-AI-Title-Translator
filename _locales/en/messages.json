@@ -1,14 +1,14 @@
 {
   "extName": {
-    "message": "AI Title Translator - AI Bilingual",
+    "message": "AI Title Translator - YouTube Titles",
     "description": "Chrome Web Store extension name in English"
   },
   "extDescription": {
-    "message": "Translate YouTube titles into multiple target languages with AI. Settings and API keys are stored only in your local browser.",
+    "message": "Translate YouTube titles into your chosen language and keep the original title visible. Settings and API keys stay in your browser.",
     "description": "Chrome Web Store extension description in English"
   },
   "actionTitle": {
-    "message": "Configure AI title translation",
+    "message": "Configure title translation",
     "description": "Toolbar tooltip"
   }
 }
