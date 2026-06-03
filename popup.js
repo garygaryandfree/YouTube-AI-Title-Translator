@@ -32,7 +32,7 @@ if (!globalThis.chrome || !globalThis.chrome.storage || !globalThis.chrome.stora
         runtime: {
             lastError: null,
             sendMessage(message, callback) {
-                if (callback) callback({ ok: false, error: "Preview mode" });
+                if (callback) callback({ ok: false, errorCode: "preview" });
             }
         }
     };
@@ -99,6 +99,7 @@ const UI_TEXT = {
         testingConfig: "Testing current configuration...",
         testPassed: "Configuration works. Sample translation received.",
         testFailed: "Test failed. Check the key, model, endpoint, or provider quota.",
+        previewTestUnavailable: "Configuration test only works from the installed extension popup, not a file preview.",
         saved: "Saved",
         feedback: "Feedback",
         supportDeveloper: "Support developer",
@@ -168,6 +169,7 @@ const UI_TEXT = {
         testingConfig: "正在测试当前配置...",
         testPassed: "配置可用，已收到示例翻译结果",
         testFailed: "测试失败，请检查 Key、模型、接口地址或服务商额度",
+        previewTestUnavailable: "配置测试只能在已安装扩展的弹窗中运行，不能在 file 预览页中运行。",
         saved: "已保存",
         feedback: "反馈建议",
         supportDeveloper: "支持开发者",
@@ -873,6 +875,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 if (reply && reply.ok && reply.translatedTitle) {
                     setStatus(t("testPassed"), "#1d9a57");
+                } else if (reply && reply.errorCode === "preview") {
+                    setStatus(t("previewTestUnavailable"), "#69717f");
                 } else {
                     setStatus(t("testFailed"), "#d92d20");
                 }
