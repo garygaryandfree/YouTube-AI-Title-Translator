@@ -873,7 +873,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     return;
                 }
 
-                if (reply && reply.ok && reply.translatedTitle) {
+                if (reply && reply.ok && reply.result && reply.result.translatedTitle) {
                     setStatus(t("testPassed"), "#1d9a57");
                 } else if (reply && reply.errorCode === "preview") {
                     setStatus(t("previewTestUnavailable"), "#69717f");
