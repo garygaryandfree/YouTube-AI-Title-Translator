@@ -28,6 +28,12 @@ if (!globalThis.chrome || !globalThis.chrome.storage || !globalThis.chrome.stora
             request() {
                 return Promise.resolve(true);
             }
+        },
+        runtime: {
+            lastError: null,
+            sendMessage(message, callback) {
+                if (callback) callback({ ok: false, error: "Preview mode" });
+            }
         }
     };
 }
@@ -89,9 +95,16 @@ const UI_TEXT = {
         apiKeyPlaceholder: "Paste your API key...",
         toggleKey: "Show or hide API Key",
         saveSettings: "Save settings",
+        testConfig: "Test configuration",
+        testingConfig: "Testing current configuration...",
+        testPassed: "Configuration works. Sample translation received.",
+        testFailed: "Test failed. Check the key, model, endpoint, or provider quota.",
         saved: "Saved",
         feedback: "Feedback",
         supportDeveloper: "Support developer",
+        localKeyChip: "API Key stays local",
+        originalChip: "Original title preserved",
+        customAiChip: "Custom AI setup",
         deepseekRecommended: "REC",
         privacyNote: "v8.0 | Stored only in this browser. No data is uploaded to the developer.",
         noKey: "No key?",
@@ -151,9 +164,16 @@ const UI_TEXT = {
         apiKeyPlaceholder: "粘贴你的密钥...",
         toggleKey: "显示或隐藏 API Key",
         saveSettings: "保存设置",
+        testConfig: "测试配置",
+        testingConfig: "正在测试当前配置...",
+        testPassed: "配置可用，已收到示例翻译结果",
+        testFailed: "测试失败，请检查 Key、模型、接口地址或服务商额度",
         saved: "已保存",
         feedback: "反馈建议",
         supportDeveloper: "支持开发者",
+        localKeyChip: "API Key 本地保存",
+        originalChip: "原始标题保留",
+        customAiChip: "可自定义 AI 配置",
         deepseekRecommended: "推荐",
         privacyNote: "v8.0 | 仅在当前浏览器本地存储，不会上传任何数据。",
         noKey: "没有 Key?",
@@ -447,6 +467,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const modelNameInput = document.getElementById("modelName");
     const modelSelect = document.getElementById("modelSelect");
     const saveBtn = document.getElementById("saveBtn");
+    const testBtn = document.getElementById("testBtn");
     const status = document.getElementById("status");
     const helpLinkContainer = document.getElementById("help-text");
     const masterToggle = document.getElementById("masterToggle");
@@ -489,6 +510,47 @@ document.addEventListener("DOMContentLoaded", () => {
     function setStatus(message, color) {
         status.textContent = message;
         status.style.color = color || "";
+    }
+
+    function buildCurrentConfig() {
+        return {
+            apiUrl: apiUrlInput.value.trim(),
+            apiKey: apiKeyInput.value.trim(),
+            model: modelNameInput.value.trim(),
+            targetLanguage
+        };
+    }
+
+    function validateCurrentConfig() {
+        const cfg = buildCurrentConfig();
+        if (!cfg.apiKey) {
+            setStatus(t("keyRequired"), "#d92d20");
+            apiKeyInput.focus();
+            return null;
+        }
+
+        if (currentProvider === "custom") {
+            if (!cfg.apiUrl || !cfg.model) {
+                setStatus(t("customRequired"), "#d92d20");
+                return null;
+            }
+            const endpoint = validateCustomEndpoint(cfg.apiUrl);
+            if (!endpoint.ok) {
+                setStatus(endpoint.message, "#d92d20");
+                apiUrlInput.focus();
+                return null;
+            }
+        } else if (!cfg.model) {
+            setStatus(t("modelRequired"), "#d92d20");
+            modelNameInput.focus();
+            return null;
+        }
+
+        if (currentProvider !== "custom") {
+            cfg.apiUrl = buildUrl(currentProvider, cfg.model);
+        }
+
+        return cfg;
     }
 
     function applyI18n() {
@@ -756,22 +818,11 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     saveBtn.addEventListener("click", async () => {
-        const url = apiUrlInput.value.trim();
-        const key = apiKeyInput.value.trim();
-        const model = modelNameInput.value.trim();
-
-        if (!key) {
-            setStatus(t("keyRequired"), "#d92d20");
-            apiKeyInput.focus();
-            return;
-        }
+        const cfg = validateCurrentConfig();
+        if (!cfg) return;
 
         if (currentProvider === "custom") {
-            if (!url || !model) {
-                setStatus(t("customRequired"), "#d92d20");
-                return;
-            }
-            const endpoint = validateCustomEndpoint(url);
+            const endpoint = validateCustomEndpoint(cfg.apiUrl);
             if (!endpoint.ok) {
                 setStatus(endpoint.message, "#d92d20");
                 apiUrlInput.focus();
@@ -782,26 +833,50 @@ document.addEventListener("DOMContentLoaded", () => {
                 setStatus(t("permissionDenied"), "#d92d20");
                 return;
             }
-        } else if (!model) {
-            setStatus(t("modelRequired"), "#d92d20");
-            modelNameInput.focus();
-            return;
         }
 
-        providerConfigs[currentProvider] = { apiKey: key, apiUrl: url, model };
+        providerConfigs[currentProvider] = { apiKey: cfg.apiKey, apiUrl: cfg.apiUrl, model: cfg.model };
 
         chrome.storage.local.set({
             providerConfigs,
             selectedProvider: currentProvider,
             targetLanguage,
             uiLanguage,
-            customApiUrl: url,
-            customApiKey: key,
-            customModel: model
+            customApiUrl: cfg.apiUrl,
+            customApiKey: cfg.apiKey,
+            customModel: cfg.model
         }, () => {
             setStatus(t("savedRefresh"), "#1d9a57");
             setSaveButtonLabel(t("saved"));
             setTimeout(() => setSaveButtonLabel(t("saveSettings")), 1500);
         });
     });
+
+    if (testBtn) {
+        testBtn.addEventListener("click", () => {
+            const cfg = validateCurrentConfig();
+            if (!cfg) return;
+
+            testBtn.disabled = true;
+            setStatus(t("testingConfig"), "#69717f");
+
+            chrome.runtime.sendMessage({
+                type: "translate",
+                text: "How global creators explain AI tools",
+                config: cfg
+            }, (reply) => {
+                testBtn.disabled = false;
+                if (chrome.runtime.lastError) {
+                    setStatus(chrome.runtime.lastError.message || t("testFailed"), "#d92d20");
+                    return;
+                }
+
+                if (reply && reply.ok && reply.translatedTitle) {
+                    setStatus(t("testPassed"), "#1d9a57");
+                } else {
+                    setStatus(t("testFailed"), "#d92d20");
+                }
+            });
+        });
+    }
 });
