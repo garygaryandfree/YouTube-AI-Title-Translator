@@ -230,7 +230,7 @@ function localizeTag(tag) {
     return labels[TARGET_LANGUAGE] || labels[UI_LANGUAGE] || labels.en;
 }
 
-console.log("🚀 Gary插件 V8.0 已启动");
+console.log("🚀 Gary插件 v2.1 已启动");
 
 // ================= 持久化翻译缓存 =================
 // 设计：目标语言 + 原文 → {tag, translatedTitle, ts} 的 Map，启动时一次从 chrome.storage 加载，
