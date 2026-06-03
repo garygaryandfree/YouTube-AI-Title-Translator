@@ -25,7 +25,7 @@
 
 AI Title Translator는 YouTube 동영상 제목을 AI로 번역하는 Chrome 확장 프로그램입니다. 번역 제목은 제목 위치에 표시되고 원문 제목은 아래에 남아 비교, 읽기, 언어 학습에 활용할 수 있습니다.
 
-v2.1부터 이 확장 프로그램은 중국어 번역 전용이 아닙니다. 일반적인 YouTube 제목 언어를 자동으로 처리하고 영어, 일본어, 한국어, 태국어, 스페인어, 프랑스어, 독일어, 포르투갈어, 인도네시아어, 베트남어 및 중국어 변형으로 번역할 수 있습니다.
+v8.0.1부터 이 확장 프로그램은 중국어 번역 전용이 아닙니다. 일반적인 YouTube 제목 언어를 자동으로 처리하고 영어, 일본어, 한국어, 태국어, 스페인어, 프랑스어, 독일어, 포르투갈어, 인도네시아어, 베트남어 및 중국어 변형으로 번역할 수 있습니다.
 
 ## Key Features
 
@@ -56,27 +56,27 @@ v2.1부터 이 확장 프로그램은 중국어 번역 전용이 아닙니다. �
 
 | English -> Japanese | English -> Korean |
 |---|---|
-| ![English to Japanese](screenshots/v2.1/en-to-ja.png) | ![English to Korean](screenshots/v2.1/en-to-ko.png) |
+| ![English to Japanese](screenshots/v8.0.1/en-to-ja.png) | ![English to Korean](screenshots/v8.0.1/en-to-ko.png) |
 
 | English -> Thai | English -> Spanish |
 |---|---|
-| ![English to Thai](screenshots/v2.1/en-to-th.png) | ![English to Spanish](screenshots/v2.1/en-to-es.png) |
+| ![English to Thai](screenshots/v8.0.1/en-to-th.png) | ![English to Spanish](screenshots/v8.0.1/en-to-es.png) |
 
 | Chinese -> English | Chinese -> French |
 |---|---|
-| ![Chinese to English](screenshots/v2.1/zh-to-en.png) | ![Chinese to French](screenshots/v2.1/zh-to-fr.png) |
+| ![Chinese to English](screenshots/v8.0.1/zh-to-en.png) | ![Chinese to French](screenshots/v8.0.1/zh-to-fr.png) |
 
 | Chinese -> German | Chinese -> Portuguese |
 |---|---|
-| ![Chinese to German](screenshots/v2.1/zh-to-de.png) | ![Chinese to Portuguese](screenshots/v2.1/zh-to-pt.png) |
+| ![Chinese to German](screenshots/v8.0.1/zh-to-de.png) | ![Chinese to Portuguese](screenshots/v8.0.1/zh-to-pt.png) |
 
 | Chinese -> Indonesian | Chinese -> Vietnamese |
 |---|---|
-| ![Chinese to Indonesian](screenshots/v2.1/zh-to-id.png) | ![Chinese to Vietnamese](screenshots/v2.1/zh-to-vi.png) |
+| ![Chinese to Indonesian](screenshots/v8.0.1/zh-to-id.png) | ![Chinese to Vietnamese](screenshots/v8.0.1/zh-to-vi.png) |
 
 ## Extension Settings UI
 
-![Extension settings UI](screenshots/v2.1/config-ui.png)
+![Extension settings UI](screenshots/v8.0.1/config-ui.png)
 
 The settings page stays compact and focused:
 
@@ -120,7 +120,7 @@ There is no source-language selector. The extension automatically handles common
 ### Install in Developer Mode
 
 1. Open [GitHub Releases](https://github.com/garygaryandfree/YouTube-AI-Title-Translator/releases).
-2. Download the latest `YouTube_AI_Title_Translator_v2.1.zip` and unzip it locally.
+2. Download the latest `YouTube_AI_Title_Translator_v8.0.1.zip` and unzip it locally.
 3. Open `chrome://extensions/` in Chrome.
 4. Enable Developer Mode.
 5. Click `Load unpacked` and select the project folder.

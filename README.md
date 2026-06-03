@@ -25,9 +25,9 @@
 
 AI Title Translator 是一个 Chrome 扩展，用 AI 自动翻译 YouTube 视频标题，并把译文直接显示在标题位置，原文保留在下方。你可以边浏览边对照原文，既方便快速理解内容，也方便学习其他语言的真实表达。
 
-v2.1 起，插件不再只面向“翻译成中文”。它可以自动处理常见 YouTube 标题语言，也可以把标题翻译成英文、日语、韩语、泰语、西班牙语、法语、德语、葡萄牙语、印尼语、越南语等目标语言。无论你想看全球新闻、科技趋势、财经信息、生活方式、音乐内容，还是世界各国 YouTuber 的频道，它都能帮你更快判断视频讲什么。
+v8.0.1 起，插件不再只面向“翻译成中文”。它可以自动处理常见 YouTube 标题语言，也可以把标题翻译成英文、日语、韩语、泰语、西班牙语、法语、德语、葡萄牙语、印尼语、越南语等目标语言。无论你想看全球新闻、科技趋势、财经信息、生活方式、音乐内容，还是世界各国 YouTuber 的频道，它都能帮你更快判断视频讲什么。
 
-## v2.1 最新更新
+## v8.0.1 最新更新
 
 - 全新 popup 配置界面：视觉更清爽，保留轻量工具感。
 - 新增 `Test configuration`：保存前可测试当前服务商、模型和 API Key 是否可用。
@@ -64,27 +64,27 @@ v2.1 起，插件不再只面向“翻译成中文”。它可以自动处理常
 
 | 英文 -> 日语 | 英文 -> 韩语 |
 |---|---|
-| ![English to Japanese](screenshots/v2.1/en-to-ja.png) | ![English to Korean](screenshots/v2.1/en-to-ko.png) |
+| ![English to Japanese](screenshots/v8.0.1/en-to-ja.png) | ![English to Korean](screenshots/v8.0.1/en-to-ko.png) |
 
 | 英文 -> 泰语 | 英文 -> 西班牙语 |
 |---|---|
-| ![English to Thai](screenshots/v2.1/en-to-th.png) | ![English to Spanish](screenshots/v2.1/en-to-es.png) |
+| ![English to Thai](screenshots/v8.0.1/en-to-th.png) | ![English to Spanish](screenshots/v8.0.1/en-to-es.png) |
 
 | 中文 -> 英文 | 中文 -> 法语 |
 |---|---|
-| ![Chinese to English](screenshots/v2.1/zh-to-en.png) | ![Chinese to French](screenshots/v2.1/zh-to-fr.png) |
+| ![Chinese to English](screenshots/v8.0.1/zh-to-en.png) | ![Chinese to French](screenshots/v8.0.1/zh-to-fr.png) |
 
 | 中文 -> 德语 | 中文 -> 葡萄牙语 |
 |---|---|
-| ![Chinese to German](screenshots/v2.1/zh-to-de.png) | ![Chinese to Portuguese](screenshots/v2.1/zh-to-pt.png) |
+| ![Chinese to German](screenshots/v8.0.1/zh-to-de.png) | ![Chinese to Portuguese](screenshots/v8.0.1/zh-to-pt.png) |
 
 | 中文 -> 印尼语 | 中文 -> 越南语 |
 |---|---|
-| ![Chinese to Indonesian](screenshots/v2.1/zh-to-id.png) | ![Chinese to Vietnamese](screenshots/v2.1/zh-to-vi.png) |
+| ![Chinese to Indonesian](screenshots/v8.0.1/zh-to-id.png) | ![Chinese to Vietnamese](screenshots/v8.0.1/zh-to-vi.png) |
 
 ## 插件配置界面
 
-![插件配置界面](screenshots/v2.1/config-ui.png)
+![插件配置界面](screenshots/v8.0.1/config-ui.png)
 
 配置页面保持简洁，主要包含这些区域：
 
@@ -129,7 +129,7 @@ Português / Bahasa Indonesia / Tiếng Việt / Русский / العربية
 ### 方法二：开发者模式安装
 
 1. 打开 [GitHub Releases](https://github.com/garygaryandfree/YouTube-AI-Title-Translator/releases)。
-2. 下载最新版本的 `YouTube_AI_Title_Translator_v2.1.zip`，并解压到本地文件夹。
+2. 下载最新版本的 `YouTube_AI_Title_Translator_v8.0.1.zip`，并解压到本地文件夹。
 3. 在 Chrome 地址栏输入 `chrome://extensions/`。
 4. 开启右上角“开发者模式”。
 5. 点击“加载已解压的扩展程序”，选择解压后的项目文件夹。
