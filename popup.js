@@ -107,7 +107,7 @@ const UI_TEXT = {
         originalChip: "Original title preserved",
         customAiChip: "Custom AI setup",
         deepseekRecommended: "REC",
-        privacyNote: "v8.0.1 | Stored only in this browser. No data is uploaded to the developer.",
+        privacyNote: "v8.0.2 | Stored only in this browser. No data is uploaded to the developer.",
         noKey: "No key?",
         helpOpenAI: "Get one from OpenAI",
         helpGoogle: "Get one from Google AI Studio",
@@ -177,7 +177,7 @@ const UI_TEXT = {
         originalChip: "原始标题保留",
         customAiChip: "可自定义 AI 配置",
         deepseekRecommended: "推荐",
-        privacyNote: "v8.0.1 | 仅在当前浏览器本地存储，不会上传任何数据。",
+        privacyNote: "v8.0.2 | 仅在当前浏览器本地存储，不会上传任何数据。",
         noKey: "没有 Key?",
         helpOpenAI: "去 OpenAI 官网申请",
         helpGoogle: "去 Google AI Studio 申请",
@@ -246,7 +246,7 @@ Object.assign(UI_TEXT.ja, {
     providerTitle: "2. AI プロバイダーを選択", modelTitle: "3. モデル設定", modelVersionLabel: "モデルバージョン",
     providerCustom: "カスタム", customEndpointLabel: "カスタムエンドポイント", apiEndpointLabel: "API エンドポイント",
     modelNameLabel: "モデル名", apiKeyPlaceholder: "API キーを貼り付け...", feedback: "フィードバック",
-    supportDeveloper: "開発者を支援", privacyNote: "v8.0.1 | このブラウザ内にのみ保存され、開発者へデータは送信されません。",
+    supportDeveloper: "開発者を支援", privacyNote: "v8.0.2 | このブラウザ内にのみ保存され、開発者へデータは送信されません。",
     noKey: "キーがありませんか?", languageSaved: "言語設定を保存しました", savedRefresh: "保存しました。YouTube を更新してください。"
 });
 Object.assign(UI_TEXT.ko, {
@@ -254,7 +254,7 @@ Object.assign(UI_TEXT.ko, {
     providerTitle: "2. AI 제공업체 선택", modelTitle: "3. 모델 설정", modelVersionLabel: "모델 버전",
     providerCustom: "사용자 지정", customEndpointLabel: "사용자 지정 엔드포인트", apiEndpointLabel: "API 엔드포인트",
     modelNameLabel: "모델 이름", apiKeyPlaceholder: "API 키 붙여넣기...", feedback: "피드백",
-    supportDeveloper: "개발자 지원", privacyNote: "v8.0.1 | 이 브라우저에만 저장되며 개발자에게 데이터가 업로드되지 않습니다.",
+    supportDeveloper: "개발자 지원", privacyNote: "v8.0.2 | 이 브라우저에만 저장되며 개발자에게 데이터가 업로드되지 않습니다.",
     noKey: "키가 없나요?", languageSaved: "언어 설정 저장됨", savedRefresh: "저장됨. YouTube를 새로고침하세요."
 });
 Object.assign(UI_TEXT.th, {
@@ -262,7 +262,7 @@ Object.assign(UI_TEXT.th, {
     providerTitle: "2. เลือกผู้ให้บริการ AI", modelTitle: "3. ตั้งค่าโมเดล", modelVersionLabel: "เวอร์ชันโมเดล",
     providerCustom: "กำหนดเอง", customEndpointLabel: "เอนด์พอยต์กำหนดเอง", apiEndpointLabel: "เอนด์พอยต์ API",
     modelNameLabel: "ชื่อโมเดล", apiKeyPlaceholder: "วาง API Key...", feedback: "ข้อเสนอแนะ",
-    supportDeveloper: "สนับสนุนนักพัฒนา", privacyNote: "v8.0.1 | บันทึกเฉพาะในเบราว์เซอร์นี้ ไม่มีการอัปโหลดข้อมูลให้ผู้พัฒนา",
+    supportDeveloper: "สนับสนุนนักพัฒนา", privacyNote: "v8.0.2 | บันทึกเฉพาะในเบราว์เซอร์นี้ ไม่มีการอัปโหลดข้อมูลให้ผู้พัฒนา",
     noKey: "ยังไม่มี Key?", languageSaved: "บันทึกภาษาสำเร็จ", savedRefresh: "บันทึกแล้ว โปรดรีเฟรช YouTube"
 });
 Object.assign(UI_TEXT.es, {
@@ -270,7 +270,7 @@ Object.assign(UI_TEXT.es, {
     providerTitle: "2. Elegir proveedor de IA", modelTitle: "3. Ajustes del modelo", modelVersionLabel: "Versión del modelo",
     providerCustom: "Personalizado", customEndpointLabel: "Endpoint personalizado", apiEndpointLabel: "Endpoint API",
     modelNameLabel: "Nombre del modelo", apiKeyPlaceholder: "Pega tu API Key...", feedback: "Comentarios",
-    supportDeveloper: "Apoyar al desarrollador", privacyNote: "v8.0.1 | Se guarda solo en este navegador. No se suben datos al desarrollador.",
+    supportDeveloper: "Apoyar al desarrollador", privacyNote: "v8.0.2 | Se guarda solo en este navegador. No se suben datos al desarrollador.",
     noKey: "¿No tienes key?", languageSaved: "Idioma guardado", savedRefresh: "Guardado. Actualiza YouTube para aplicar."
 });
 Object.assign(UI_TEXT.fr, {
@@ -278,7 +278,7 @@ Object.assign(UI_TEXT.fr, {
     providerTitle: "2. Choisir le fournisseur IA", modelTitle: "3. Paramètres du modèle", modelVersionLabel: "Version du modèle",
     providerCustom: "Personnalisé", customEndpointLabel: "Endpoint personnalisé", apiEndpointLabel: "Endpoint API",
     modelNameLabel: "Nom du modèle", apiKeyPlaceholder: "Collez votre clé API...", feedback: "Retour",
-    supportDeveloper: "Soutenir le développeur", privacyNote: "v8.0.1 | Stocké uniquement dans ce navigateur. Aucune donnée n'est envoyée au développeur.",
+    supportDeveloper: "Soutenir le développeur", privacyNote: "v8.0.2 | Stocké uniquement dans ce navigateur. Aucune donnée n'est envoyée au développeur.",
     noKey: "Pas de clé?", languageSaved: "Langue enregistrée", savedRefresh: "Enregistré. Actualisez YouTube."
 });
 Object.assign(UI_TEXT.de, {
@@ -286,7 +286,7 @@ Object.assign(UI_TEXT.de, {
     providerTitle: "2. KI-Anbieter wählen", modelTitle: "3. Modelleinstellungen", modelVersionLabel: "Modellversion",
     providerCustom: "Benutzerdefiniert", customEndpointLabel: "Eigener Endpunkt", apiEndpointLabel: "API-Endpunkt",
     modelNameLabel: "Modellname", apiKeyPlaceholder: "API Key einfügen...", feedback: "Feedback",
-    supportDeveloper: "Entwickler unterstützen", privacyNote: "v8.0.1 | Nur in diesem Browser gespeichert. Keine Daten werden an den Entwickler hochgeladen.",
+    supportDeveloper: "Entwickler unterstützen", privacyNote: "v8.0.2 | Nur in diesem Browser gespeichert. Keine Daten werden an den Entwickler hochgeladen.",
     noKey: "Kein Key?", languageSaved: "Sprache gespeichert", savedRefresh: "Gespeichert. YouTube aktualisieren."
 });
 Object.assign(UI_TEXT.pt, {
@@ -294,7 +294,7 @@ Object.assign(UI_TEXT.pt, {
     providerTitle: "2. Escolher provedor de IA", modelTitle: "3. Configurações do modelo", modelVersionLabel: "Versão do modelo",
     providerCustom: "Personalizado", customEndpointLabel: "Endpoint personalizado", apiEndpointLabel: "Endpoint da API",
     modelNameLabel: "Nome do modelo", apiKeyPlaceholder: "Cole sua API Key...", feedback: "Feedback",
-    supportDeveloper: "Apoiar desenvolvedor", privacyNote: "v8.0.1 | Salvo apenas neste navegador. Nenhum dado é enviado ao desenvolvedor.",
+    supportDeveloper: "Apoiar desenvolvedor", privacyNote: "v8.0.2 | Salvo apenas neste navegador. Nenhum dado é enviado ao desenvolvedor.",
     noKey: "Sem key?", languageSaved: "Idioma salvo", savedRefresh: "Salvo. Atualize o YouTube."
 });
 Object.assign(UI_TEXT.id, {
@@ -302,7 +302,7 @@ Object.assign(UI_TEXT.id, {
     providerTitle: "2. Pilih penyedia AI", modelTitle: "3. Pengaturan model", modelVersionLabel: "Versi model",
     providerCustom: "Kustom", customEndpointLabel: "Endpoint kustom", apiEndpointLabel: "Endpoint API",
     modelNameLabel: "Nama model", apiKeyPlaceholder: "Tempel API Key...", feedback: "Masukan",
-    supportDeveloper: "Dukung pengembang", privacyNote: "v8.0.1 | Hanya disimpan di browser ini. Tidak ada data yang diunggah ke pengembang.",
+    supportDeveloper: "Dukung pengembang", privacyNote: "v8.0.2 | Hanya disimpan di browser ini. Tidak ada data yang diunggah ke pengembang.",
     noKey: "Belum punya key?", languageSaved: "Bahasa disimpan", savedRefresh: "Tersimpan. Segarkan YouTube."
 });
 Object.assign(UI_TEXT.vi, {
@@ -310,7 +310,7 @@ Object.assign(UI_TEXT.vi, {
     providerTitle: "2. Chọn nhà cung cấp AI", modelTitle: "3. Cài đặt mô hình", modelVersionLabel: "Phiên bản mô hình",
     providerCustom: "Tùy chỉnh", customEndpointLabel: "Endpoint tùy chỉnh", apiEndpointLabel: "Endpoint API",
     modelNameLabel: "Tên mô hình", apiKeyPlaceholder: "Dán API Key...", feedback: "Phản hồi",
-    supportDeveloper: "Ủng hộ nhà phát triển", privacyNote: "v8.0.1 | Chỉ lưu trong trình duyệt này. Không tải dữ liệu lên nhà phát triển.",
+    supportDeveloper: "Ủng hộ nhà phát triển", privacyNote: "v8.0.2 | Chỉ lưu trong trình duyệt này. Không tải dữ liệu lên nhà phát triển.",
     noKey: "Chưa có key?", languageSaved: "Đã lưu ngôn ngữ", savedRefresh: "Đã lưu. Hãy làm mới YouTube."
 });
 Object.assign(UI_TEXT.ru, {
@@ -318,7 +318,7 @@ Object.assign(UI_TEXT.ru, {
     providerTitle: "2. Выберите AI-провайдера", modelTitle: "3. Настройки модели", modelVersionLabel: "Версия модели",
     providerCustom: "Свой", customEndpointLabel: "Свой endpoint", apiEndpointLabel: "API endpoint",
     modelNameLabel: "Имя модели", apiKeyPlaceholder: "Вставьте API Key...", feedback: "Обратная связь",
-    supportDeveloper: "Поддержать разработчика", privacyNote: "v8.0.1 | Хранится только в этом браузере. Данные не отправляются разработчику.",
+    supportDeveloper: "Поддержать разработчика", privacyNote: "v8.0.2 | Хранится только в этом браузере. Данные не отправляются разработчику.",
     noKey: "Нет key?", languageSaved: "Язык сохранен", savedRefresh: "Сохранено. Обновите YouTube."
 });
 Object.assign(UI_TEXT.ar, {
@@ -326,7 +326,7 @@ Object.assign(UI_TEXT.ar, {
     providerTitle: "2. اختر مزود الذكاء الاصطناعي", modelTitle: "3. إعدادات النموذج", modelVersionLabel: "إصدار النموذج",
     providerCustom: "مخصص", customEndpointLabel: "نقطة نهاية مخصصة", apiEndpointLabel: "نقطة نهاية API",
     modelNameLabel: "اسم النموذج", apiKeyPlaceholder: "الصق API Key...", feedback: "ملاحظات",
-    supportDeveloper: "دعم المطور", privacyNote: "v8.0.1 | يتم الحفظ في هذا المتصفح فقط. لا يتم رفع أي بيانات إلى المطور.",
+    supportDeveloper: "دعم المطور", privacyNote: "v8.0.2 | يتم الحفظ في هذا المتصفح فقط. لا يتم رفع أي بيانات إلى المطور.",
     noKey: "لا تملك Key؟", languageSaved: "تم حفظ اللغة", savedRefresh: "تم الحفظ. حدّث YouTube."
 });
 Object.assign(UI_TEXT.hi, {
@@ -334,7 +334,7 @@ Object.assign(UI_TEXT.hi, {
     providerTitle: "2. AI प्रदाता चुनें", modelTitle: "3. मॉडल सेटिंग", modelVersionLabel: "मॉडल संस्करण",
     providerCustom: "कस्टम", customEndpointLabel: "कस्टम endpoint", apiEndpointLabel: "API endpoint",
     modelNameLabel: "मॉडल नाम", apiKeyPlaceholder: "API Key पेस्ट करें...", feedback: "फ़ीडबैक",
-    supportDeveloper: "डेवलपर का समर्थन करें", privacyNote: "v8.0.1 | केवल इसी ब्राउज़र में संग्रहीत। डेवलपर को कोई डेटा अपलोड नहीं होता।",
+    supportDeveloper: "डेवलपर का समर्थन करें", privacyNote: "v8.0.2 | केवल इसी ब्राउज़र में संग्रहीत। डेवलपर को कोई डेटा अपलोड नहीं होता।",
     noKey: "Key नहीं है?", languageSaved: "भाषा सेटिंग सहेजी गई", savedRefresh: "सहेजा गया। YouTube रीफ़्रेश करें।"
 });
 

@@ -11,6 +11,33 @@ const SUPPORTED_UI_LANGUAGES = new Set([
     "zh-Hans", "en", "ja", "ko", "th", "es", "fr", "de", "pt", "id", "vi", "ru", "ar", "hi"
 ]);
 
+// Only skip these titles when translating into Chinese. Matching happens in the
+// content script before cache lookup, UI creation, or any request to a model.
+const CHINESE_TRANSLATION_BLOCKLIST = [
+    "CCP",
+    "CPC",
+    "Communist Party",
+    "Politburo",
+    "Regime",
+    "Xi Jinping",
+    "Mao Zedong",
+    "Dalai Lama",
+    "Jiang Zemin",
+    "Hu Jintao",
+    "Tiananmen",
+    "June 4",
+    "Falun",
+    "Cultural Revolution",
+    "Protest",
+    "Human Rights",
+    "Democracy",
+    "Censorship",
+    "Dictator"
+];
+const CHINESE_TRANSLATION_BLOCK_PATTERNS = CHINESE_TRANSLATION_BLOCKLIST.map(word =>
+    new RegExp(`\\b${word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i")
+);
+
 const CONTENT_TEXT = {
     en: {
         original: "Original",
@@ -230,7 +257,7 @@ function localizeTag(tag) {
     return labels[TARGET_LANGUAGE] || labels[UI_LANGUAGE] || labels.en;
 }
 
-console.log("🚀 Gary插件 v8.0.1 已启动");
+console.log("🚀 Gary插件 v8.0.2 已启动");
 
 // ================= 持久化翻译缓存 =================
 // 设计：目标语言 + 原文 → {tag, translatedTitle, ts} 的 Map，启动时一次从 chrome.storage 加载，
@@ -596,6 +623,11 @@ function shouldTranslateTitle(text) {
     return true;
 }
 
+function shouldBlockChineseTranslation(text) {
+    return (TARGET_LANGUAGE === "zh-Hans" || TARGET_LANGUAGE === "zh-Hant") &&
+        CHINESE_TRANSLATION_BLOCK_PATTERNS.some(pattern => pattern.test(text));
+}
+
 function isChineseTitleForTarget(languages) {
     return languages.has("zh") &&
         !languages.has("ja") &&
@@ -627,6 +659,12 @@ async function process() {
         if (el.getAttribute('data-gary-done')) {
             if (el.dataset.garyOriginal === text) continue;
             resetTitleProcessingState(el, targetElement);
+        }
+
+        if (shouldBlockChineseTranslation(text)) {
+            el.setAttribute('data-gary-done', 'blocked');
+            el.dataset.garyOriginal = text;
+            continue;
         }
 
         if (!shouldTranslateTitle(text)) continue;
