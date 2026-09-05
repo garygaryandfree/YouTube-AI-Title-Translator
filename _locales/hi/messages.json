@@ -1,0 +1,14 @@
+{
+  "extName": {
+    "message": "AI Title Translator - YouTube शीर्षक",
+    "description": "Chrome Web Store extension name in Hindi"
+  },
+  "extDescription": {
+    "message": "YouTube शीर्षकों का चुनी गई भाषा में अनुवाद करें और मूल शीर्षक भी दिखाएं। सेटिंग और API कुंजी केवल आपके ब्राउज़र में रहती हैं।",
+    "description": "Chrome Web Store extension description in Hindi"
+  },
+  "actionTitle": {
+    "message": "शीर्षक अनुवाद कॉन्फ़िगर करें",
+    "description": "Toolbar tooltip"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "extName": {
+    "message": "AI Title Translator - Títulos de YouTube",
+    "description": "Chrome Web Store extension name in Spanish"
+  },
+  "extDescription": {
+    "message": "Traduce los títulos de YouTube al idioma que elijas y mantén visible el título original. Los ajustes y las claves API solo se guardan en tu navegador.",
+    "description": "Chrome Web Store extension description in Spanish"
+  },
+  "actionTitle": {
+    "message": "Configurar la traducción de títulos",
+    "description": "Toolbar tooltip"
+  }
+}

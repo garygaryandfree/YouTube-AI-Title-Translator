@@ -1,0 +1,14 @@
+{
+  "extName": {
+    "message": "AI Title Translator - YouTube タイトル",
+    "description": "Chrome Web Store extension name in Japanese"
+  },
+  "extDescription": {
+    "message": "YouTube のタイトルを選択した言語に翻訳し、元のタイトルも表示します。設定と API キーはブラウザ内にのみ保存されます。",
+    "description": "Chrome Web Store extension description in Japanese"
+  },
+  "actionTitle": {
+    "message": "タイトル翻訳の設定",
+    "description": "Toolbar tooltip"
+  }
+}

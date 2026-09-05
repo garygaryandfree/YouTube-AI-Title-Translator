@@ -42,7 +42,7 @@
       "price": "0",
       "priceCurrency": "USD"
     },
-    "softwareVersion": "8.0.2"
+    "softwareVersion": "8.0.3"
   }
   </script>
   
@@ -421,6 +421,23 @@
       display: none;
     }
 
+    /* 已保存 Key 的 provider：右下角绿色小圆点（active 时已有红色勾选，不重复标） */
+    .provider-card.provider-configured:not(.active)::after {
+      content: "";
+      position: absolute;
+      right: 8px;
+      bottom: 8px;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+    }
+
+    .provider-card:focus-visible {
+      outline: 2px solid var(--blue);
+      outline-offset: 2px;
+    }
+
     .provider-badge {
       position: absolute;
       top: 5px;
@@ -759,6 +776,26 @@
       display: none;
     }
 
+    .ghost-btn {
+      width: 100%;
+      margin-top: 8px;
+      padding: 8px;
+      color: var(--muted);
+      background: transparent;
+      border: 1px dashed var(--line-strong);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 12px;
+      line-height: 1.2;
+      font-weight: 650;
+      transition: color .16s ease, border-color .16s ease;
+    }
+
+    .ghost-btn:hover {
+      color: var(--text);
+      border-color: var(--muted);
+    }
+
     .footer {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -950,7 +987,7 @@
       </section>
 
       <section class="section" aria-labelledby="modelTitle">
-        <h2 class="section-title" id="modelTitle"><span data-i18n="modelTitle">3. Model settings</span> <span>Model</span></h2>
+        <h2 class="section-title" id="modelTitle" data-i18n="modelTitle">3. Model settings</h2>
         <div class="input-section" id="modelSection">
           <label for="modelSelect" data-i18n="modelVersionLabel">Model version</label>
           <select id="modelSelect" class="select-control"></select>
@@ -1000,6 +1037,7 @@
         </button>
       </div>
       <div id="status"></div>
+      <button type="button" id="clearCacheBtn" class="ghost-btn">Clear translation cache</button>
     </main>
 
     <div class="footer">
@@ -1013,7 +1051,7 @@
         <span data-i18n="supportDeveloper">Support developer</span>
       </a>
     </div>
-    <p class="privacy-note" data-i18n="privacyNote">v8.0.2 | Stored only in this browser. No data is uploaded to the developer.</p>
+    <p class="privacy-note">Stored only in this browser. No data is uploaded to the developer.</p>
   </div>
 
   <script src="popup.js"></script>

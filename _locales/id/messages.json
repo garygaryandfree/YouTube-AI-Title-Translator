@@ -1,0 +1,14 @@
+{
+  "extName": {
+    "message": "AI Title Translator - Judul YouTube",
+    "description": "Chrome Web Store extension name in Indonesian"
+  },
+  "extDescription": {
+    "message": "Terjemahkan judul YouTube ke bahasa pilihanmu dan tetap tampilkan judul aslinya. Pengaturan dan kunci API hanya tersimpan di browser ini.",
+    "description": "Chrome Web Store extension description in Indonesian"
+  },
+  "actionTitle": {
+    "message": "Atur terjemahan judul",
+    "description": "Toolbar tooltip"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "extName": {
+    "message": "AI Title Translator - عناوين YouTube",
+    "description": "Chrome Web Store extension name in Arabic"
+  },
+  "extDescription": {
+    "message": "ترجم عناوين YouTube إلى اللغة التي تختارها مع إبقاء العنوان الأصلي ظاهرًا. تُحفظ الإعدادات ومفاتيح API في متصفحك فقط.",
+    "description": "Chrome Web Store extension description in Arabic"
+  },
+  "actionTitle": {
+    "message": "إعداد ترجمة العناوين",
+    "description": "Toolbar tooltip"
+  }
+}

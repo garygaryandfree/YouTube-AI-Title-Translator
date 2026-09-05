@@ -1,0 +1,14 @@
+{
+  "extName": {
+    "message": "AI Title Translator - YouTube 標題",
+    "description": "Chrome Web Store extension name in Traditional Chinese"
+  },
+  "extDescription": {
+    "message": "將 YouTube 標題翻譯成所選語言，並保留原文對照。設定與 API Key 僅儲存在本機瀏覽器。",
+    "description": "Chrome Web Store extension description in Traditional Chinese"
+  },
+  "actionTitle": {
+    "message": "設定標題翻譯",
+    "description": "Toolbar tooltip"
+  }
+}

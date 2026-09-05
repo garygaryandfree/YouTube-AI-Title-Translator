@@ -1,0 +1,14 @@
+{
+  "extName": {
+    "message": "AI Title Translator - заголовки YouTube",
+    "description": "Chrome Web Store extension name in Russian"
+  },
+  "extDescription": {
+    "message": "Переводит заголовки YouTube на выбранный язык, сохраняя оригинал. Настройки и API-ключи хранятся только в вашем браузере.",
+    "description": "Chrome Web Store extension description in Russian"
+  },
+  "actionTitle": {
+    "message": "Настроить перевод заголовков",
+    "description": "Toolbar tooltip"
+  }
+}

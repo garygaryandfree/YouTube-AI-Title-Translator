@@ -1,0 +1,14 @@
+{
+  "extName": {
+    "message": "AI Title Translator - Tiêu đề YouTube",
+    "description": "Chrome Web Store extension name in Vietnamese"
+  },
+  "extDescription": {
+    "message": "Dịch tiêu đề YouTube sang ngôn ngữ bạn chọn và vẫn hiển thị tiêu đề gốc. Cài đặt và API key chỉ được lưu trong trình duyệt của bạn.",
+    "description": "Chrome Web Store extension description in Vietnamese"
+  },
+  "actionTitle": {
+    "message": "Cấu hình dịch tiêu đề",
+    "description": "Toolbar tooltip"
+  }
+}

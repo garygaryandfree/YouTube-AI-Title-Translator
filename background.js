@@ -43,33 +43,6 @@ const TARGET_LANGUAGE_NAMES = {
     vi: "Vietnamese"
 };
 
-// 同 content.js 里的实现：括号计数提取首个完整闭合 JSON 对象，
-// 处理 (1) 双 JSON 重复 (2) 散文包围 (3) 字符串内含 } 等病态返回
-function extractFirstJsonValue(s) {
-    const objectStart = s.indexOf('{');
-    const arrayStart = s.indexOf('[');
-    let start = -1;
-    if (objectStart >= 0 && arrayStart >= 0) start = Math.min(objectStart, arrayStart);
-    else start = Math.max(objectStart, arrayStart);
-    if (start < 0) return null;
-    const open = s[start];
-    const close = open === "{" ? "}" : "]";
-    let depth = 0, inStr = false, escape = false;
-    for (let i = start; i < s.length; i++) {
-        const c = s[i];
-        if (escape) { escape = false; continue; }
-        if (c === '\\') { escape = true; continue; }
-        if (c === '"') { inStr = !inStr; continue; }
-        if (inStr) continue;
-        if (c === open) depth++;
-        else if (c === close) {
-            depth--;
-            if (depth === 0) return s.slice(start, i + 1);
-        }
-    }
-    return null;
-}
-
 function extractJsonValueCandidates(s) {
     const candidates = [];
     for (let start = 0; start < s.length; start++) {
@@ -94,6 +67,20 @@ function extractJsonValueCandidates(s) {
         }
     }
     return candidates;
+}
+
+// 所有 AI 请求统一走这里：30s 超时 + 网络层失败（含超时）重试一次。
+// 没有超时兜底的话，一个挂死的连接会永久占住并发槽（MAX_CONCURRENT_TRANSLATIONS），
+// 整支队列停摆，页面 badge 永远停在"翻译中"。
+const FETCH_TIMEOUT_MS = 30000;
+async function fetchWithTimeout(url, options) {
+    for (let attempt = 0; attempt < 2; attempt++) {
+        try {
+            return await fetch(url, Object.assign({}, options, { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) }));
+        } catch (e) {
+            if (attempt === 1) throw e;
+        }
+    }
 }
 
 function getApiType(config) {
@@ -211,7 +198,10 @@ function classifyApiError(status, data) {
     if (status === 402 || status === 429 || lower.includes("quota") || lower.includes("balance") || lower.includes("rate limit")) {
         return makeError("quota", "余额不足或被限流", { status, data });
     }
-    if (status === 400 || status === 404 || lower.includes("model") || lower.includes("not found")) {
+    // 明确提到"模型不存在"才归为模型名错误；普通 400（参数错误等）落到 service，
+    // 避免把我们自己的请求体问题误导成"模型名可能错误"
+    if (status === 404 || lower.includes("not found") || lower.includes("not exist") ||
+        (status === 400 && lower.includes("model"))) {
         return makeError("model", "模型名可能错误", { status, data });
     }
     return makeError("service", "网络或服务商异常", { status, data });
@@ -288,14 +278,23 @@ function buildChatCompletionsBody(config, promptText, maxTokens, systemPrompt) {
         }, {
             role: "user",
             content: promptText
-        }],
-        temperature: 0.3,
-        max_tokens: maxTokens
+        }]
     };
 
-    // OpenAI 新模型使用 max_completion_tokens；多数 OpenAI 兼容服务只认 max_tokens。
+    // OpenAI 官方接口：gpt-5/o 系列只认 max_completion_tokens（max_tokens 已废弃，
+    // 同发会直接 400），且 reasoning 模型拒绝自定义 temperature——两者都不发。
+    // 其他 OpenAI 兼容服务（DeepSeek/Kimi/OpenRouter 等）仍按老约定发 max_tokens + temperature。
     if (config.apiUrl.includes("api.openai.com")) {
         body.max_completion_tokens = maxTokens;
+    } else {
+        body.temperature = 0.3;
+        body.max_tokens = maxTokens;
+        // DeepSeek V4 思考模式默认开（effort=high），思维链计入 max_tokens，
+        // 会把 500/1200 的小额度吃光导致 JSON 截断、解析失败。翻译短标题不需要推理，
+        // 显式关闭（官方参数）；仅限官方域名，自定义端点不发未知参数。
+        if (config.apiUrl.includes("api.deepseek.com") && /^deepseek-v4/.test(config.model || "")) {
+            body.thinking = { type: "disabled" };
+        }
     }
 
     return body;
@@ -324,7 +323,7 @@ async function fetchAiTranslation(text, config) {
 
         if (apiType === "google") {
             const urlWithKey = `${config.apiUrl}?key=${config.apiKey}`;
-            response = await fetch(urlWithKey, {
+            response = await fetchWithTimeout(urlWithKey, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -337,7 +336,7 @@ async function fetchAiTranslation(text, config) {
                 })
             });
         } else if (apiType === "anthropic") {
-            response = await fetch(config.apiUrl, {
+            response = await fetchWithTimeout(config.apiUrl, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -356,7 +355,7 @@ async function fetchAiTranslation(text, config) {
                 })
             });
         } else {
-            response = await fetch(config.apiUrl, {
+            response = await fetchWithTimeout(config.apiUrl, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -418,7 +417,7 @@ async function fetchAiTranslationBatch(items, config) {
 
         if (apiType === "google") {
             const urlWithKey = `${config.apiUrl}?key=${config.apiKey}`;
-            response = await fetch(urlWithKey, {
+            response = await fetchWithTimeout(urlWithKey, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -431,7 +430,7 @@ async function fetchAiTranslationBatch(items, config) {
                 })
             });
         } else if (apiType === "anthropic") {
-            response = await fetch(config.apiUrl, {
+            response = await fetchWithTimeout(config.apiUrl, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -440,7 +439,7 @@ async function fetchAiTranslationBatch(items, config) {
                 },
                 body: JSON.stringify({
                     model: config.model,
-                    system: "You are a translator. Reply with exactly one JSON object and nothing else.",
+                    system: SYSTEM_PROMPT,
                     messages: [{
                         role: "user",
                         content: promptText
@@ -450,7 +449,7 @@ async function fetchAiTranslationBatch(items, config) {
                 })
             });
         } else {
-            response = await fetch(config.apiUrl, {
+            response = await fetchWithTimeout(config.apiUrl, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -526,40 +525,60 @@ async function fetchAiTranslationBatchDedup(items, config) {
 
     if (uniqueItems.length > 0) {
         enqueueTranslation(async () => {
-            const batchReply = await fetchAiTranslationBatch(uniqueItems, config);
-            const resolvedItems = batchReply.results ? batchReply.results.slice() : uniqueItems.map(() => null);
-            const itemErrors = uniqueItems.map((_, i) => {
-                return resolvedItems[i] ? null : getFallbackErrorForMissingItem(batchReply);
-            });
+            try {
+                const batchReply = await fetchAiTranslationBatch(uniqueItems, config);
+                const resolvedItems = batchReply.results ? batchReply.results.slice() : uniqueItems.map(() => null);
+                const itemErrors = uniqueItems.map((_, i) => {
+                    return resolvedItems[i] ? null : getFallbackErrorForMissingItem(batchReply);
+                });
 
-            const missingIndexes = resolvedItems
-                .map((result, i) => result ? -1 : i)
-                .filter(i => i >= 0);
+                const missingIndexes = resolvedItems
+                    .map((result, i) => result ? -1 : i)
+                    .filter(i => i >= 0);
 
-            if (missingIndexes.length > 0 && uniqueItems.length > 1) {
-                await Promise.all(missingIndexes.map(async (i) => {
-                    const retry = await fetchAiTranslation(uniqueItems[i], config);
-                    if (retry && retry.ok && retry.result) {
-                        resolvedItems[i] = retry.result;
-                        itemErrors[i] = null;
-                    } else {
-                        itemErrors[i] = retry && retry.error ? retry.error : itemErrors[i];
-                    }
-                }));
+                // 瞬时错误（parse/empty/network）单条重试一次，单条批量也享受这次机会；
+                // auth/quota/model 重试也是白调，直接沿用原错误
+                const batchErrorType = batchReply.error && batchReply.error.type;
+                const retryable = !batchReply.error || ["parse", "empty", "network"].includes(batchErrorType);
+                if (missingIndexes.length > 0 && retryable) {
+                    await Promise.all(missingIndexes.map(async (i) => {
+                        const retry = await fetchAiTranslation(uniqueItems[i], config);
+                        if (retry && retry.ok && retry.result) {
+                            resolvedItems[i] = retry.result;
+                            itemErrors[i] = null;
+                        } else {
+                            itemErrors[i] = retry && retry.error ? retry.error : itemErrors[i];
+                        }
+                    }));
+                }
+
+                uniqueKeys.forEach((entry, i) => {
+                    const result = resolvedItems[i] || null;
+                    const itemError = result ? null : itemErrors[i];
+                    entry.resolve({ result, error: itemError });
+                    inflightTextResults.delete(entry.key);
+                });
+                return {
+                    ok: resolvedItems.some(Boolean),
+                    results: resolvedItems,
+                    errors: itemErrors,
+                    error: itemErrors.find(Boolean) || null
+                };
+            } catch (e) {
+                // 兜底：任务中途抛任何异常都必须 resolve 所有 deferred，
+                // 否则 content 侧的 sendMessage 永远等不到回复，badge 卡在"翻译中"
+                const error = makeError("network", "网络或服务商异常", String(e));
+                uniqueKeys.forEach(entry => {
+                    entry.resolve({ result: null, error });
+                    inflightTextResults.delete(entry.key);
+                });
+                return {
+                    ok: false,
+                    results: uniqueItems.map(() => null),
+                    errors: uniqueItems.map(() => error),
+                    error
+                };
             }
-
-            uniqueKeys.forEach((entry, i) => {
-                const result = resolvedItems[i] || null;
-                const itemError = result ? null : itemErrors[i];
-                entry.resolve({ result, error: itemError });
-                inflightTextResults.delete(entry.key);
-            });
-            return {
-                ok: resolvedItems.some(Boolean),
-                results: resolvedItems,
-                errors: itemErrors,
-                error: itemErrors.find(Boolean) || null
-            };
         });
     }
 
@@ -601,3 +620,22 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 });
 
 console.log("🚀 Gary BG SW 启动");
+
+// === 单测导出 ===
+// 仅供 node:test 引用；扩展运行时没有 module 对象，这段不会执行
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = {
+        extractJsonValueCandidates,
+        parseSingleTranslationFromText,
+        parseBatchTranslationsFromText,
+        extractBatchArray,
+        findBatchResult,
+        normalizeTranslationResult,
+        classifyApiError,
+        buildChatCompletionsBody,
+        buildSinglePrompt,
+        buildBatchPrompt,
+        enqueueTranslation,
+        fetchAiTranslationBatchDedup
+    };
+}

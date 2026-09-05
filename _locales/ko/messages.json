@@ -1,0 +1,14 @@
+{
+  "extName": {
+    "message": "AI Title Translator - YouTube 제목",
+    "description": "Chrome Web Store extension name in Korean"
+  },
+  "extDescription": {
+    "message": "YouTube 제목을 선택한 언어로 번역하고 원본 제목도 함께 표시합니다. 설정과 API 키는 브라우저에만 저장됩니다.",
+    "description": "Chrome Web Store extension description in Korean"
+  },
+  "actionTitle": {
+    "message": "제목 번역 설정",
+    "description": "Toolbar tooltip"
+  }
+}

@@ -1,12 +1,13 @@
 {
   "manifest_version": 3,
   "name": "__MSG_extName__",
-  "version": "8.0.2",
+  "version": "8.0.3",
   "description": "__MSG_extDescription__",
   "default_locale": "en",
 
   "icons": {
     "16": "icon/icon16.png",
+    "32": "icon/icon32.png",
     "48": "icon/icon48.png",
     "128": "icon/icon128.png"
   },
@@ -40,7 +41,8 @@
     "https://api.moonshot.cn/*"
   ],
   "optional_host_permissions": [
-    "<all_urls>"
+    "https://*/*",
+    "http://*/*"
   ],
   "content_scripts": [
     {

@@ -21,6 +21,10 @@ if (!globalThis.chrome || !globalThis.chrome.storage || !globalThis.chrome.stora
                 set(values, callback) {
                     Object.assign(previewStore, values);
                     if (callback) callback();
+                },
+                remove(keys, callback) {
+                    (Array.isArray(keys) ? keys : [keys]).forEach(key => { delete previewStore[key]; });
+                    if (callback) callback();
                 }
             }
         },
@@ -99,6 +103,10 @@ const UI_TEXT = {
         testingConfig: "Testing current configuration...",
         testPassed: "Configuration works. Sample translation received.",
         testFailed: "Test failed. Check the key, model, endpoint, or provider quota.",
+        testFailAuth: "Invalid API key",
+        testFailQuota: "Quota exhausted or rate limited",
+        testFailModel: "Model name may be wrong",
+        testFailNetwork: "Network or provider error",
         previewTestUnavailable: "Configuration test only works from the installed extension popup, not a file preview.",
         saved: "Saved",
         feedback: "Feedback",
@@ -107,7 +115,7 @@ const UI_TEXT = {
         originalChip: "Original title preserved",
         customAiChip: "Custom AI setup",
         deepseekRecommended: "REC",
-        privacyNote: "v8.0.2 | Stored only in this browser. No data is uploaded to the developer.",
+        privacyNote: "Stored only in this browser. No data is uploaded to the developer.",
         noKey: "No key?",
         helpOpenAI: "Get one from OpenAI",
         helpGoogle: "Get one from Google AI Studio",
@@ -143,7 +151,10 @@ const UI_TEXT = {
         tierStrong: "stronger",
         tierCheapFast: "recommended, low cost and fast",
         tierReasoning: "reasoning model, slower but more accurate",
-        tierCompatible: "compatible"
+        tierCompatible: "compatible",
+        clearCache: "Clear translation cache",
+        cacheCleared: "Cache cleared",
+        configuredProvider: "Key configured"
     },
     "zh-Hans": {
         appTitle: "YouTube 标题翻译",
@@ -169,6 +180,10 @@ const UI_TEXT = {
         testingConfig: "正在测试当前配置...",
         testPassed: "配置可用，已收到示例翻译结果",
         testFailed: "测试失败，请检查 Key、模型、接口地址或服务商额度",
+        testFailAuth: "Key 无效，请检查 API Key",
+        testFailQuota: "余额不足或被限流",
+        testFailModel: "模型名可能错误，请检查模型版本",
+        testFailNetwork: "网络或服务商异常，请稍后重试",
         previewTestUnavailable: "配置测试只能在已安装扩展的弹窗中运行，不能在 file 预览页中运行。",
         saved: "已保存",
         feedback: "反馈建议",
@@ -177,7 +192,7 @@ const UI_TEXT = {
         originalChip: "原始标题保留",
         customAiChip: "可自定义 AI 配置",
         deepseekRecommended: "推荐",
-        privacyNote: "v8.0.2 | 仅在当前浏览器本地存储，不会上传任何数据。",
+        privacyNote: "仅在当前浏览器本地存储，不会上传任何数据。",
         noKey: "没有 Key?",
         helpOpenAI: "去 OpenAI 官网申请",
         helpGoogle: "去 Google AI Studio 申请",
@@ -213,7 +228,10 @@ const UI_TEXT = {
         tierStrong: "更强",
         tierCheapFast: "推荐，便宜快",
         tierReasoning: "推理模型，慢但更准",
-        tierCompatible: "兼容旧 Key"
+        tierCompatible: "兼容旧 Key",
+        clearCache: "清除翻译缓存",
+        cacheCleared: "缓存已清除",
+        configuredProvider: "已配置 Key"
     }
 };
 
@@ -246,7 +264,7 @@ Object.assign(UI_TEXT.ja, {
     providerTitle: "2. AI プロバイダーを選択", modelTitle: "3. モデル設定", modelVersionLabel: "モデルバージョン",
     providerCustom: "カスタム", customEndpointLabel: "カスタムエンドポイント", apiEndpointLabel: "API エンドポイント",
     modelNameLabel: "モデル名", apiKeyPlaceholder: "API キーを貼り付け...", feedback: "フィードバック",
-    supportDeveloper: "開発者を支援", privacyNote: "v8.0.2 | このブラウザ内にのみ保存され、開発者へデータは送信されません。",
+    supportDeveloper: "開発者を支援", privacyNote: "このブラウザ内にのみ保存され、開発者へデータは送信されません。",
     noKey: "キーがありませんか?", languageSaved: "言語設定を保存しました", savedRefresh: "保存しました。YouTube を更新してください。"
 });
 Object.assign(UI_TEXT.ko, {
@@ -254,7 +272,7 @@ Object.assign(UI_TEXT.ko, {
     providerTitle: "2. AI 제공업체 선택", modelTitle: "3. 모델 설정", modelVersionLabel: "모델 버전",
     providerCustom: "사용자 지정", customEndpointLabel: "사용자 지정 엔드포인트", apiEndpointLabel: "API 엔드포인트",
     modelNameLabel: "모델 이름", apiKeyPlaceholder: "API 키 붙여넣기...", feedback: "피드백",
-    supportDeveloper: "개발자 지원", privacyNote: "v8.0.2 | 이 브라우저에만 저장되며 개발자에게 데이터가 업로드되지 않습니다.",
+    supportDeveloper: "개발자 지원", privacyNote: "이 브라우저에만 저장되며 개발자에게 데이터가 업로드되지 않습니다.",
     noKey: "키가 없나요?", languageSaved: "언어 설정 저장됨", savedRefresh: "저장됨. YouTube를 새로고침하세요."
 });
 Object.assign(UI_TEXT.th, {
@@ -262,7 +280,7 @@ Object.assign(UI_TEXT.th, {
     providerTitle: "2. เลือกผู้ให้บริการ AI", modelTitle: "3. ตั้งค่าโมเดล", modelVersionLabel: "เวอร์ชันโมเดล",
     providerCustom: "กำหนดเอง", customEndpointLabel: "เอนด์พอยต์กำหนดเอง", apiEndpointLabel: "เอนด์พอยต์ API",
     modelNameLabel: "ชื่อโมเดล", apiKeyPlaceholder: "วาง API Key...", feedback: "ข้อเสนอแนะ",
-    supportDeveloper: "สนับสนุนนักพัฒนา", privacyNote: "v8.0.2 | บันทึกเฉพาะในเบราว์เซอร์นี้ ไม่มีการอัปโหลดข้อมูลให้ผู้พัฒนา",
+    supportDeveloper: "สนับสนุนนักพัฒนา", privacyNote: "บันทึกเฉพาะในเบราว์เซอร์นี้ ไม่มีการอัปโหลดข้อมูลให้ผู้พัฒนา",
     noKey: "ยังไม่มี Key?", languageSaved: "บันทึกภาษาสำเร็จ", savedRefresh: "บันทึกแล้ว โปรดรีเฟรช YouTube"
 });
 Object.assign(UI_TEXT.es, {
@@ -270,7 +288,7 @@ Object.assign(UI_TEXT.es, {
     providerTitle: "2. Elegir proveedor de IA", modelTitle: "3. Ajustes del modelo", modelVersionLabel: "Versión del modelo",
     providerCustom: "Personalizado", customEndpointLabel: "Endpoint personalizado", apiEndpointLabel: "Endpoint API",
     modelNameLabel: "Nombre del modelo", apiKeyPlaceholder: "Pega tu API Key...", feedback: "Comentarios",
-    supportDeveloper: "Apoyar al desarrollador", privacyNote: "v8.0.2 | Se guarda solo en este navegador. No se suben datos al desarrollador.",
+    supportDeveloper: "Apoyar al desarrollador", privacyNote: "Se guarda solo en este navegador. No se suben datos al desarrollador.",
     noKey: "¿No tienes key?", languageSaved: "Idioma guardado", savedRefresh: "Guardado. Actualiza YouTube para aplicar."
 });
 Object.assign(UI_TEXT.fr, {
@@ -278,7 +296,7 @@ Object.assign(UI_TEXT.fr, {
     providerTitle: "2. Choisir le fournisseur IA", modelTitle: "3. Paramètres du modèle", modelVersionLabel: "Version du modèle",
     providerCustom: "Personnalisé", customEndpointLabel: "Endpoint personnalisé", apiEndpointLabel: "Endpoint API",
     modelNameLabel: "Nom du modèle", apiKeyPlaceholder: "Collez votre clé API...", feedback: "Retour",
-    supportDeveloper: "Soutenir le développeur", privacyNote: "v8.0.2 | Stocké uniquement dans ce navigateur. Aucune donnée n'est envoyée au développeur.",
+    supportDeveloper: "Soutenir le développeur", privacyNote: "Stocké uniquement dans ce navigateur. Aucune donnée n'est envoyée au développeur.",
     noKey: "Pas de clé?", languageSaved: "Langue enregistrée", savedRefresh: "Enregistré. Actualisez YouTube."
 });
 Object.assign(UI_TEXT.de, {
@@ -286,7 +304,7 @@ Object.assign(UI_TEXT.de, {
     providerTitle: "2. KI-Anbieter wählen", modelTitle: "3. Modelleinstellungen", modelVersionLabel: "Modellversion",
     providerCustom: "Benutzerdefiniert", customEndpointLabel: "Eigener Endpunkt", apiEndpointLabel: "API-Endpunkt",
     modelNameLabel: "Modellname", apiKeyPlaceholder: "API Key einfügen...", feedback: "Feedback",
-    supportDeveloper: "Entwickler unterstützen", privacyNote: "v8.0.2 | Nur in diesem Browser gespeichert. Keine Daten werden an den Entwickler hochgeladen.",
+    supportDeveloper: "Entwickler unterstützen", privacyNote: "Nur in diesem Browser gespeichert. Keine Daten werden an den Entwickler hochgeladen.",
     noKey: "Kein Key?", languageSaved: "Sprache gespeichert", savedRefresh: "Gespeichert. YouTube aktualisieren."
 });
 Object.assign(UI_TEXT.pt, {
@@ -294,7 +312,7 @@ Object.assign(UI_TEXT.pt, {
     providerTitle: "2. Escolher provedor de IA", modelTitle: "3. Configurações do modelo", modelVersionLabel: "Versão do modelo",
     providerCustom: "Personalizado", customEndpointLabel: "Endpoint personalizado", apiEndpointLabel: "Endpoint da API",
     modelNameLabel: "Nome do modelo", apiKeyPlaceholder: "Cole sua API Key...", feedback: "Feedback",
-    supportDeveloper: "Apoiar desenvolvedor", privacyNote: "v8.0.2 | Salvo apenas neste navegador. Nenhum dado é enviado ao desenvolvedor.",
+    supportDeveloper: "Apoiar desenvolvedor", privacyNote: "Salvo apenas neste navegador. Nenhum dado é enviado ao desenvolvedor.",
     noKey: "Sem key?", languageSaved: "Idioma salvo", savedRefresh: "Salvo. Atualize o YouTube."
 });
 Object.assign(UI_TEXT.id, {
@@ -302,7 +320,7 @@ Object.assign(UI_TEXT.id, {
     providerTitle: "2. Pilih penyedia AI", modelTitle: "3. Pengaturan model", modelVersionLabel: "Versi model",
     providerCustom: "Kustom", customEndpointLabel: "Endpoint kustom", apiEndpointLabel: "Endpoint API",
     modelNameLabel: "Nama model", apiKeyPlaceholder: "Tempel API Key...", feedback: "Masukan",
-    supportDeveloper: "Dukung pengembang", privacyNote: "v8.0.2 | Hanya disimpan di browser ini. Tidak ada data yang diunggah ke pengembang.",
+    supportDeveloper: "Dukung pengembang", privacyNote: "Hanya disimpan di browser ini. Tidak ada data yang diunggah ke pengembang.",
     noKey: "Belum punya key?", languageSaved: "Bahasa disimpan", savedRefresh: "Tersimpan. Segarkan YouTube."
 });
 Object.assign(UI_TEXT.vi, {
@@ -310,7 +328,7 @@ Object.assign(UI_TEXT.vi, {
     providerTitle: "2. Chọn nhà cung cấp AI", modelTitle: "3. Cài đặt mô hình", modelVersionLabel: "Phiên bản mô hình",
     providerCustom: "Tùy chỉnh", customEndpointLabel: "Endpoint tùy chỉnh", apiEndpointLabel: "Endpoint API",
     modelNameLabel: "Tên mô hình", apiKeyPlaceholder: "Dán API Key...", feedback: "Phản hồi",
-    supportDeveloper: "Ủng hộ nhà phát triển", privacyNote: "v8.0.2 | Chỉ lưu trong trình duyệt này. Không tải dữ liệu lên nhà phát triển.",
+    supportDeveloper: "Ủng hộ nhà phát triển", privacyNote: "Chỉ lưu trong trình duyệt này. Không tải dữ liệu lên nhà phát triển.",
     noKey: "Chưa có key?", languageSaved: "Đã lưu ngôn ngữ", savedRefresh: "Đã lưu. Hãy làm mới YouTube."
 });
 Object.assign(UI_TEXT.ru, {
@@ -318,7 +336,7 @@ Object.assign(UI_TEXT.ru, {
     providerTitle: "2. Выберите AI-провайдера", modelTitle: "3. Настройки модели", modelVersionLabel: "Версия модели",
     providerCustom: "Свой", customEndpointLabel: "Свой endpoint", apiEndpointLabel: "API endpoint",
     modelNameLabel: "Имя модели", apiKeyPlaceholder: "Вставьте API Key...", feedback: "Обратная связь",
-    supportDeveloper: "Поддержать разработчика", privacyNote: "v8.0.2 | Хранится только в этом браузере. Данные не отправляются разработчику.",
+    supportDeveloper: "Поддержать разработчика", privacyNote: "Хранится только в этом браузере. Данные не отправляются разработчику.",
     noKey: "Нет key?", languageSaved: "Язык сохранен", savedRefresh: "Сохранено. Обновите YouTube."
 });
 Object.assign(UI_TEXT.ar, {
@@ -326,7 +344,7 @@ Object.assign(UI_TEXT.ar, {
     providerTitle: "2. اختر مزود الذكاء الاصطناعي", modelTitle: "3. إعدادات النموذج", modelVersionLabel: "إصدار النموذج",
     providerCustom: "مخصص", customEndpointLabel: "نقطة نهاية مخصصة", apiEndpointLabel: "نقطة نهاية API",
     modelNameLabel: "اسم النموذج", apiKeyPlaceholder: "الصق API Key...", feedback: "ملاحظات",
-    supportDeveloper: "دعم المطور", privacyNote: "v8.0.2 | يتم الحفظ في هذا المتصفح فقط. لا يتم رفع أي بيانات إلى المطور.",
+    supportDeveloper: "دعم المطور", privacyNote: "يتم الحفظ في هذا المتصفح فقط. لا يتم رفع أي بيانات إلى المطور.",
     noKey: "لا تملك Key؟", languageSaved: "تم حفظ اللغة", savedRefresh: "تم الحفظ. حدّث YouTube."
 });
 Object.assign(UI_TEXT.hi, {
@@ -334,7 +352,7 @@ Object.assign(UI_TEXT.hi, {
     providerTitle: "2. AI प्रदाता चुनें", modelTitle: "3. मॉडल सेटिंग", modelVersionLabel: "मॉडल संस्करण",
     providerCustom: "कस्टम", customEndpointLabel: "कस्टम endpoint", apiEndpointLabel: "API endpoint",
     modelNameLabel: "मॉडल नाम", apiKeyPlaceholder: "API Key पेस्ट करें...", feedback: "फ़ीडबैक",
-    supportDeveloper: "डेवलपर का समर्थन करें", privacyNote: "v8.0.2 | केवल इसी ब्राउज़र में संग्रहीत। डेवलपर को कोई डेटा अपलोड नहीं होता।",
+    supportDeveloper: "डेवलपर का समर्थन करें", privacyNote: "केवल इसी ब्राउज़र में संग्रहीत। डेवलपर को कोई डेटा अपलोड नहीं होता।",
     noKey: "Key नहीं है?", languageSaved: "भाषा सेटिंग सहेजी गई", savedRefresh: "सहेजा गया। YouTube रीफ़्रेश करें।"
 });
 
@@ -419,7 +437,7 @@ const PRESETS = {
     }
 };
 
-let currentProvider = "openai";
+let currentProvider = "deepseek";
 let uiLanguage = DEFAULT_UI_LANGUAGE;
 let targetLanguage = DEFAULT_TARGET_LANGUAGE;
 
@@ -484,6 +502,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const apiUrlGroup = document.getElementById("apiUrlGroup");
     const modelNameGroup = document.getElementById("modelNameGroup");
     const apiKeyVisibility = document.getElementById("apiKeyVisibility");
+    const clearCacheBtn = document.getElementById("clearCacheBtn");
 
     const cards = {
         openai: document.getElementById("card-openai"),
@@ -573,6 +592,12 @@ document.addEventListener("DOMContentLoaded", () => {
         setSaveButtonLabel(t("saveSettings"));
         updateProviderHelp(currentProvider);
         rebuildModelSelect(currentProvider, modelNameInput.value);
+        // 版本号跟随 manifest，不再硬编码在 14 份文案里
+        const extVersion = (chrome.runtime && chrome.runtime.getManifest) ? chrome.runtime.getManifest().version : "";
+        document.querySelectorAll(".privacy-note").forEach(el => {
+            el.textContent = (extVersion ? `v${extVersion} | ` : "") + t("privacyNote");
+        });
+        renderClearCacheBtn();
     }
 
     function updateProviderHelp(provider) {
@@ -676,6 +701,37 @@ document.addEventListener("DOMContentLoaded", () => {
         return !!(info && info.models.some(model => model.id === modelId));
     }
 
+    // 已保存 Key 的 provider 在卡片右下角显示绿点 + tooltip
+    function refreshConfiguredIndicators() {
+        Object.keys(cards).forEach(key => {
+            const configured = !!(providerConfigs[key] && providerConfigs[key].apiKey);
+            cards[key].classList.toggle("provider-configured", configured);
+            cards[key].title = configured ? t("configuredProvider") : "";
+        });
+    }
+
+    // 测试失败时按错误类型给出具体原因
+    function testFailMessage(error) {
+        const type = error && error.type ? error.type : "";
+        if (type === "auth") return t("testFailAuth");
+        if (type === "quota") return t("testFailQuota");
+        if (type === "model") return t("testFailModel");
+        if (type === "network" || type === "service") return t("testFailNetwork");
+        return t("testFailed");
+    }
+
+    // 兼容 {v, entries} 新格式与旧版裸数组
+    function countCacheEntries(raw) {
+        const arr = Array.isArray(raw) ? raw : (raw && Array.isArray(raw.entries) ? raw.entries : []);
+        return arr.length;
+    }
+
+    let cacheEntryCount = 0;
+    function renderClearCacheBtn() {
+        if (!clearCacheBtn) return;
+        clearCacheBtn.textContent = `${t("clearCache")} (${cacheEntryCount})`;
+    }
+
     function selectProvider(provider) {
         hydrateForm(provider);
         const hasKey = !!(providerConfigs[provider] && providerConfigs[provider].apiKey);
@@ -716,6 +772,22 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    // 保存与测试共用的自定义端点授权：校验 URL + 申请 host 权限
+    async function ensureCustomEndpointPermission(cfg) {
+        const endpoint = validateCustomEndpoint(cfg.apiUrl);
+        if (!endpoint.ok) {
+            setStatus(endpoint.message, "#d92d20");
+            apiUrlInput.focus();
+            return false;
+        }
+        const granted = await ensureHostPermission(endpoint.url);
+        if (!granted) {
+            setStatus(t("permissionDenied"), "#d92d20");
+            return false;
+        }
+        return true;
+    }
+
     function saveLanguageSettings(showStatus) {
         chrome.storage.local.set({ uiLanguage, targetLanguage }, () => {
             if (showStatus) {
@@ -733,12 +805,13 @@ document.addEventListener("DOMContentLoaded", () => {
         {
             enabled: true,
             providerConfigs: null,
-            selectedProvider: "openai",
+            selectedProvider: "deepseek",
             customApiUrl: "",
             customApiKey: "",
             customModel: "",
             uiLanguage: DEFAULT_UI_LANGUAGE,
-            targetLanguage: DEFAULT_TARGET_LANGUAGE
+            targetLanguage: DEFAULT_TARGET_LANGUAGE,
+            translationCache: null
         },
         (result) => {
             uiLanguage = UI_TEXT[result.uiLanguage] ? result.uiLanguage : DEFAULT_UI_LANGUAGE;
@@ -760,8 +833,11 @@ document.addEventListener("DOMContentLoaded", () => {
             populateLanguageSelect(targetLanguageSelect, TARGET_LANGUAGES, targetLanguage);
             applyI18n();
 
-            const provider = PRESETS[result.selectedProvider] ? result.selectedProvider : "openai";
+            cacheEntryCount = countCacheEntries(result.translationCache);
+            renderClearCacheBtn();
+            const provider = PRESETS[result.selectedProvider] ? result.selectedProvider : "deepseek";
             hydrateForm(provider);
+            refreshConfiguredIndicators();
         }
     );
 
@@ -823,19 +899,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const cfg = validateCurrentConfig();
         if (!cfg) return;
 
-        if (currentProvider === "custom") {
-            const endpoint = validateCustomEndpoint(cfg.apiUrl);
-            if (!endpoint.ok) {
-                setStatus(endpoint.message, "#d92d20");
-                apiUrlInput.focus();
-                return;
-            }
-            const granted = await ensureHostPermission(endpoint.url);
-            if (!granted) {
-                setStatus(t("permissionDenied"), "#d92d20");
-                return;
-            }
-        }
+        if (currentProvider === "custom" && !(await ensureCustomEndpointPermission(cfg))) return;
 
         providerConfigs[currentProvider] = { apiKey: cfg.apiKey, apiUrl: cfg.apiUrl, model: cfg.model };
 
@@ -850,14 +914,28 @@ document.addEventListener("DOMContentLoaded", () => {
         }, () => {
             setStatus(t("savedRefresh"), "#1d9a57");
             setSaveButtonLabel(t("saved"));
+            refreshConfiguredIndicators();
             setTimeout(() => setSaveButtonLabel(t("saveSettings")), 1500);
         });
     });
 
+    if (clearCacheBtn) {
+        clearCacheBtn.addEventListener("click", () => {
+            chrome.storage.local.remove("translationCache", () => {
+                cacheEntryCount = 0;
+                renderClearCacheBtn();
+                setStatus(t("cacheCleared"), "#1d9a57");
+                setTimeout(() => setStatus(""), 1600);
+            });
+        });
+    }
+
     if (testBtn) {
-        testBtn.addEventListener("click", () => {
+        testBtn.addEventListener("click", async () => {
             const cfg = validateCurrentConfig();
             if (!cfg) return;
+            // 自定义端点：测试前同样需要 host 权限，否则 SW 的 fetch 必然失败
+            if (currentProvider === "custom" && !(await ensureCustomEndpointPermission(cfg))) return;
 
             testBtn.disabled = true;
             setStatus(t("testingConfig"), "#69717f");
@@ -874,13 +952,20 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
 
                 if (reply && reply.ok && reply.result && reply.result.translatedTitle) {
-                    setStatus(t("testPassed"), "#1d9a57");
+                    // 把示例译文直接展示出来，比一句"配置可用"更有说服力
+                    setStatus(`${t("testPassed")}："How global creators explain AI tools" → ${reply.result.translatedTitle}`, "#1d9a57");
                 } else if (reply && reply.errorCode === "preview") {
                     setStatus(t("previewTestUnavailable"), "#69717f");
                 } else {
-                    setStatus(t("testFailed"), "#d92d20");
+                    setStatus(testFailMessage(reply && reply.error), "#d92d20");
                 }
             });
         });
     }
 });
+
+// === 单测导出 ===
+// 仅供 node:test 引用；扩展运行时没有 module 对象，这段不会执行
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { UI_TEXT, UI_LANGUAGES, TARGET_LANGUAGES, PRESETS };
+}

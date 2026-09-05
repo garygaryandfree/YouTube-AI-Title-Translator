@@ -101,3 +101,17 @@ html[dark] .gary-tag.gary-error {
 html[dark] .gary-cn-title.gary-error {
     color: #ff7a7a;
 }
+
+/* 排队/翻译中的呼吸动画（data-gary-state 由 content.js 维护） */
+@keyframes gary-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.45; }
+}
+.gary-cn-box[data-gary-state="pending"] .gary-tag {
+    animation: gary-pulse 1.2s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+    .gary-cn-box[data-gary-state="pending"] .gary-tag {
+        animation: none;
+    }
+}
