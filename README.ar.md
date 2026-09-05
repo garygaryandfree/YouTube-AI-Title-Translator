@@ -1,8 +1,8 @@
 # AI Title Translator - عناوين YouTube ثنائية اللغة بالذكاء الاصطناعي
 
-[![GitHub stars](https://img.shields.io/github/stars/garygaryandfree/YouTube-AI-Title-Translator?style=for-the-badge)](https://github.com/garygaryandfree/YouTube-AI-Title-Translator/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/garygaryandfree/YouTube-AI-Title-Translator?style=for-the-badge)](https://github.com/garygaryandfree/YouTube-AI-Title-Translator/network)
-[![GitHub issues](https://img.shields.io/github/issues/garygaryandfree/YouTube-AI-Title-Translator?style=for-the-badge)](https://github.com/garygaryandfree/YouTube-AI-Title-Translator/issues)
+[![GitHub stars](https://img.shields.io/github/stars/GaryGaryyy/YouTube-AI-Title-Translator?style=for-the-badge)](https://github.com/GaryGaryyy/YouTube-AI-Title-Translator/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/GaryGaryyy/YouTube-AI-Title-Translator?style=for-the-badge)](https://github.com/GaryGaryyy/YouTube-AI-Title-Translator/network)
+[![GitHub issues](https://img.shields.io/github/issues/GaryGaryyy/YouTube-AI-Title-Translator?style=for-the-badge)](https://github.com/GaryGaryyy/YouTube-AI-Title-Translator/issues)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 [![Chrome Extension](https://img.shields.io/badge/Chrome-Extension-green?style=for-the-badge&logo=google-chrome&logoColor=white)](https://chromewebstore.google.com/detail/bhajnflcikmidmdalnjhknillnkaojhk)
 
@@ -23,204 +23,153 @@
   <a href="README.hi.md">हिन्दी</a>
 </p>
 
-AI Title Translator إضافة Chrome تترجم عناوين فيديو YouTube بالذكاء الاصطناعي. يظهر العنوان المترجم في موضع العنوان، بينما يبقى العنوان الأصلي تحته للمقارنة والقراءة وتعلم اللغات.
+إضافة Chrome تترجم عناوين فيديوهات YouTube بالذكاء الاصطناعي: يحل العنوان المترجم مكان العنوان الأصلي مباشرة، بينما يبقى العنوان الأصلي بحجم أصغر أسفله. تقارن بين العنوانين أثناء التصفح، فتحكم سريعا على موضوع الفيديو، وتتعلم أيضا كيف تُصاغ العناوين الحقيقية بلغات أخرى. مجانية ومفتوحة المصدر، ولا تُحفظ مفاتيح API Key والإعدادات إلا في متصفحك أنت.
 
-منذ v8.0.1 لم تعد الإضافة أداة للترجمة إلى الصينية فقط. فهي تتعامل تلقائيا مع لغات عناوين YouTube الشائعة وتترجم إلى الإنجليزية واليابانية والكورية والتايلاندية والإسبانية والفرنسية والألمانية والبرتغالية والإندونيسية والفيتنامية والصينية.
+## أحدث التحديثات (v8.0.3)
 
-## Key Features
+- **تعمل بدون API Key**: عندما لا يكون أي Key مهيأ، تتحول الإضافة تلقائيا إلى الترجمة على الجهاز المدمجة في Chrome 138+، فتبدأ دون أي تكلفة
+- **إعادة المحاولة بالنقر عند فشل الترجمة**: تظهر العناوين الفاشلة بتنبيه أحمر، ونقرة واحدة عليها تعيد ترجمتها
+- **إصلاح خطأ «Unexpected model response» الذي يسببه وضع التفكير في DeepSeek V4**: تُفعّل نماذج V4 وضع التفكير افتراضيا، وكانت سلسلة الاستدلال تستنفد حصة الإخراج فيُقتطع JSON؛ وقد عُطّل وضع التفكير الآن لنماذج V4
+- أُضيف إلى النافذة المنبثقة (popup) زر مسح ذاكرة الترجمة المؤقتة مع عرض عدد العناصر؛ وتظهر نقطة خضراء على بطاقة المزود الذي حُفظ مفتاحه؛ وعند اختبار الإعدادات تُعرض ترجمة نموذجية مباشرة
+- أُضيفت 12 لغة توطين جديدة، ليصل عدد لغات الواجهة إلى 14 لغة
 
-| Feature | What it does |
-|---------|--------------|
-| Multilingual title handling | Automatically handles common title languages such as English, Chinese, Japanese, Korean, Thai, Spanish, French, German, Portuguese, Indonesian, Vietnamese, Russian, Arabic, and Hindi |
-| Multiple target languages | Translate titles into Simplified Chinese, Traditional Chinese, English, Japanese, Korean, Thai, Spanish, French, German, Portuguese, Indonesian, or Vietnamese |
-| AI context translation | Goes beyond word-by-word translation by understanding hooks, slang, abbreviations, creator style, and local context |
-| Translation + original comparison | Shows the translated title first and keeps the original title underneath, useful for both browsing and language learning |
-| Topic tags | Adds short tags such as Tech, News, Music, and Finance so you can scan video categories quickly |
-| Multilingual settings UI | The extension popup defaults to English and supports 14 interface languages |
-| Multiple AI providers | Supports OpenAI, Gemini, Claude, DeepSeek, MiniMax, Z.AI, Kimi, and custom OpenAI-compatible endpoints |
-| Local privacy | API keys, target language, interface language, and provider settings stay in your browser |
+## الميزات الأساسية
 
-## Compared With Machine Translation / Page Translation
+| الميزة | الوصف |
+|------|------|
+| الترجمة والأصل جنبا إلى جنب | تظهر الترجمة كعنوان رئيسي، ويبقى العنوان الأصلي أسفلها، لتسهيل التصفح السريع وتعلم اللغة |
+| ترجمة AI سياقية | ليست استبدالا كلمة بكلمة، بل تفهم النكات والنبرة والاختصارات وصيغ العناوين المثيرة للنقر |
+| وسوم المحتوى | توليد تلقائي لوسوم مثل تقنية وأخبار وموسيقى ومال، فتعرف نوع الفيديو قبل أن تقرر فتحه |
+| ترجمة بين لغات متعددة | التعرف التلقائي على لغات المصدر الشائعة، والترجمة إلى 12 لغة هدف؛ وتُتخطى تلقائيا العناوين المكتوبة أصلا بلغة الهدف |
+| تعدد مزودي AI | مدمج DeepSeek وOpenAI وGemini وClaude وMiniMax وZ.AI وKimi، مع دعم نقاط نهاية مخصصة متوافقة مع OpenAI |
+| ترجمة مدمجة بدون Key | عند عدم تهيئة أي Key تُستخدم أداة Translator المدمجة في Chrome: تعمل على الجهاز، ومجانية، ولا تُرفع النصوص |
+| تخزين مؤقت محلي وخصوصية | تُخزن الترجمات محليا لتجنب الطلبات المكررة؛ ولا تُحفظ مفاتيح API Key والإعدادات إلا في المتصفح الحالي |
 
-| Area | Machine translation / page translation | AI Title Translator |
-|------|----------------------------------------|---------------------|
-| YouTube title context | Often literal and weak with hooks, memes, and shortened phrases | Uses AI to rewrite titles naturally for the selected target language |
-| Source languages | Usually follows page-level language behavior | Handles multilingual YouTube titles without a source-language selector |
-| Target language control | Often tied to browser or page translation settings | Lets you choose the title target language separately |
-| Reading experience | May rewrite the whole page and make layout noisy | Only translates YouTube titles, with translation above and original below |
-| Content scanning | You still need to read the full title | Adds topic tags for fast scanning across news, tech, finance, music, and more |
-| Learning value | Original text is often replaced | Original titles stay visible for comparison and learning |
-| Privacy and configuration | Usually depends on a third-party page translation service | Stores settings locally and sends title text only to the AI provider you choose |
+## عرض توضيحي
 
-## Demo
-
-| English -> Japanese | English -> Korean |
+| الإنجليزية -> اليابانية | الإنجليزية -> الكورية |
 |---|---|
 | ![English to Japanese](screenshots/v8.0.1/en-to-ja.png) | ![English to Korean](screenshots/v8.0.1/en-to-ko.png) |
 
-| English -> Thai | English -> Spanish |
+| الإنجليزية -> التايلاندية | الإنجليزية -> الإسبانية |
 |---|---|
 | ![English to Thai](screenshots/v8.0.1/en-to-th.png) | ![English to Spanish](screenshots/v8.0.1/en-to-es.png) |
 
-| Chinese -> English | Chinese -> French |
+| الصينية -> الإنجليزية | الصينية -> الفرنسية |
 |---|---|
 | ![Chinese to English](screenshots/v8.0.1/zh-to-en.png) | ![Chinese to French](screenshots/v8.0.1/zh-to-fr.png) |
 
-| Chinese -> German | Chinese -> Portuguese |
+| الصينية -> الألمانية | الصينية -> البرتغالية |
 |---|---|
 | ![Chinese to German](screenshots/v8.0.1/zh-to-de.png) | ![Chinese to Portuguese](screenshots/v8.0.1/zh-to-pt.png) |
 
-| Chinese -> Indonesian | Chinese -> Vietnamese |
+| الصينية -> الإندونيسية | الصينية -> الفيتنامية |
 |---|---|
 | ![Chinese to Indonesian](screenshots/v8.0.1/zh-to-id.png) | ![Chinese to Vietnamese](screenshots/v8.0.1/zh-to-vi.png) |
 
-## Extension Settings UI
+## البدء السريع
 
-![Extension settings UI](screenshots/v8.0.1/config-ui.png)
+### الطريقة الأولى: Chrome Web Store (موصى بها)
 
-The settings page stays compact and focused:
+[انقر للانتقال إلى Chrome Web Store والتثبيت](https://chromewebstore.google.com/detail/bhajnflcikmidmdalnjhknillnkaojhk)
 
-| Area | Purpose |
-|------|---------|
-| Top-right Interface language | Provides multilingual support for the extension settings page, without changing the YouTube page language or translation target |
-| Translation switch | Turns automatic YouTube title translation on or off |
-| Translate titles into | Chooses the target language for translated titles. The default is English |
-| Choose AI provider | Selects the AI provider. DeepSeek is marked as the recommended option |
-| Model settings | Chooses a preset model or lets you enter another supported model ID |
-| API Key | Stores the API key for the selected provider in local Chrome storage |
-| Custom endpoint | Supports OpenRouter, SiliconFlow, local Ollama, LM Studio, and other OpenAI-compatible services |
-| Save settings | Saves the configuration. Refresh YouTube after changing provider, model, or API key settings |
+### الطريقة الثانية: التثبيت في وضع المطور
 
-## Supported Languages
+1. افتح [GitHub Releases](https://github.com/GaryGaryyy/YouTube-AI-Title-Translator/releases)، وحمّل أحدث ملف zip وافك ضغطه.
+2. أدخل `chrome://extensions/` في شريط عنوان Chrome، وفعّل «وضع المطور» (Developer Mode) في أعلى الزاوية.
+3. انقر «Load unpacked» (تحميل إضافة غير مضغوطة)، واختر المجلد بعد فك الضغط.
 
-### Translation Target Languages
+بعد التثبيت انقر أيقونة الإضافة في شريط أدوات المتصفح: اختر أولا لغة الهدف (`Translate titles into`)، ثم اختر مزود AI والصق API Key، وبعد الحفظ حدّث صفحة YouTube. يمكنك أيضا الاستخدام مباشرة بدون Key؛ راجع قسم «الترجمة المدمجة» أدناه.
 
-```text
-Simplified Chinese / Traditional Chinese / English / Japanese / Korean / Thai /
-Spanish / French / German / Portuguese / Indonesian / Vietnamese
-```
+## شرح الإعدادات
 
-### Extension Interface Languages
+![واجهة إعدادات الإضافة](screenshots/v8.0.1/config-ui.png)
 
-```text
-English / Simplified Chinese / Japanese / Korean / Thai / Spanish / French /
-German / Portuguese / Indonesian / Vietnamese / Russian / Arabic / Hindi
-```
+| المنطقة | الوظيفة |
+|------|------|
+| `Interface language` (لغة الواجهة) | لغة عرض واجهة الإعدادات (14 لغة)، لا تؤثر في صفحة YouTube ولا في لغة الترجمة الهدف |
+| مفتاح `Translation` (الترجمة) | تشغيل الترجمة التلقائية للعناوين في صفحات YouTube أو إيقافها؛ وعند الإيقاف تُزال الترجمات المعروضة من الصفحة |
+| `Translate titles into` (ترجمة العناوين إلى) | لغة الهدف لترجمة العناوين، والافتراضية هي الإنجليزية |
+| `Choose AI provider` (اختر مزود الذكاء الاصطناعي) | اختيار مزود AI؛ الافتراضي والموصى به هو DeepSeek، وتظهر نقطة خضراء في الزاوية السفلية من بطاقة المزود الذي حُفظ مفتاحه |
+| `Model settings` (إعدادات النموذج) | اختيار إصدار النموذج، أو اختيار «Other» (أخرى) لإدخال معرّف النموذج يدويا |
+| `API Key` | المفتاح الذي حصلت عليه من المزود المعني، يُحفظ محليا فقط |
+| `Custom endpoint` (نقطة نهاية مخصصة) | للاتصال بخدمات متوافقة مثل OpenRouter وSiliconFlow وVolcengine Ark وOllama وLM Studio |
+| `Save settings` (حفظ) | حفظ الإعدادات، ويُنصح بتحديث صفحة YouTube بعد الحفظ |
+| `Test configuration` | اختبار صلاحية الإعدادات الحالية؛ عند النجاح تُعرض ترجمة نموذجية مباشرة، وعند الفشل يظهر السبب (Key غير صالح / الرصيد غير كاف / اسم النموذج خاطئ / مشكلة في الشبكة) |
+| `Clear translation cache` | مسح ذاكرة الترجمة المؤقتة المحلية (مع عرض عدد العناصر الحالية)؛ الذاكرة مميزة حسب لغة الهدف، فتبديل اللغات لا يؤثر في بعضها |
 
-### Automatic Source Coverage
+## لا تملك API Key؟ استخدم الترجمة المدمجة
 
-There is no source-language selector. The extension automatically handles common YouTube title languages, including English, Chinese, Japanese, Korean, Thai, Spanish, French, German, Portuguese, Indonesian, Vietnamese, Russian, Arabic, and Hindi.
+عندما لا يكون أي Key مهيأ، تحاول الإضافة تلقائيا استخدام Translator / LanguageDetector المدمجين في Chrome 138+: تتم الترجمة على جهازك، دون رفع أي نص ودون أي تكلفة. أما أزواج اللغات التي لا يدعمها الجهاز فتظهر لها رسالة إرشاد «يرجى إعداد الإضافة»، وبعد تهيئة Key لأي مزود AI يمكن ترجمة جميع اللغات المدعومة.
 
-## Quick Start
+الترجمة المدمجة لا تملك قدرة تصنيف وسوم المحتوى، لذا يظهر في موضع الوسم «على الجهاز / On-device».
 
-### Install from Chrome Web Store
+## المزودون والنماذج وAPI Key
 
-[Open the Chrome Web Store listing](https://chromewebstore.google.com/detail/bhajnflcikmidmdalnjhknillnkaojhk)
+| المزود | النماذج المدمجة | رابط طلب Key |
+|--------|----------|--------------|
+| DeepSeek (موصى به) | `deepseek-v4-flash`، `deepseek-v4-pro`، `deepseek-chat` | [platform.deepseek.com/api_keys](https://platform.deepseek.com/api_keys) |
+| OpenAI | `gpt-5.5`، `gpt-5.4-mini`، `gpt-5.4` | [platform.openai.com/api-keys](https://platform.openai.com/api-keys) |
+| Google Gemini | `gemini-3.5-flash`، `gemini-3-pro-preview`، `gemini-3-flash-preview`، `gemini-2.5-flash` | [aistudio.google.com/app/apikey](https://aistudio.google.com/app/apikey) |
+| Claude | `claude-opus-4-7`، `claude-opus-4-6`، `claude-sonnet-4-6`، `claude-haiku-4-5` | [console.anthropic.com/settings/keys](https://console.anthropic.com/settings/keys) |
+| MiniMax | `MiniMax-M2.7-highspeed`، `MiniMax-M2.7`، `MiniMax-M2.5` | [platform.minimax.io](https://platform.minimax.io/user-center/basic-information/interface-key) |
+| Z.AI | `glm-5.1`، `glm-5.1-flash`، `glm-4.6` | [z.ai/manage-apikey/apikey-list](https://z.ai/manage-apikey/apikey-list) |
+| Kimi | `kimi-k2.6`، `kimi-k2.6-turbo`، `kimi-k2.6-thinking` | [platform.kimi.ai/console/api-keys](https://platform.kimi.ai/console/api-keys) |
 
-### Install in Developer Mode
+الإضافة نفسها مجانية؛ أما المزودون فيحاسبون حسب استهلاك API وفقا لقواعد منصاتهم.
 
-1. Open [GitHub Releases](https://github.com/garygaryandfree/YouTube-AI-Title-Translator/releases).
-2. Download the latest `YouTube_AI_Title_Translator_v8.0.1.zip` and unzip it locally.
-3. Open `chrome://extensions/` in Chrome.
-4. Enable Developer Mode.
-5. Click `Load unpacked` and select the project folder.
+### نقطة النهاية المخصصة (Custom endpoint)
 
-After installing, click the extension icon in Chrome to open the settings page. Choose the settings interface language in the top-right corner, then choose the title target language under `Translate titles into`; the first-time default is English. Keep `Translation` turned on, select an AI provider and model, paste that provider's API key, and save. Refresh YouTube after changing provider, model, or API key settings.
+اختيار `Custom` يتيح الاتصال بأي خدمة متوافقة مع صيغة OpenAI Chat Completions، ويلزم ملء:
 
-## API Key Links
+- `API Endpoint`: عنوان الواجهة الكامل، مثل `https://openrouter.ai/api/v1/chat/completions`
+- `Model name`: معرّف النموذج الذي يطلبه المزود، مثل `openai/gpt-5.4-mini`
+- `API Key`: مفتاح المزود المعني
 
-| Provider | Link |
-|----------|------|
-| OpenAI | [platform.openai.com/api-keys](https://platform.openai.com/api-keys) |
-| Google Gemini | [aistudio.google.com/app/apikey](https://aistudio.google.com/app/apikey) |
-| Claude | [console.anthropic.com/settings/keys](https://console.anthropic.com/settings/keys) |
-| DeepSeek | [platform.deepseek.com/api_keys](https://platform.deepseek.com/api_keys) |
-| MiniMax | [platform.minimax.io/user-center/basic-information/interface-key](https://platform.minimax.io/user-center/basic-information/interface-key) |
-| Z.AI | [z.ai/manage-apikey/apikey-list](https://z.ai/manage-apikey/apikey-list) |
-| Kimi | [platform.kimi.ai/console/api-keys](https://platform.kimi.ai/console/api-keys) |
+عند حفظ نطاق جديد لأول مرة يعرض Chrome تأكيدا للإذن، وهو ضروري لكي تصل الإضافة إلى ذلك المزود مباشرة. يجب أن تستخدم نقاط النهاية المخصصة HTTPS (باستثناء تصحيح `localhost` على الجهاز).
 
-## Built-in Model Presets
+## اللغات المدعومة
 
-| Provider | Models |
-|----------|--------|
-| OpenAI | `gpt-5.5`, `gpt-5.4-mini`, `gpt-5.4` |
-| Gemini | `gemini-3.5-flash`, `gemini-3-pro-preview`, `gemini-3-flash-preview`, `gemini-2.5-flash` |
-| Claude | `claude-opus-4-7`, `claude-opus-4-6`, `claude-sonnet-4-6`, `claude-haiku-4-5` |
-| DeepSeek | `deepseek-v4-flash`, `deepseek-v4-pro`, `deepseek-chat` |
-| MiniMax | `MiniMax-M2.7-highspeed`, `MiniMax-M2.7`, `MiniMax-M2.5` |
-| Z.AI | `glm-5.1`, `glm-5.1-flash`, `glm-4.6` |
-| Kimi | `kimi-k2.6`, `kimi-k2.6-turbo`, `kimi-k2.6-thinking` |
+**لغات الهدف (12 لغة)**: 简体中文 / 繁體中文 / English / 日本語 / 한국어 / ไทย / Español / Français / Deutsch / Português / Bahasa Indonesia / Tiếng Việt
 
-## Custom Endpoints
+**لغات الواجهة (14 لغة)**: English / 简体中文 / 日本語 / 한국어 / ไทย / Español / Français / Deutsch / Português / Bahasa Indonesia / Tiếng Việt / Русский / العربية / हिन्दी
 
-Choose `Custom` if you use OpenRouter, SiliconFlow, Volcengine Ark, local Ollama, LM Studio, or another OpenAI Chat Completions compatible service.
+**لغات المصدر**: لا حاجة للاختيار؛ تتعرف الإضافة تلقائيا على لغات العناوين الشائعة مثل الإنجليزية والصينية واليابانية والكورية والتايلاندية والإسبانية والفرنسية والألمانية والبرتغالية والإندونيسية والفيتنامية والروسية والعربية والهندية.
 
-Required fields:
-
-- `API Endpoint`: full request URL, for example `https://openrouter.ai/api/v1/chat/completions`
-- `Model name`: provider-specific model ID, for example `openai/gpt-5.4-mini`
-- `API Key`: the key for that provider
-
-When saving a new custom endpoint domain for the first time, Chrome may ask for host permission. Custom endpoints must use HTTPS, except local `localhost` debugging endpoints.
-
-## Privacy
+## الخصوصية والبيانات
 
 ```text
-API key / target language / interface language / provider settings -> Chrome local storage
-                                                                 -> direct request to your selected AI provider
-                                                                 -> never uploaded to the developer's server
+API Key / لغة الهدف / لغة الواجهة / إعدادات المزود -> التخزين المحلي في Chrome
+نص العنوان                                        -> يُرسل فقط إلى مزود AI الذي اخترته بنفسك
+                                                  -> لا يمر عبر خوادم المطور
 ```
 
-The extension does not upload API keys, language settings, browsing history, or title content to the developer. Title text is sent only to the AI provider configured by the user for translation.
+الإضافة لا تجمع أي بيانات: تُكتب الإعدادات في التخزين المحلي للمتصفح الحالي، ويُرسل نص العنوان مباشرة إلى المزود الذي هيأته لغرض الترجمة. وعند استخدام الترجمة المدمجة لا يغادر النص جهازك.
 
-## Tech Stack
-
-- Frontend: HTML5, CSS3, JavaScript
-- Browser API: Chrome Extensions Manifest V3
-- AI integrations: OpenAI API, Google Gemini API, Anthropic Claude API, DeepSeek API, MiniMax API, Z.AI GLM API, Kimi API, custom OpenAI-compatible endpoints
-- Storage: Chrome Storage Local API
-- Architecture: Content Script + Background Service Worker
-- Build: native static extension, no build step
-
-## Development
+## دليل المطور
 
 ```bash
-git clone https://github.com/garygaryandfree/YouTube-AI-Title-Translator.git
+git clone https://github.com/GaryGaryyy/YouTube-AI-Title-Translator.git
 cd YouTube-AI-Title-Translator
 ```
 
-Load the folder from `chrome://extensions/` with `Load unpacked`. After editing code, reload the extension and refresh YouTube.
+فعّل وضع المطور في `chrome://extensions/`، واختر «Load unpacked» ثم حدد مجلد المشروع. بعد تعديل الشيفرة انقر زر التحديث على بطاقة الإضافة، ثم حدّث صفحة YouTube لتسري التغييرات.
 
-## FAQ
+تشغيل الاختبارات (Node 18+، بدون تبعيات خارجية):
 
-### Is the extension paid?
+```bash
+npm test
+```
 
-No. The extension is free and open source. AI providers may charge for API usage.
+التقنيات: Manifest V3 (Content Script + Background Service Worker)، وHTML/CSS/JS أصيلة، وChrome Storage Local API، دون أي خطوة بناء.
 
-### Are API keys uploaded to a server?
+## الملاحظات والدعم
 
-No. Settings are stored only in Chrome local storage, and requests go directly from your browser to your selected AI provider.
+- الإبلاغ عن الأخطاء واقتراح الميزات: [GitHub Issues](https://github.com/GaryGaryyy/YouTube-AI-Title-Translator/issues)
+- التواصل عبر البريد: garyzhang345@gmail.com
 
-### Why are some titles skipped?
+## الترخيص
 
-If a title is already in the target language, the extension skips it. For example, English titles are skipped when the target language is English, and Chinese titles are skipped when the target language is Chinese.
+هذا المشروع مفتوح المصدر بموجب MIT License؛ للتفاصيل راجع [LICENSE](LICENSE).
 
-### Why does switching target languages trigger new translations?
-
-The cache is target-aware. For example, the same English title translated into Chinese and Japanese is stored as two separate cache entries.
-
-### Why does changing Interface language not refresh YouTube titles?
-
-`Interface language` controls only the extension settings UI. YouTube title translation is controlled by `Translate titles into`, and only target-language changes need to re-render page titles.
-
-## Feedback
-
-- Bugs: [GitHub Issues](https://github.com/garygaryandfree/YouTube-AI-Title-Translator/issues)
-- Feature requests: [GitHub Issues](https://github.com/garygaryandfree/YouTube-AI-Title-Translator/issues)
-- Email: garyzhang345@gmail.com
-
-## License
-
-MIT License. See [LICENSE](LICENSE).
-
-*Last updated: May 26, 2026*
+*آخر تحديث: 5 سبتمبر 2026*
