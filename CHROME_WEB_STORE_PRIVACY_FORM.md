@@ -2,12 +2,32 @@
 
 Use this checklist when completing the Chrome Web Store Developer Dashboard privacy form.
 
+## Single Purpose (单一用途说明)
+
+Paste (English recommended for reviewers):
+
+```
+This extension has a single purpose: it translates YouTube video titles into the user's chosen language and displays the translation together with the original title on YouTube pages.
+```
+
+中文：
+
+```
+本扩展具有单一用途：将 YouTube 视频标题翻译为用户选择的语言，并把译文与原始标题一起显示在 YouTube 页面上。
+```
+
+## Remote Code (您正在使用远程代码吗？)
+
+Answer **No / 不，我并未使用远程代码**.
+
+The extension executes only code bundled in its own package. Calls to AI providers fetch data (JSON text), never executable code — that is not "remote code" under the MV3 policy. Answering "Yes" is factually wrong and invites rejection or in-depth review.
+
 ## Privacy Policy URL
 
 Use one of these public URLs:
 
-- GitHub page: https://github.com/garygaryandfree/YouTube-AI-Title-Translator/blob/main/PRIVACY.md
-- Raw text: https://raw.githubusercontent.com/garygaryandfree/YouTube-AI-Title-Translator/main/PRIVACY.md
+- GitHub page: https://github.com/GaryGaryyy/YouTube-AI-Title-Translator/blob/main/PRIVACY.md
+- Raw text: https://raw.githubusercontent.com/GaryGaryyy/YouTube-AI-Title-Translator/main/PRIVACY.md
 
 ## Data Types To Disclose
 
@@ -30,13 +50,21 @@ Use these statements where relevant:
 - The extension does not use user data for advertising.
 - The extension does not use user data for creditworthiness, lending, or unrelated analytics.
 - When translation is enabled, visible YouTube title text is sent directly from the user's browser to the AI service endpoint selected by the user.
+- When no API key is configured, the extension may use Chrome's built-in on-device translation (Chrome 138+); in this mode title text is processed locally on the device and is not sent to any server.
 
 ## Permissions Justification
 
-- `storage`: saves API keys, provider/model settings, translation switch state, and local translation cache in the browser.
-- `https://*.youtube.com/*`: reads visible YouTube video titles and inserts translated titles on YouTube pages.
-- AI service host permissions: allow the extension to send translation requests to the user-selected AI service.
-- Optional host permissions: requested only when the user configures a custom API endpoint.
+Paste-ready, storage (需请求 storage 的理由):
+
+```
+The storage permission is used only to save the user's settings (API keys, provider, model, target language, UI language) and a local translation cache in the browser, so repeated titles are not re-requested. All data stays on the user's device and is never uploaded to the developer.
+```
+
+Paste-ready, host permissions (需请求主机权限的理由):
+
+```
+Host permissions serve the single purpose: (1) the youtube.com content script reads visible video titles and renders translations in place; (2) the built-in AI provider hosts (api.openai.com, api.deepseek.com, etc.) let the browser send title text directly to the AI provider the user selected; (3) optional host access is requested at runtime only when the user configures a custom OpenAI-compatible endpoint. No host data is sent to the developer.
+```
 
 ## Custom Endpoint Note
 
